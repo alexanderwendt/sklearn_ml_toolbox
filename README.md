@@ -36,6 +36,20 @@ In this process step, the following processing is done:
 - Dataset loading
 - Dataset cleaning
 - Individual X value analysis with 
-  - histograms for robust and normal average and standard deviations, 
+  - histograms for robust and normal average and standard deviations
+  <img src="80_Documentation/MA2Norm.png" width="700">
+  - Pearson and Spearman rang Correlation matrices
+  <img src="80_Documentation/Correlation_Spearman.png" width="700">
+  - Autocorrelation and partial autocorrelation of time dependent variables
+  <img src="80_Documenntation/Partial_Autocorrelation_OMXS30.png" width="700">
+  - Parallel Coordinates
+  <img src="80_Documenntation/Partial_Coordinates_OMXS30.png" width="700">
+- Visualization of missing data
+- t-SNE Visualization
+- 
 
-<img src="80_Documentation/MA2Norm.png" width="700">
+
+
+
+
+
