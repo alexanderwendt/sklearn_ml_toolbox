@@ -189,8 +189,7 @@ In the prediction, the model from the training phase is loaded and used for pred
 
 <img src="80_Documentation/S50_OMXS30_Prediction.png" width="700">
 
-
-
+The Machine Learning Toolbox offers multiple tools for preparing, analyzing and training data on an SVM algorithm. 
 
 
 
