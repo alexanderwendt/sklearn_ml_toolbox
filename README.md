@@ -41,8 +41,22 @@ In this process step, the following processing is done:
   - Autocorrelation and partial autocorrelation of time dependent variables <img src="80_Documenntation/Partial_Autocorrelation_OMXS30.png" width="700">
   - Parallel Coordinates <img src="80_Documenntation/Partial_Coordinates_OMXS30.png" width="700">
 - Visualization of missing data
-- t-SNE Visualization
-- d
+- t-SNE Visualization <img src="80_Documenntation/t-SNE_OMXS30.png" width="700">
+- UMAP unsupervised and supervised 2D projection <img src="80_Documenntation/UMAP_Supervised_OMXS30.png" width="700">
+- PCA Analysis <img src="80_Documenntation/PCA_Accumulated_Variance_OMXS30.png" width="700">
+
+Feature selection is done by using several different methods to get the most significant features and adding them to a list of features. This list is then tested in the model optimization step. The following feature selection methods are used:
+- Logistic regression with lasso (L1) regulaization <img src="80_Documenntation/Lasso_FS_OMXS30.png" width="700">
+- Tree based feature selection <img src="80_Documenntation/Tree_based_FS_OMXS30.png" width="700">
+- Backward Elimination
+- Recursive Elimination with Logistic Regression
+
+All extracted features are merged into a data frame.
+<img src="80_Documenntation/Significant_Features_OMXS30.jpg" width="700">
+
+Finally, the prepared dataset and the extracted features are stored.
+
+
 
 
 
