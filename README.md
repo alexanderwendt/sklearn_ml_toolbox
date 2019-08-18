@@ -104,7 +104,7 @@ Scalers:
 
 Proportion of the different scalers in the top 10% of the results
 
-<img src="80_Documentation/S40_OMXS30_Scaler_Selection_Top10p.png" width="500">
+<img src="80_Documentation/S40_OMXS30_Scaler_Selection_Top10p.png" width="300">
 
 Statistical difference significance matrix (0 for the same distribution, 1 for different distribution)
 
@@ -140,10 +140,12 @@ Feature Selection
 Run 2: Exhaustive Parameter Selection Through Wide Grid Search. The basic parameters have been set. Now make an exhaustive parameter search for tuning parameters. Only a few samples are used and low kfold just to find the parameter limits. The parameters of C and gamma are selected wide.
 
 The results of C and gamma are visible in the following:
+
 <img src="80_Documentation/S40_OMXS30_run2_validation_C.png" width="200">
 <img src="80_Documentation/S40_OMXS30_run2_validation_gamma.png" width="200">
 
 The optimal range has been found (white)
+
 <img src="80_Documentation/S40_OMXS30_run2_2D_graph.png" width="400">
 
 As the optimal range is found, the limits of C and gamma are adjusted to cover the top 10 results.
