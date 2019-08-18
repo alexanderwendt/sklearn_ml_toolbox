@@ -166,8 +166,28 @@ First iteration with 6000 samples and the best 3 are selected
 
 The result of run 4 is the best parameter combination.
 
+TODO: Implement bayesian optimization.
 
+#### Optimize Model for Precision/Recall
+The training data is split in a new training set and a cross validation set (shuffled and stratified). The training set is trained with the optimal parameters. On the cross validation data, the precision/recall curve is optimized as seen below. The decision threshold is moved in the optimal direction.
 
+<img src="80_Documentation/S40_OMXS30_Precision_Recall.png" width="500">
+
+#### Validation
+The model is trained with the complete training data and the optimal parameters. Then it is evaluated on the test data from the split at the beginning of the notebook. The results are shown in a confusion matrix
+
+<img src="80_Documentation/S40_OMXS30_Eval_Conf_Matrix.png" width="500">
+
+The prediction for the OMXS30 example is visualized together with the correct values. The correct values are shown in green above the price, i.e. the positive trend and the predicted values in yellow.
+<img src="80_Documentation/S40_OMXS30_Results.png" width="700">
+
+#### Final Training of the complete model
+To use the most of the data, finally all available data is used to train the final model. This model is saved in 04/Model
+
+### Prediction
+In the prediction, the model from the training phase is loaded and used for prediction of the unknown data. 
+
+<img src="80_Documentation/S50_OMXS30_Prediction.png" width="700">
 
 
 
