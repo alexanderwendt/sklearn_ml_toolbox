@@ -36,23 +36,23 @@ In this process step, the following processing is done:
 - Dataset loading
 - Dataset cleaning
 - Individual X value analysis with 
-  - histograms for robust and normal average and standard deviations <img src="80_Documentation/MA2Norm.png" width="700">
-  - Pearson and Spearman rang Correlation matrices <img src="80_Documentation/Correlation_Spearman.png" width="700">
-  - Autocorrelation and partial autocorrelation of time dependent variables <img src="80_Documenntation/Partial_Autocorrelation_OMXS30.png" width="700">
-  - Parallel Coordinates <img src="80_Documenntation/Partial_Coordinates_OMXS30.png" width="700">
+  - histograms for robust and normal average and standard deviations <img src="80_Documentation/MA2Norm.png" width="300">
+  - Pearson and Spearman rang Correlation matrices <img src="80_Documentation/Correlation_Spearman.png" width="500">
+  - Autocorrelation and partial autocorrelation of time dependent variables <img src="80_Documentation/Partial_Autocorrelation_OMXS30.png" width="500">
+  - Parallel Coordinates <img src="80_Documentation/Partial_Coordinates_OMXS30.png" width="700">
 - Visualization of missing data
-- t-SNE Visualization <img src="80_Documenntation/t-SNE_OMXS30.png" width="700">
-- UMAP unsupervised and supervised 2D projection <img src="80_Documenntation/UMAP_Supervised_OMXS30.png" width="700">
-- PCA Analysis <img src="80_Documenntation/PCA_Accumulated_Variance_OMXS30.png" width="700">
+- t-SNE Visualization <img src="80_Documentation/t-SNE_OMXS30.png" width="600">
+- UMAP unsupervised and supervised 2D projection <img src="80_Documentation/UMAP_Supervised_OMXS30.png" width="600">
+- PCA Analysis <img src="80_Documentation/PCA_Accumulated_Variance_OMXS30.png" width="600">
 
 Feature selection is done by using several different methods to get the most significant features and adding them to a list of features. This list is then tested in the model optimization step. The following feature selection methods are used:
-- Logistic regression with lasso (L1) regulaization <img src="80_Documenntation/Lasso_FS_OMXS30.png" width="700">
-- Tree based feature selection <img src="80_Documenntation/Tree_based_FS_OMXS30.png" width="700">
+- Logistic regression with lasso (L1) regulaization <img src="80_Documentation/Lasso_FS_OMXS30.png" width="500">
+- Tree based feature selection <img src="80_Documentation/Tree_based_FS_OMXS30.png" width="500">
 - Backward Elimination
 - Recursive Elimination with Logistic Regression
 
 All extracted features are merged into a data frame.
-<img src="80_Documenntation/Significant_Features_OMXS30.jpg" width="700">
+<img src="80_Documentation/Significant_Features_OMXS30.jpg" width="600">
 
 Finally, the prepared dataset and the extracted features are stored.
 
