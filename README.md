@@ -19,3 +19,10 @@ Files:
 - OMX_S40_Model_[Type]: Model optimization for the model [Type]. Only SVM has been optimized so far. 
 - OMX_S50_Prediction: A saved model is loaded together with prepared test data and a class prediction is made.
 
+## Data for the Template
+To demonstrate the machine learning toolbox, the problem of classifying the trend of the swedish OMXS30 stock index was selected. From the raw data, future samples were used to detemine the current trend. The challenge is to recognize the correct trend, which is simple when looking backward, but hard in advance or in the current moment. The trend is classified in positive and negative trend.
+
+## Content
+
+### Data Preparation
+In the data preparation, the y values are generated if applicable. In the OMXS30 example, 
