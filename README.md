@@ -46,7 +46,7 @@ In this process step, the following processing is done:
   <img src="80_Documenntation/Partial_Coordinates_OMXS30.png" width="700">
 - Visualization of missing data
 - t-SNE Visualization
-- 
+- d
 
 
 
