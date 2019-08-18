@@ -25,4 +25,8 @@ To demonstrate the machine learning toolbox, the problem of classifying the tren
 ## Content
 
 ### Data Preparation
-In the data preparation, the y values are generated if applicable. In the OMXS30 example, 
+In the data preparation, the y values are generated if applicable. In the OMXS30 example, the positive trend is illustrated as orange and the negative trend is blue.
+
+<img src="80_Documentation/OMXS30_Trend_Definition.png" width="700">
+
+
