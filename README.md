@@ -38,12 +38,22 @@ In this process step, the following processing is done:
 - Individual X value analysis with 
   - histograms for robust and normal average and standard deviations <img src="80_Documentation/MA2Norm.png" width="300">
   - Pearson and Spearman rang Correlation matrices <img src="80_Documentation/Correlation_Spearman.png" width="500">
-  - Autocorrelation and partial autocorrelation of time dependent variables <img src="80_Documentation/Partial_Autocorrelation_OMXS30.png" width="500">
-  - Parallel Coordinates <img src="80_Documentation/Partial_Coordinates_OMXS30.png" width="700">
+  - Autocorrelation and partial autocorrelation of time dependent variables 
+
+<img src="80_Documentation/Partial_Autocorrelation_OMXS30.png" width="500">
+  - Parallel Coordinates 
+
+<img src="80_Documentation/Partial_Coordinates_OMXS30.png" width="700">
 - Visualization of missing data
-- t-SNE Visualization <img src="80_Documentation/t-SNE_OMXS30.png" width="600">
-- UMAP unsupervised and supervised 2D projection <img src="80_Documentation/UMAP_Supervised_OMXS30.png" width="600">
-- PCA Analysis <img src="80_Documentation/PCA_Accumulated_Variance_OMXS30.png" width="600">
+- t-SNE Visualization 
+
+<img src="80_Documentation/t-SNE_OMXS30.png" width="600">
+- UMAP unsupervised and supervised 2D projection 
+
+<img src="80_Documentation/UMAP_Supervised_OMXS30.png" width="600">
+- PCA Analysis 
+
+<img src="80_Documentation/PCA_Accumulated_Variance_OMXS30.png" width="600">
 
 Feature selection is done by using several different methods to get the most significant features and adding them to a list of features. This list is then tested in the model optimization step. The following feature selection methods are used:
 - Logistic regression with lasso (L1) regulaization <img src="80_Documentation/Lasso_FS_OMXS30.png" width="500">
