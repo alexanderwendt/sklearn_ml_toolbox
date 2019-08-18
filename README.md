@@ -29,4 +29,13 @@ In the data preparation, the y values are generated if applicable. In the OMXS30
 
 <img src="80_Documentation/OMXS30_Trend_Definition.png" width="700">
 
+Features are generated based on the raw X data. In the example, technical indicators like MA, RSI and Stochastics are used to generate features.
 
+### Analysis and Feature Selection
+In this process step, the following processing is done:
+- Dataset loading
+- Dataset cleaning
+- Individual X value analysis with 
+  - histograms for robust and normal average and standard deviations, 
+
+<img src="80_Documentation/MA2Norm.png" width="700">
