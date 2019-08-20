@@ -170,7 +170,7 @@ Run 4: Run best parameters from the intense random search. In the final run, bas
 
 <img src="80_Documentation/S40_OMXS30_run4_Iter2.png" width="300">
 
-First iteration with 6000 samples and the best 3 are selected
+3rd iteration with 6000 samples and the best 3 are selected
 
 <img src="80_Documentation/S40_OMXS30_run4_Iter3.png" width="300">
 
