@@ -171,7 +171,7 @@ def paintHistogram(df, colName):
     plt.show()
 
     # Get data
-    print("Feature characteristics:")
+    print("Feature characteristics for {}:".format(colName))
     print("Min value = ", min(df[colName]))
     print("Max value = ", max(df[colName]))
     print("Mean = ", round(mean, 2))
