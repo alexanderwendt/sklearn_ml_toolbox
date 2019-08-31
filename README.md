@@ -104,7 +104,7 @@ Scalers:
 
 Proportion of the different scalers in the top 10% of the results
 
-<img src="80_Documentation/S40_OMXS30_Scaler_Selection_Top10p.png" width="300">
+<img src="80_Documentation/S40_OMXS30_Scaler_Selection_Top10p.png" width="400">
 
 Statistical difference significance matrix (0 for the same distribution, 1 for different distribution)
 
@@ -141,8 +141,8 @@ Run 2: Exhaustive Parameter Selection Through Wide Grid Search. The basic parame
 
 The results of C and gamma are visible in the following:
 
-<img src="80_Documentation/S40_OMXS30_run2_validation_C.png" width="200">
-<img src="80_Documentation/S40_OMXS30_run2_validation_gamma.png" width="200">
+<img src="80_Documentation/S40_OMXS30_run2_validation_C.png" width="300">
+<img src="80_Documentation/S40_OMXS30_run2_validation_gamma.png" width="300">
 
 The optimal range has been found (white)
 
@@ -170,7 +170,7 @@ Run 4: Run best parameters from the intense random search. In the final run, bas
 
 <img src="80_Documentation/S40_OMXS30_run4_Iter2.png" width="300">
 
-First iteration with 6000 samples and the best 3 are selected
+3rd iteration with 6000 samples and the best 3 are selected
 
 <img src="80_Documentation/S40_OMXS30_run4_Iter3.png" width="300">
 
