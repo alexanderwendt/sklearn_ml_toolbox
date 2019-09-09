@@ -51,3 +51,8 @@ Manual;All
 ;MACD12_26_9
 ;MACD12_26_9Diff
 ;MACD12_26_9DiffDirChange
+;month_of_year
+;week_of_year
+;day_of_year
+;day_of_month
+;day_of_week
