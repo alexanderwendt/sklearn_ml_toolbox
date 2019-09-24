@@ -86,7 +86,9 @@ def paintBarChartForCategorical(xlabels, yvalues):
     plt.tight_layout()
     fig.subplots_adjust(bottom=0.3, left=0.1)
     bar = plt.bar(xlabel_string, yvalues, color=barColors, width=1.0, capsize=10, edgecolor='black')
-    plt.show()
+    #plt.show()
+	
+    return fig
 
 
 # Calculate Interval length according to Freedman und Diaconis
@@ -145,7 +147,7 @@ def paintHistogram(df, colName):
     bins = getNumberOfIntervals(df[colName])
 
     # Plot the graph
-    plt.figure(num=None, figsize=(8, 8), dpi=80, facecolor='w', edgecolor='k')
+    fig = plt.figure(num=None, figsize=(8, 8), dpi=80, facecolor='w', edgecolor='k')
     plt.xlabel(colName)
     plt.ylabel('Probability')
     plt.title('{} Histogram'.format(colName))
@@ -168,7 +170,7 @@ def paintHistogram(df, colName):
     plt.text(median * 1.01, plt.gca().get_ylim()[1] * 0.90, 'Median={}'.format(round(median, 2)))
     plt.text((median + 2*s_mad) * 1.01, plt.gca().get_ylim()[1] * 0.93, 'Median+2s_mad={}'.format(round(median + 2*s_mad, 2)))
     plt.text((median - 2*s_mad) * 1.01, plt.gca().get_ylim()[1] * 0.93, 'Median-2s_mad={}'.format(round(median - 2*s_mad, 2)))
-    plt.show()
+    #plt.show()
 
     # Get data
     print("Feature characteristics for {}:".format(colName))
@@ -179,6 +181,9 @@ def paintHistogram(df, colName):
     print("Standard deviation =", round(sigma, 4))
     print("Skew =", round(skew, 4))
     print("kurtosis =", round(kurtosis, 4))
+
+    return fig	
+	
 
 def plotBinaryValues(df_dig, cols):
     #Plot binary values including NaN
