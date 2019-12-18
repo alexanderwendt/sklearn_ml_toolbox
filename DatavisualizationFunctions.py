@@ -308,3 +308,29 @@ def plotUmap(embedding, y, classList, title, cmapString='RdYlGn'):
     cbar.set_ticks(np.arange(len(classList)))
     cbar.set_ticklabels(classList)
     plt.title(title);
+	
+def amplifyForPlot(binaryArray, targetArray, distance):
+    return binaryArray * targetArray * (1-distance)
+
+def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, legend):
+    
+    y0 = (y_class==0)*1
+    y1 = (y_class==1)*1
+    y2 = (y_class==2)*1
+    
+    plot_data_OK = amplifyForPlot(y0, y_ref, offset1)
+    plot_data_blim = amplifyForPlot(y1, y_ref, offset2)
+    plot_data_tlim = amplifyForPlot(y2, y_ref, offset3)
+    
+    # Plot test data
+    plt.figure(num=None, figsize=(11.5, 7), dpi=80, facecolor='w', edgecolor='k')
+
+    plt.plot(y_time, y_ref)
+    plt.plot(y_time, plot_data_OK, color='grey')
+    plt.plot(y_time, plot_data_blim, color='green')
+    plt.plot(y_time, plot_data_tlim, color='red')
+    plt.title("Prediction Results")
+    plt.ylim([np.min(y_ref)*0.99999, np.max(y_ref)*1.00002])
+    plt.grid()
+    plt.legend(legend)
+    #plt.show()
