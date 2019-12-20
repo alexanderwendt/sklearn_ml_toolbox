@@ -31,28 +31,33 @@ To demonstrate the machine learning toolbox, the problem of classifying the tren
 
 ## Content
 
-### Data Preparation
+### Data Preparation (S20, S21)
 In the data preparation, the y values are generated if applicable. In the OMXS30 example, the positive trend is illustrated as orange and the negative trend is blue.
 
 <img src="80_Documentation/OMXS30_Trend_Definition.png" width="700">
 
 Features are generated based on the raw X data. In the example, technical indicators like MA, RSI and Stochastics are used to generate features.
 
-### Analysis and Feature Selection
+### Analysis and Feature Selection (S30, S31)
 In this process step, the following processing is done:
-- Dataset loading
-- Dataset cleaning
-- Individual X value analysis with 
-  - histograms for robust and normal average and standard deviations 
+#### Dataset loading
+Prepared features and labels are loaded from files. The default format is to load a csv file with features in the columns and with the last column as the class. In the parameters, the class name is defined.
+
+#### Dataset cleaning
+The dataset is prepared to be used as an input to a model. Feature can be renamed, inconsitent used of NaN are replaced.
+
+#### Individual X value analysis
+Several tools and graphs analyze and visualize different charactersics of the data to create an understanding of its structure and values. The following analyses are made:
+- histograms for robust and normal average and standard deviations 
   
 <img src="80_Documentation/MA2Norm.png" width="300">
-  - Pearson and Spearman rang Correlation matrices 
+- Pearson and Spearman rang Correlation matrices 
   
 <img src="80_Documentation/Correlation_Spearman.png" width="500">
-  - Autocorrelation and partial autocorrelation of time dependent variables 
+- Autocorrelation and partial autocorrelation of time dependent variables 
 
 <img src="80_Documentation/Partial_Autocorrelation_OMXS30.png" width="300">
-  - Parallel Coordinates 
+- Parallel Coordinates 
 
 <img src="80_Documentation/Partial_Coordinates_OMXS30.png" width="600">
 - Visualization of missing data
@@ -66,6 +71,7 @@ In this process step, the following processing is done:
 
 <img src="80_Documentation/PCA_Accumulated_Variance_OMXS30.png" width="500">
 
+#### Feature Selection
 Feature selection is done by using several different methods to get the most significant features and adding them to a list of features. This list is then tested in the model optimization step. The following feature selection methods are used:
 - Logistic regression with lasso (L1) regulaization 
 <img src="80_Documentation/Lasso_FS_OMXS30.png" width="500">
@@ -79,7 +85,7 @@ All extracted features are merged into a data frame.
 
 Finally, the prepared dataset and the extracted features are stored.
 
-### Model Optimization
+### Model Optimization (S40)
 The model used is a Support Vector Machine. In the model optimization the following process steps are done:
 
 #### Preparation of the Optimization
@@ -195,7 +201,7 @@ The prediction for the OMXS30 example is visualized together with the correct va
 #### Final Training of the complete model
 To use the most of the data, finally all available data is used to train the final model. This model is saved in 04/Model
 
-### Prediction
+### Prediction (S50, S51)
 In the prediction, the model from the training phase is loaded and used for prediction of the unknown data. 
 
 <img src="80_Documentation/S50_OMXS30_Prediction.png" width="700">
