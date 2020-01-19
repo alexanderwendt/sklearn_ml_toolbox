@@ -21,6 +21,17 @@ def get_data_subset_index(numberOfSamples, X):
     
     return X_index_subset
 
+def is_multi_class(y_classes):
+    # Check if y is binarized
+    if len(y_classes) == 2 and np.max(list(y_classes.keys())) == 1:
+        is_multiclass = False
+        print("Classes are binarized, 2 classes.")
+    else:
+        is_multiclass = True
+        print("Classes are not binarized, {} classes with values {}. "
+              "For a binarized class, the values should be [0, 1].".format(len(y_classes), list(y_classes.keys())))
+    return is_multiclass
+
 class ColumnExtractor(object):
     '''Column extractor method to extract selected columns from a list. This is used as a feature selector. Source
     https://stackoverflow.com/questions/25250654/how-can-i-use-a-custom-feature-selection-function-in-scikit-learns-pipeline.'''

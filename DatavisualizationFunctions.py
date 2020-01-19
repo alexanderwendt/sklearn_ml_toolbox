@@ -46,6 +46,7 @@ def paintBarChartForMissingValues(xlabels, yvalues):
     plt.show()
 
 def paintBarChartForCategorical(xlabels, yvalues):
+    ''' '''
     # Create the figure
     fig = plt.figure(num=None, figsize=(8, 7), dpi=80, facecolor='w', edgecolor='k')
 
@@ -245,7 +246,9 @@ def plot_confusion_matrix_multiclass(cm, classes, normalize=False, title='Confus
 
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+
     plt.tight_layout()
+    plt.show()
 
 def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues):
     """

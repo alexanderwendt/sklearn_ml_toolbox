@@ -1,0 +1,6 @@
+{
+	"dataset_name":"omxs30",
+	"use_training_settings":"True",
+	"source_path":"01_Source/^OMX_1986-2019.CSV",
+	"class_name":"5dTrend"
+}
