@@ -1,0 +1,9 @@
+Install Requirements.txt from pip: https://medium.com/@boscacci/why-and-how-to-make-a-requirements-txt-f329c685181e
+# Exit the current venv
+(shiny_new_env)$ conda deactivate
+# Spin up a new one
+$ conda create -n env_2 python=3.4
+# Activate it
+$ conda activate env_2
+# Install from our fancy new file
+(env_2)$ pip install -r requirements.txt

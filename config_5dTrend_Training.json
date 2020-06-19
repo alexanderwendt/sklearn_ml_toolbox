@@ -1,6 +1,10 @@
 {
 	"dataset_name":"omxs30",
 	"use_training_settings":"True",
-	"source_path":"01_Source/^OMX_1986-2019.CSV",
+	"source_path":"01_Source/^OMX_1986-2018.CSV",
 	"class_name":"5dTrend"
+	"binarize_labels":"False",
+	"class_number":1,
+	"binary_1_label":"Pos. Trend",
+	"binary_0_label":"Neg. Trend"
 }

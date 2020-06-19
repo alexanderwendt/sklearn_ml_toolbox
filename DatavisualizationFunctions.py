@@ -1,10 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as m
+import pandas as pd
 from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics import confusion_matrix
 from statsmodels import robust
 import itertools
+from scipy.stats import ks_2samp
+import seaborn as sns
+
+import DataSupportFunctions as sup
 
 def paintBarChartForMissingValues(xlabels, yvalues):
     # Create the figure
@@ -45,8 +50,14 @@ def paintBarChartForMissingValues(xlabels, yvalues):
     bar = plt.bar(xlabels, yvalues, color=barColors, width=1.0, capsize=10, edgecolor='black')
     plt.show()
 
-def paintBarChartForCategorical(xlabels, yvalues):
-    ''' '''
+def paintBarChartForCategorical(series, xlegend="Feature Label", ylegend="Share of Feature Labels", title="Distribution of Labels for Feature"):
+    ''' Plot bar chart for categorical values, ranked by occurence
+
+    :xlabels: Labels on X axis as list
+    :yvalues: Values on y axis for categorical values as series
+
+    :return: figure
+    '''
     # Create the figure
     fig = plt.figure(num=None, figsize=(8, 7), dpi=80, facecolor='w', edgecolor='k')
 
@@ -64,29 +75,29 @@ def paintBarChartForCategorical(xlabels, yvalues):
             colorValue=(value)/(maxValue-minValue)
         return colorValue
 
-    barProportions = [calculateProportion(i, 0, max(yvalues)) for i in yvalues]
+    barProportions = [calculateProportion(i, 0, max(series)) for i in series]
     barColors = colorMap(barProportions)
 
     # Create a color bar
-    cscalar = m.cm.ScalarMappable(cmap=colorMap, norm=plt.Normalize(0,max(yvalues)))
+    cscalar = m.cm.ScalarMappable(cmap=colorMap, norm=plt.Normalize(0,max(series)))
     cscalar.set_array([])
     #colorbar = plt.colorbar(cscalar, orientation='vertical', ticks=[0, 0.05, max(yvalues)])
     #colorbar.set_label('Low and high values', rotation=270,labelpad=25)
 
     #fix xlabel
-    xlabel_string = list(map(str, xlabels))
+    xlabel_string = list(map(str, series.index))
     xlabel_string = list(map(lambda x: x[0:20], xlabel_string))
 
     #Plot
-    plt.xlabel("Feature Label")
-    plt.ylabel('Share of Feature Labels')
+    plt.xlabel(xlegend)
+    plt.ylabel(ylegend)
     plt.xticks(rotation=90)
     #plt.gca().yaxis.set_ticks(np.arange(0, 0.1, 0.005))
-    plt.title('Distribution of Labels for Feature <{}>'.format(yvalues.name))
+    plt.title(title)
     #plt.gca().set_ylim([0, 0.1])
     plt.tight_layout()
     fig.subplots_adjust(bottom=0.3, left=0.1)
-    bar = plt.bar(xlabel_string, yvalues, color=barColors, width=1.0, capsize=10, edgecolor='black')
+    bar = plt.bar(xlabel_string, series, color=barColors, width=1.0, capsize=10, edgecolor='black')
     #plt.show()
 	
     return fig
@@ -337,3 +348,332 @@ def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, le
     plt.grid()
     plt.legend(legend)
     #plt.show()
+
+
+# %% pycharm={"is_executing": false}
+def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend):
+    plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
+    plt.plot(y_time, y_ref)
+    plt.plot(y_time, amplifyForPlot(binclass, y_ref, offset_binclass), color='orange')
+    #plt.title(conf['source_path'])
+    plt.title("Prediction Results")
+    plt.ylim([np.min(y_ref)*0.99999, np.max(y_ref)*1.00002])
+    plt.grid()
+    plt.legend(legend)
+    plt.show()
+
+def plot_grid_search_validation_curve(grid, param_to_vary, refit_scorer_name, title='Validation Curve', ylim=None, xlim=None, log=None):
+    """Plots train and cross-validation scores from a GridSearchCV instance's
+    best params while varying one of those params.
+
+    This method does not work
+    """
+    #https://matthewbilyeu.com/blog/2019-02-05/validation-curve-plot-from-gridsearchcv-results
+
+    df_cv_results = pd.DataFrame(grid.cv_results_)
+    train_scores_mean = df_cv_results['mean_train_' + refit_scorer_name]
+    valid_scores_mean = df_cv_results['mean_test_' + refit_scorer_name]
+    train_scores_std = df_cv_results['std_train_' + refit_scorer_name]
+    valid_scores_std = df_cv_results['std_test_' + refit_scorer_name]
+
+    param_cols = [c for c in df_cv_results.columns if c[:6] == 'param_']
+    param_ranges = [grid.param_grid[p[6:]] for p in param_cols]
+    param_ranges_lengths = [len(pr) for pr in param_ranges]
+
+    train_scores_mean = np.array(train_scores_mean).reshape(*param_ranges_lengths)
+    valid_scores_mean = np.array(valid_scores_mean).reshape(*param_ranges_lengths)
+    train_scores_std = np.array(train_scores_std).reshape(*param_ranges_lengths)
+    valid_scores_std = np.array(valid_scores_std).reshape(*param_ranges_lengths)
+
+    param_to_vary_idx = param_cols.index('param_{}'.format(param_to_vary))
+
+    slices = []
+    for idx, param in enumerate(grid.best_params_):
+        if (idx == param_to_vary_idx):
+            slices.append(slice(None))
+            continue
+        best_param_val = grid.best_params_[param]
+        idx_of_best_param = 0
+        if isinstance(param_ranges[idx], np.ndarray):
+            idx_of_best_param = param_ranges[idx].tolist().index(best_param_val)
+        else:
+            idx_of_best_param = param_ranges[idx].index(best_param_val)
+        slices.append(idx_of_best_param)
+
+    train_scores_mean = train_scores_mean[tuple(slices)]
+    valid_scores_mean = valid_scores_mean[tuple(slices)]
+    train_scores_std = train_scores_std[tuple(slices)]
+    valid_scores_std = valid_scores_std[tuple(slices)]
+
+    plt.figure(figsize=(5,5))
+    plt.clf()
+
+    plt.title(title)
+    plt.xlabel(param_to_vary)
+    plt.ylabel('Score')
+
+    if (ylim is None):
+        plt.ylim(0.0, 1.1)
+    else:
+        plt.ylim(*ylim)
+
+    if (not (xlim is None)):
+        plt.xlim(*xlim)
+
+    lw = 2
+
+    plot_fn = plt.plot
+    if log:
+        plot_fn = plt.semilogx
+
+    param_range = param_ranges[param_to_vary_idx]
+    #if (not isinstance(param_range[0], numbers.Number)):
+    #    param_range = [str(x) for x in param_range]
+    plot_fn(param_range, train_scores_mean, label='Training score', color='r',
+            lw=lw)
+    plt.fill_between(param_range, train_scores_mean - train_scores_std,
+                     train_scores_mean + train_scores_std, alpha=0.1,
+                     color='r', lw=lw)
+    plot_fn(param_range, valid_scores_mean, label='Cross-validation score',
+            color='b', lw=lw)
+    plt.fill_between(param_range, valid_scores_mean - valid_scores_std,
+                     valid_scores_mean + valid_scores_std, alpha=0.1,
+                     color='b', lw=lw)
+
+    plt.legend(loc='lower right')
+    plt.grid()
+
+    plt.show()
+
+
+def plot_heatmap_xy(scores, parameters, xlabel, ylabel, title, normalizeScale=False):
+    '''Plot heat map for 2 variables'''
+    # Source of inspiration: https://jakevdp.github.io/PythonDataScienceHandbook/04.04-density-and-contour-plots.html
+
+    # Plot a heatmap of 2 variables
+    fig, ax = plt.subplots(1, 1, figsize=(7, 5), constrained_layout=True, sharey=True)
+    # fig = plt.figure(figsize=(7,5), constrained_layout=True)
+    # ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
+    # ax=axs[0]
+
+    # ax=plt.gca()
+    colorMap = plt.cm.bone  # plt.cm.gist_gray #plt.cm.hot
+
+    if normalizeScale == True:
+        im1 = plt.imshow(scores, interpolation='catrom', cmap=colorMap, vmin=0, vmax=1)
+    else:
+        # im1 = plt.imshow(scores, interpolation='nearest', cmap=colorMap)
+        im1 = plt.imshow(scores, interpolation='catrom', origin='lower', cmap=colorMap)
+
+    levels = np.linspace(np.min(scores), np.max(scores), 20)
+
+    # contours = plt.contour(scores, 10, colors='black')
+    # contours = plt.contour(scores, 10, colors='black')
+    contours = ax.contourf(scores, levels=levels, cmap=plt.cm.bone)
+
+    ax.contour(scores, levels=levels, colors='k', linestyles='solid', alpha=1, linewidths=.5, antialiased=True)
+
+    # plt.contourf =
+    ax.clabel(contours, inline=True, fontsize=8, colors='r')
+
+    # Get best value
+    def get_Top_n_values_from_array(arr, n):
+        result = []
+        for i in range(1, n + 1):
+            x = np.partition(arr.flatten(), -2)[-i]
+            r = np.where(arr == x)
+            # print(r[0][0], r[1][0])
+            value = [r[0][0], r[1][0]]
+            result.append(value)
+        return result
+
+    bestvalues = get_Top_n_values_from_array(scores, 10)
+    [plt.plot(pos[1], pos[0], 'o', markersize=12, fillstyle='none', c='r', mew=3, label="best_value") for pos in
+     bestvalues]
+    # best = np.unravel_index(np.argmax(scores, axis=None), scores.shape)
+    # print(best)
+    # plt.plot(parameters[xlabel][best[1]], parameters[ylabel][best[0]], 'o', markersize = 12, fillstyle = 'none', c='r', mew=3, label="value1")
+    # plt.plot(3, 8, 'o', markersize = 12, fillstyle = 'none', c='r', mew=3, label="value1")
+
+    plt.sca(ax)
+    plt.xticks(np.arange(len(parameters[xlabel])), ['{:.1E}'.format(x) for x in parameters[xlabel]],
+               rotation='vertical')
+    plt.yticks(np.arange(len(parameters[ylabel])), ['{:.1E}'.format(x) for x in parameters[ylabel]])
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xlim(0, len(parameters[xlabel]) - 1)
+    plt.ylim(0, len(parameters[ylabel]) - 1)
+    ax.set_title(title)
+
+    # cbar_ax = fig.add_axes([0.95, 0.15, 0.05, 0.8])
+    cbar = fig.colorbar(im1, ax=ax)  # cax=axs[1])
+    plt.show()
+
+# #%matplotlib inline
+# For an identical distribution, we cannot reject the null hypothesis since the p-value is high, 41%. To reject the null
+# hypothesis, the p value shall be <5%
+
+def calculate_significance_matrix(parameter_name, unique_param_values, results, refit_scorer_name, alpha_limit=0.05):
+    '''Function that calculate a matrix for the significance of the inputs with the Computes the
+    Kolmogorov-Smirnov statistic on 2 samples and plots it.
+
+    For an identical distribution, we cannot reject the null hypothesis since the p-value is high. The null hypothesis
+    is that some distributions belong to the same distribution. A high p value -> much overlap in the distributions.
+    To reject the null hypothesis, the p value shall be <5%
+
+    :name: Parameter name e.g. scaler
+    :param_values: Unique values of the measured feature
+    :results: Grid search results
+    :refit_scorer_name: Refit scorer name
+    :alpha_limit: p value: default 0.05. If values < 0.05, then the result is 1 and the distributions are not part of the
+    same distribution
+
+    '''
+
+    print(unique_param_values)
+    print(parameter_name)
+    significance_calculations = pd.DataFrame(index=unique_param_values, columns=unique_param_values)
+
+    for i in significance_calculations:
+        for j in significance_calculations.columns:
+            p0 = results[results['param_' + parameter_name].astype(str) == str(i)]['mean_test_' + refit_scorer_name]
+            p1 = results[results['param_' + parameter_name].astype(str) == str(j)]['mean_test_' + refit_scorer_name]
+            if (len(p0) == 0 or len(p1) == 0):
+                significance_calculations[j].loc[i] = 0
+            else:
+                significance_calculations[j].loc[i] = ks_2samp(p0, p1).pvalue
+
+    label = list(map(str, unique_param_values))
+    label = list(map(lambda x: x[0:20], label))  # param_values#[str(t)[:9] for t in merged_params_run1[name]]
+
+    index = label
+    cols = label
+    statistics_df = pd.DataFrame(significance_calculations.values < alpha_limit, index=index, columns=cols)
+
+    fig = plt.Figure()
+    sns.heatmap(statistics_df, cmap='Blues', linewidths=0.5, annot=True, vmin=0, vmax=1)
+    plt.title("Statistical Difference Significance Matrix for " + parameter_name)
+
+    fig = plt.gcf()
+    #plt.show()
+
+    return statistics_df, fig
+    # plt.show()
+
+def plotOverlayedHistorgrams(parameter_name, unique_param_values, results, median_results, refit_scorer_name):
+    '''Plot layered histograms from feature distributions
+
+    :parameter_name: Parameter name e.g. scaler
+    :unique_param_values: Unique values of the measured feature
+    :results: Grid search results
+    :median_results: median results of the distributions
+    :refit_scorer_name: Refit scorer name
+
+    :return: figure
+
+    '''
+    #min_range = np.percentile(results['mean_test_' + refit_scorer_name], 25)  #25% percentile
+    min_range = np.min(results['mean_test_' + refit_scorer_name])
+
+    #median_result = dict()
+
+    plt.figure(figsize=(12, 8))
+    max_counts = 0
+
+    for i in unique_param_values:
+        #print(i)
+        p0 = results[results['param_' + parameter_name].astype(str) == str(i)]['mean_test_' + refit_scorer_name]
+        if (len(p0) > 0):
+            bins = 100
+            counts, _ = np.histogram(p0, bins=bins, range=(min_range, 1))
+            if np.max(counts) > max_counts:
+                max_counts = np.max(counts)
+            #print(counts)
+            #median_hist = np.round(np.percentile(p0, 50), 3)
+            #median_result[i] = median_hist
+            median_hist = median_results[i]
+            s = str(i).split('(', 1)[0] + ": " + str(median_hist)
+            label = str(i).split('(', 1)[0]
+
+            plt.hist(p0,
+                     alpha=0.5,
+                     bins=bins,
+                     range=(min_range, 1),
+                     label=label)
+            plt.vlines(median_hist, 0, np.max(counts))
+            plt.text(median_hist, np.max(counts) + 1, s, fontsize=12)
+            #print("Median for {}:{}".format(s, median_hist))
+        else:
+            print("No results for ", i)
+        #plt.hist(p1, alpha=0.5)
+    plt.legend(loc='upper left')
+    plt.title("Distribution of different {}".format(parameter_name))
+    plt.xlabel('Test {}'.format(refit_scorer_name))
+    plt.ylabel('Number of occurances')
+    plt.ylim([0, max_counts+2])
+
+    fig = plt.gcf()
+
+    return fig
+
+def visualize_parameter_grid_search(param_name, search_cv_parameters, search_cv_results, refit_scorer_name,
+                                    save_fig_prefix=None):
+    '''
+    Create visualizations and data for a certain grid search parameter.
+
+    :param_name:
+    :search_cv_parameters:
+    :search_cv_results:
+    :refit_scorer_name:
+    :save_fig_prefix: Save figures in the folder specified in the path and file prefix if it is set and not none
+
+    :return:
+
+    '''
+
+    # Get all values from all keys scaler in a list
+    #sublist = [x[name] for x in params_run1] # Get a list of lists with all values from all keys
+    #flatten = lambda l: [item for sublist in l for item in sublist]  # Lambda flatten function
+    unique_list = sup.get_unique_values_from_list_of_dicts(param_name, search_cv_parameters) #Get unique values of list by converting it into a set and then to list
+
+    #Get list of all scalers and their indices
+
+    #indexList = [list(results_run1[results_run1['param_' + name].astype(str) == i].index) for i in unique_list]
+
+    #indexList = [
+    #    results_run1.loc[results_run1['param_' + name] == results_run1['param_' + name].unique()[i]].iloc[0, :].name for
+    #    i in unique_list]
+    print("Plot best {} values".format(param_name))
+    #display(results_run1.loc[indexList[0]].round(3))
+
+    # number of results to consider
+    #number_results = np.int(results_run1.shape[0] * 1.00)
+    #print("The top 10% of the results are used, i.e {} samples".format(number_results))
+
+    # Bar chart for categorical values
+    # Create series to display
+    hist_label = search_cv_results['param_' + param_name].astype(str)  # .apply(str).apply(lambda x: x[:20])
+    source = hist_label.value_counts() / search_cv_results.shape[0]
+    # Chart
+    fig1 = paintBarChartForCategorical(source, title='Distribution of Labels for Feature <{}>'.format(source.name))
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_' + param_name + '_categorical_bar', dpi=300)
+    fig1.show()
+
+    # Significance matrix for distributions
+    significance_matrix, fig2 = calculate_significance_matrix(param_name, unique_list, search_cv_results, refit_scorer_name)
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_' + param_name + '_significance_matrix', dpi=300)
+    fig2.show()
+
+    # Overlayed histograms
+    medians = sup.get_median_values_from_distributions(param_name, unique_list, search_cv_results, refit_scorer_name)
+    fig3 = plotOverlayedHistorgrams(param_name, unique_list, search_cv_results, medians, refit_scorer_name)
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_' + param_name + '_overlayed_histograms', dpi=300)
+    fig3.show()
+
+    print("Method end")
+
+    return significance_matrix, medians
+
