@@ -96,8 +96,8 @@ import joblib
 import matplotlib.dates as mdates
 import datetime
 
-import DataSupportFunctions as sup
-import DatavisualizationFunctions as vis
+import data_handling_support_functions as sup
+import data_visualization_functions as vis
 
 import json
 

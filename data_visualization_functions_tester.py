@@ -1,4 +1,4 @@
-import DatavisualizationFunctions as vis
+import data_visualization_functions as vis
 
 import numpy as np
 

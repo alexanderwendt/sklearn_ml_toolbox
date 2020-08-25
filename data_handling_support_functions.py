@@ -1,15 +1,34 @@
 import random
 import numpy as np
+import pandas as pd
 
 def inverse_dict(dictionary):
-    #Inverse a dictionary
+    '''
+    Inverse a dictionary
+
+    :args:
+        dictionary: Dictionary [k, V]
+    :return:
+        dictionary_reverse: Inverse dictionary [V, k]
+    '''
+
     dictionary_reverse = {}
     for k, v in dictionary.items():
         dictionary_reverse[v] = k
     return dictionary_reverse
 
-def get_data_subset_index(numberOfSamples, X):
-    #Get a random subset of data from a set
+def get_random_data_subset_index(numberOfSamples, X):
+    '''
+    Get a random subset of data from a set
+
+    :args:
+        numberOfSamples: Number of samples
+        X: Training data
+    :return:
+        X_index_subset: Random subset of the data
+
+    '''
+
     np.random.seed(0)
     if X.shape[0] > numberOfSamples:
         X_index_subset = random.sample(list(range(0, X.shape[0], 1)), k=numberOfSamples)
@@ -22,7 +41,16 @@ def get_data_subset_index(numberOfSamples, X):
     return X_index_subset
 
 def is_multi_class(y_classes):
-    # Check if y is binarized
+    '''
+    Check if y is binarized
+
+    :args:
+        y_classes: List of class numbers
+    :return:
+        is_multiclass: True if a class is multiclass, False if binarized
+
+    '''
+
     if len(y_classes) == 2 and np.max(list(y_classes.keys())) == 1:
         is_multiclass = False
         print("Classes are binarized, 2 classes.")
@@ -32,25 +60,12 @@ def is_multi_class(y_classes):
               "For a binarized class, the values should be [0, 1].".format(len(y_classes), list(y_classes.keys())))
     return is_multiclass
 
-#class ColumnExtractor(object):
-#    '''Column extractor method to extract selected columns from a list. This is used as a feature selector. Source
-#    https://stackoverflow.com/questions/25250654/how-can-i-use-a-custom-feature-selection-function-in-scikit-learns-pipeline.'''#
-#
-#    def __init__(self, cols):
-#        self.cols = cols
-#
-#    def transform(self, X):
-#        col_list = []
-#        #for c in self.cols:
-#        #    col_list.append(X[:, c:c+1])
-#        #return np.concatenate(col_list, axis=1)
-#        return X[self.cols]
-#
-#    def fit(self, X, y=None):
-#        return self
-
 def getListFromColumn(df, df_source, col_number):
-    '''Get a list of column indices from a source'''
+    '''
+    Get a list of column indices from a source
+
+
+    '''
     #Get list of column names from a column number
     col_names = list(df[df.columns[col_number]].dropna().values)
     #Get list of column indices in the other data frame.
@@ -62,12 +77,13 @@ def get_unique_values_from_list_of_dicts(key, list_of_dicts, is_item_string=True
     '''
         Get all unique values from a list of dictionaries for a certain key
 
-        :key: key in the dicts
-        :list_of_dicts: list of dictionaries
-        :is_item_string: If true, then all values are converted to string and then compared. If False, object id
+    :args:
+        key: key in the dicts
+        list_of_dicts: list of dictionaries
+        is_item_string: If true, then all values are converted to string and then compared. If False, object id
         is compared
 
-        :return: list of unique values
+    :return: list of unique values
     '''
 
     # Get all values from all keys scaler in a list
@@ -94,10 +110,11 @@ def get_unique_values_from_list_of_dicts(key, list_of_dicts, is_item_string=True
 def get_median_values_from_distributions(method_name, unique_param_values, model_results, refit_scorer_name):
     '''Extract the median values from a list of distributions
 
-    :method_name: Parameter name, e.g. scaler
-    :unique_param_values: list of unique parameter values
-    :model_results: grid search results
-    :refit_scorer_name: refit scorer name for the end scores
+    :args:
+        :method_name: Parameter name, e.g. scaler
+        :unique_param_values: list of unique parameter values
+        :model_results: grid search results
+        :refit_scorer_name: refit scorer name for the end scores
 
     :return: dict of median values for each unique parameter value
 

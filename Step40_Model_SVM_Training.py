@@ -144,9 +144,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #import matplotlib as m
 
-import DataSupportFunctions as sup
-import DatavisualizationFunctions as vis
-import Data_visualization_functions_for_SVM as vissvm
+import data_handling_support_functions as sup
+import data_visualization_functions as vis
+import data_visualization_functions_for_SVM as vissvm
 import Sklearn_model_utils as model
 from Sklearn_model_utils import Nosampler, ColumnExtractor
 from IPython.core.display import display

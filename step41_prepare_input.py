@@ -12,16 +12,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.svm import SVC
 
-import DatavisualizationFunctions as vis
-import Data_visualization_functions_for_SVM as vissvm
+import data_visualization_functions as vis
+import data_visualization_functions_for_SVM as vissvm
 import Sklearn_model_utils as model
 from Sklearn_model_utils import Nosampler, ColumnExtractor
 from IPython.core.display import display
 from sklearn.model_selection import train_test_split
 
 #Import local libraries
-import step40functions as step40
-import DataSupportFunctions as sup
+import step40_functions as step40
+import data_handling_support_functions as sup
 
 #Set Global settings
 #Print settings as precision 3
@@ -128,7 +128,7 @@ def generate_paths(conf):
     print("Model directory: ", paths['model_directory'])
 
     paths['results_directory'] = "05_Results"
-    print("Rsults directory: ", paths['results_directory'])
+    print("Results directory: ", paths['results_directory'])
 
     # Dump file name
     paths['model_input_path'] = paths['model_directory'] + "/" + "prepared_input.pickle"
@@ -145,11 +145,16 @@ def generate_paths(conf):
     #Model specifics
     paths['svm_model_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model" + ".sav"
     paths['svm_external_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_ext_parameters" + ".json"
-    paths['svm_default_hyper_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_hyper_parameters" + ".json"
-    paths['svm_pipe_first_selection'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + '_pipe_run_best_first_selection.pkl'
+    #paths['svm_default_hyper_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_hyper_parameters" + ".json"
+
+    paths['svm_pipe_first_selection'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + '_pipe_run1_selection.pkl'
+    paths['svm_pipe_final_selection'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf[
+        'class_name'] + '_pipe_run2_final.pkl'
 
     #Results
     paths['svm_run1_result_filename'] = paths['results_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + '_results_run1.pkl'
+    paths['svm_run2_result_filename'] = paths['results_directory'] + "/" + conf['dataset_name'] + "_" + conf[
+        'class_name'] + '_results_run2.pkl'
 
     print("=== Paths ===")
     print("Used file paths: ", paths)
@@ -227,6 +232,7 @@ def get_class_information(y, y_classes_source):
     for i in a:
         y_classes[i] = y_classes_source[i]
     print("The following classes remain", y_classes)
+
     # Check if y is binarized
     if len(y_classes) == 2 and np.max(list(y_classes.keys())) == 1:
         is_multiclass = False
@@ -236,6 +242,7 @@ def get_class_information(y, y_classes_source):
         print(
             "Classes are not binarized, {} classes with values {}. For a binarized class, the values should be [0, 1].".
             format(len(y_classes), list(y_classes.keys())))
+
     return y_classes
 
 
@@ -259,6 +266,7 @@ def create_feature_dict(df_feature_columns, df_X):
 
 def create_prepared_data(df_X, y, y_classes, df_feature_columns, paths):
     '''
+    Create a dict with prepared data like models, training data and paths. This object can then be put into a pickle structure
 
     :args:
         df_X: matrix with features, X as dataframe
@@ -307,18 +315,23 @@ def create_prepared_data(df_X, y, y_classes, df_feature_columns, paths):
     prepared_data['scorers'] = scorers
     prepared_data['refit_scorer_name'] = refit_scorer_name
     prepared_data['paths'] = paths
-    prepared_data['selected_features'] = feature_dict.values() #selected_features
+    prepared_data['selected_features'] = list(feature_dict.values()) #selected_features
     prepared_data['feature_dict'] = feature_dict
 
     return prepared_data
 
 def prepare_data(config_file_path):
     '''
+    Load config file, load training and other files, create a pickle
 
+    :args:
+        config_file_path: Filepath for configuration with dataset name and file paths
+    :return:
+        Nothing
 
     '''
     conf = load_config(config_file_path)
-    paths, skip_first_run_hyperparameter_optimization = generate_paths(conf)
+    paths = generate_paths(conf)
     df_X, y, y_classes, df_feature_columns = load_files(paths)
     prepared_data = create_prepared_data(df_X, y, y_classes, df_feature_columns, paths)
 

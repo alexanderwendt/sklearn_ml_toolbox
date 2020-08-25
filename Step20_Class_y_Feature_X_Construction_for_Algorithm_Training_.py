@@ -115,7 +115,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
 
-import DatavisualizationFunctions as vis
+import data_visualization_functions as vis
 #from matplotlib.finance import candlestick_ohlc
 # from mpl_finance import candlestick_ohlc
 

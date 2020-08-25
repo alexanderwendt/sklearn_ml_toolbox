@@ -5,12 +5,15 @@ from IPython.core.display import display
 from imblearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
-import step40functions as step40
-import DataSupportFunctions as sup
+import step40_functions as step40
+import data_visualization_functions_for_SVM as svmvis
+import data_handling_support_functions as sup
 import Sklearn_model_utils as modelutil
 import numpy as np
+import pandas as pd
 import copy
-import DatavisualizationFunctions as vis
+import data_visualization_functions as vis
+import matplotlib.pyplot as plt
 
 ## %% First run with a wide grid search
 # Minimal set of parameter to test different grid searches
@@ -22,13 +25,147 @@ from imblearn.combine import SMOTEENN
 from imblearn.combine import SMOTETomek
 from pickle import dump
 
+def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter_svm, pipe_run_random, scorers,
+                                                refit_scorer_name, save_fig_prefix):
+    '''
+    Iterated search for parameters. Set sample size, kfolds, number of iterations and top result selection. Execute
+    random search cv for the number of entries and extract the best parameters from that search. As a result the
+    best C and gamma are extracted.
+
+    :args:
+        X_train: Training data, featrues X
+        y_train: Training labels, ground truth y
+        init_parameter_svm: Initial SVM parameters C and gamma
+        pipe_run_random: ML Pipe
+        scorers: scorers to use
+        refit_scorer_name: Refit scrorer
+        save_fig_prefix: Prefix for images from the analysis
+
+    :return:
+        param_final: Final parameters C and gamma
+    '''
+
+    # Iterated pipeline with increasing number of tries
+    sample_size = [200, 400, 600]
+    kfolds = [2, 3, 3]
+    number_of_interations = [100, 100, 20]
+    select_from_best = [10, 10, 10]
+
+    combined_parameters = zip(sample_size, kfolds, number_of_interations, select_from_best)
+
+    new_parameter_rand = init_parameter_svm  # Initialize the system with the parameter borders
+
+    for i, combination in enumerate(combined_parameters):
+        sample_size, folds, iterations, selection = combination
+        print("Start random optimization run {} with the following parameters: ".format(i))
+        print("Sample size: ", sample_size)
+        print("Number of folds: ", folds)
+        print("Number of tries: ", iterations)
+        print("Number of best results to select from: ", selection)
+
+        # Run random search
+        new_parameter_rand, results_random_search, clf = step40.run_random_cv_for_SVM(X_train, y_train, new_parameter_rand,
+                                                                   pipe_run_random, scorers,
+                                                                   refit_scorer_name, number_of_samples=sample_size,
+                                                                   kfolds=folds,
+                                                                   n_iter_search=iterations, plot_best=selection)
+        print("Got best parameters: ")
+        display(new_parameter_rand)
+
+        # Display random search results
+        ax = svmvis.visualize_random_search_results(clf, refit_scorer_name)
+        ax_enhanced = svmvis.add_best_results_to_random_search_visualization(ax, results_random_search, selection)
+
+        plt.gca()
+        plt.savefig(save_fig_prefix + '_' + 'run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
+                    + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection), dpi=300)
+        plt.show()
+
+        print("===============================================================")
+
+    # %%
+    print("Best parameter limits: ")
+    display(new_parameter_rand)
+
+    print("Best results: ")
+    display(results_random_search.round(3).head(10))
+
+    param_final = {}
+    param_final['C'] = results_random_search.iloc[0]['param_svm__C']
+    param_final['gamma'] = results_random_search.iloc[0]['param_svm__gamma']
+
+    #param_final = new_parameter_rand[0]
+    print("Hyper parameters found")
+    display(param_final)
+
+    return param_final, results_random_search
+
+
+def execute_narrow_search(data_input_path="04_Model" + "/" + "prepared_input.pickle"):
+    '''
+    Execute a narrow search on the subset of data
+
+
+    '''
+
+    # Load file paths
+    f = open(data_input_path, "rb")
+    prepared_data = pickle.load(f)
+    print("Loaded data: ", prepared_data)
+
+    #results_run1_file_path = prepared_data['paths']['svm_run1_result_filename']
+
+    X_train = prepared_data['X_train']
+    y_train = prepared_data['y_train']
+    X_test = prepared_data['X_test']
+    y_test = prepared_data['y_test']
+    y_classes = prepared_data['y_classes']
+    scorers = prepared_data['scorers']
+    refit_scorer_name = prepared_data['refit_scorer_name']
+    selected_features = prepared_data['selected_features']
+    results_run2_file_path = prepared_data['paths']['svm_run2_result_filename']
+    svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
+    svm_pipe_final_selection = prepared_data['paths']['svm_pipe_final_selection']
+    model_directory = prepared_data['paths']['model_directory']
+    model_name = prepared_data['paths']['dataset_name']
+
+    figure_path_prefix = model_directory + '/images/' + model_name
+
+
+    # Load saved results
+    r = open(svm_pipe_first_selection, "rb")
+    pipe_run_best_first_selection = pickle.load(r)
+
+    # Based on the kernel, get the initial range of continuous parameters
+    parameter_svm = step40.get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_selection)
+
+    # Execute iterated random search where parameters are even more limited
+    param_final, results_run2 = execute_search_iterations_random_search_SVM(X_train, y_train, parameter_svm, pipe_run_best_first_selection, scorers,
+                                                refit_scorer_name,
+                                                save_fig_prefix=model_directory + '/images/' + model_name)
+
+    # Enhance kernel with found parameters
+    pipe_run_best_first_selection['svm'].C = param_final['C']
+    pipe_run_best_first_selection['svm'].gamma = param_final['gamma']
+
+    print("Model parameters defined", pipe_run_best_first_selection)
+
+    print("Save model")
+    # Save best pipe
+    dump(pipe_run_best_first_selection, open(svm_pipe_final_selection, 'wb'))
+    print("Stored pipe_run_best_first_selection at ", svm_pipe_final_selection)
+    # Save results
+    dump(results_run2, open(results_run2_file_path, 'wb'))
+    print("Stored pipe_run_best_first_selection at ", results_run2_file_path)
+
+    print("Method end")
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Step 4.3 - Execute wide grid search for SVM')
-    parser.add_argument("-exe", '--execute_wide', default=False,
-                        help='Execute Training', required=False)
+    parser = argparse.ArgumentParser(description='Step 4.4 - Execute narrow incremental search for SVM')
+    parser.add_argument("-exe", '--execute_narrow', default=True,
+                        help='Execute narrow training', required=False)
     parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
                         help='Prepared data', required=False)
 
@@ -39,5 +176,8 @@ if __name__ == "__main__":
 
     # Execute wide search
     #execute_wide_run(execute_search=args.execute_wide, data_input_path=args.data_path)
+
+    # Execute narrow search
+    execute_narrow_search(data_input_path=args.data_path)
 
     print("=== Program end ===")

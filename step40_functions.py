@@ -17,6 +17,7 @@ from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransfor
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn import feature_selection
 
@@ -44,6 +45,10 @@ from sklearn.linear_model import LogisticRegression  # For InstanceHardnessThres
 from sklearn.tree import DecisionTreeClassifier  # For Random Forest Balancer
 
 from imblearn.pipeline import Pipeline
+
+from scipy.stats import reciprocal
+from scipy.stats import randint as sp_randint
+from sklearn.model_selection import RandomizedSearchCV
 
 
 
@@ -125,7 +130,10 @@ def estimate_training_duration(model_clf, X_train, y_train, X_test, y_test, samp
     return sample_numbers, durations, scores
 
 def get_top_median_method(method_name, model_results, refit_scorer_name, top_share=0.10):
-    ''' inputs: name='scaler' '''
+    '''
+    inputs: name='scaler'
+
+    '''
     # View best scaler
 
     #Merge results from all subsets
@@ -143,7 +151,7 @@ def get_top_median_method(method_name, model_results, refit_scorer_name, top_sha
     hist_label = model_results['param_' + method_name][0:number_results]#.apply(str).apply(lambda x: x[:20])
     source = hist_label.value_counts()/number_results #
 
-    import DatavisualizationFunctions as vis
+    import data_visualization_functions as vis
 
     median_values = vis.get_median_values_from_distributions(method_name, merged_params_of_model_results[method_name], model_results, refit_scorer_name)
 
@@ -153,7 +161,9 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
     '''Run an extensive grid search over all parameters to find the best parameters for SVM Classifier.
     The search shall be done only with a subset of the data. Default subset is 0.1. Input is training and test data.
 
-    subset_share=0.1'''
+    subset_share=0.1
+
+    '''
 
     #Create a subset to train on
     print("[Step 1]: Create a data subset")
@@ -246,3 +256,143 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
         np.sum(results_run1['mean_test_' + refit_scorer_name].isna())))
 
     return grid_search_run1, params_run1, pipe_run1, results_run1
+
+
+def get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_selection):
+    '''
+    From the selected pipe, extract the range of continuous parameters to test on based on SVM kernel
+
+    :args:
+        :pipe_run_best_first_selection: Pipe for the best selection of variables for SVM
+
+    :return:
+        :parameter_svm: Continuous parameter range for continuous variables
+
+    '''
+    best_kernel = str(pipe_run_best_first_selection['svm'].get_params()['kernel']).strip()
+    print("Best kernel", best_kernel)
+    display(pipe_run_best_first_selection)
+    # Define pipeline, which is constant for all tests
+    pipe_run_random = pipe_run_best_first_selection  # Use the best pipe from the best run
+    # Main set of parameters for the grid search run 2: Select solver parameter
+    # Initial parameters
+    if best_kernel == 'rbf':
+        params_run2 = {
+            'svm__C': [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5],
+            'svm__gamma':
+                [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]
+        }
+    elif best_kernel == 'linear' or best_kernel == 'sigmoid':
+        params_run2 = {
+            'svm__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
+            'svm__gamma': [1e0, 1.01e0]
+        }
+    elif best_kernel == 'poly':
+        params_run2 = {
+            'svm__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
+            'svm__gamma': [1e0, 1.01e0]
+        }
+    else:
+        raise Exception('wrong kernel:{}'.format(best_kernel))
+    print("Parameters for kernel {} are {}".format(best_kernel, params_run2))
+    # Get limits of the best values and focus in this area
+    param_svm_C_minmax = pd.Series(
+        data=[np.min(params_run2['svm__C']),
+              np.max(params_run2['svm__C'])],
+        index=['min', 'max'],
+        name='param_svm__C')
+    param_svm_gamma_minmax = pd.Series(data=[
+        np.min(params_run2['svm__gamma']),
+        np.max(params_run2['svm__gamma'])],
+        index=['min', 'max'],
+        name='param_svm__gamma')
+    parameter_svm = pd.DataFrame([param_svm_C_minmax, param_svm_gamma_minmax])
+    print("The initial parameters are in this area")
+    display(parameter_svm)
+
+    return parameter_svm
+
+
+def generate_parameter_limits_for_SVM(results, plot_best=20):
+    '''
+    From a result structure, extract the min. and max. values of C and gamma as series and add them to a dataframe
+
+    :args:
+        :results: Result set with measurements of gamma and C
+        :plot_best: Get the best x values to extract the range from. Default value=20
+
+    :return:
+        :parameter_svm: Min and max parameter ranges from the top x results of the result data frame
+
+    '''
+    # Get limits of the best values and focus in this area
+    param_svm_C_minmax = pd.Series(
+        data=[np.min(results['param_svm__C'].head(plot_best)), np.max(results['param_svm__C'].head(plot_best))],
+        index=['min', 'max'], name='param_svm__C')
+
+    param_svm_gamma_minmax = pd.Series(
+        data=[np.min(results['param_svm__gamma'].head(plot_best)), np.max(results['param_svm__gamma'].head(plot_best))],
+        index=['min', 'max'], name='param_svm__gamma')
+
+    parameter_svm = pd.DataFrame([param_svm_C_minmax, param_svm_gamma_minmax])
+
+    return parameter_svm
+
+
+def run_random_cv_for_SVM(X_train, y_train, parameter_svm, pipe_run, scorers, refit_scorer_name, number_of_samples=400, kfolds=5,
+              n_iter_search=2000, plot_best=20):
+    '''
+    Execute random search cv
+
+    :args:
+        :X_train: feature dataframe X
+        :y_train: ground truth dataframe y
+        :parameter_svm: Variable parameter range for C and gamma
+        :pipe_run:  Pipe to run
+        :scorers: Scorers
+        :refit_scorer_name: Refit scrorer name
+        :number_of_samples: Number of samples to use from the training data. Default=400
+        :kfolds: Number of folds for cross validation. Default=5
+        :n_iter_search: Number of random search iterations. Default=2000
+        :plot_best: Number of top results selected for narrowing the parameter range. Default=20
+
+    :return:
+
+
+    '''
+
+    # Extract data subset to train on
+    X_train_subset, y_train_subset = modelutil.extract_data_subset(X_train, y_train, number_of_samples)
+
+    # Main set of parameters for the grid search run 2: Select solver parameter
+    # Reciprocal for the logarithmic range
+    params_run = {
+        'svm__C': reciprocal(parameter_svm.loc['param_svm__C']['min'], parameter_svm.loc['param_svm__C']['max']),
+        'svm__gamma': reciprocal(parameter_svm.loc['param_svm__gamma']['min'],
+                                 parameter_svm.loc['param_svm__gamma']['max'])
+    }
+
+    # K-Fold settings
+    skf = StratifiedKFold(n_splits=kfolds)
+
+    # run randomized search
+    random_search_run = RandomizedSearchCV(pipe_run, param_distributions=params_run, n_jobs=-1,
+                                           n_iter=n_iter_search, cv=skf, scoring=scorers,
+                                           refit=refit_scorer_name, return_train_score=True,
+                                           iid=True, verbose=5).fit(X_train_subset, y_train_subset)
+
+    print("Best parameters: ", random_search_run.best_params_)
+    print("Best score: {:.3f}".format(random_search_run.best_score_))
+
+    # Create the result table
+    results = modelutil.generate_result_table(random_search_run, params_run, refit_scorer_name)
+
+    # Get limits of the best values and focus in this area
+    parameter_svm = generate_parameter_limits_for_SVM(results, plot_best)
+    # display(parameter_svm)
+
+    # Display results
+    display(results.round(3).head(5))
+    display(parameter_svm)
+
+    return parameter_svm, results, random_search_run

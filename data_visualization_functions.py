@@ -9,7 +9,7 @@ import itertools
 from scipy.stats import ks_2samp
 import seaborn as sns
 
-import DataSupportFunctions as sup
+import data_handling_support_functions as sup
 
 def paintBarChartForMissingValues(xlabels, yvalues):
     # Create the figure

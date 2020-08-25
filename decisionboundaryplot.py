@@ -362,7 +362,7 @@ class DBPlot(BaseEstimator):
             try:
                 plt.imshow(np.flipud(self.background), extent = [
                            self.X2d_xmin, self.X2d_xmax, self.X2d_ymin, self.X2d_ymax], cmap = "GnBu", alpha = 0.33)
-            except (Exception, ex):
+            except Exception as ex:
                 print("Failed to render image background")
 
         # decision boundary
@@ -702,14 +702,14 @@ class DBPlot(BaseEstimator):
                     error += 1e-8 * ((self.mean_2d_dist - np.min(db_distances)) /
                                      self.mean_2d_dist)**2
                 return error
-            except (Exception, ex):
+            except Exception as ex:
                 print("Error in objective function:", ex)
                 return np.infty
 
         optimizer = self._get_optimizer(
             D = self.X.shape[1] - 1, upper_bound = 2 * np.pi, iteration_budget = self.hypersphere_iteration_budget)
         optimizer.set_min_objective(objective)
-        db_phi = optimizer.optimize([rnd.random() * 2 * np.pi for k in range(self.X.shape[1] - 1)])
+        db_phi = optimizer.optimize([random.random() * 2 * np.pi for k in range(self.X.shape[1] - 1)])
         db_point = centroid + polar_to_cartesian(db_phi, R)
         return db_point
 

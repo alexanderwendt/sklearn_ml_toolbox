@@ -173,8 +173,8 @@ from math import sqrt
 import matplotlib.pyplot as plt
 import matplotlib as m
 from matplotlib.ticker import FuncFormatter, MaxNLocator
-import DatavisualizationFunctions as vis
-import DataSupportFunctions as sup
+import data_visualization_functions as vis
+import data_handling_support_functions as sup
 
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -726,7 +726,7 @@ get_ipython().run_cell_magic('skip', '$skip_feature_analysis', "corr_matrix = X_
 # In[48]:
 
 
-get_ipython().run_cell_magic('skip', '$skip_feature_analysis', '#Select a random subset to visualize\nimport random\n\ntotal_values = features.join(outcomes)\nprint("Merged features and outcomes to use in correlation matrix")\n\n#Reduce the training set with the number of samples randomly chosen\nX_train_index_subset = sup.get_data_subset_index(1000, features)\n\n#Select column values to use in the correlation plot\nfeature_plot=list(range(0,10,1))\n#cols = [\'MA2Norm\', \'MA50Norm\', \'MA200Norm\', \'MA400Norm\', \'MA200NormDiff\', \'MA400NormDiff\']\ncols = total_values.columns[feature_plot]\nprint(feature_plot)\nprint(cols)\n\ncomparison_name = conf[\'class_name\']\nprint("Class name: ", comparison_name)\n\ndf_fv = total_values.iloc[X_train_index_subset, :]')
+get_ipython().run_cell_magic('skip', '$skip_feature_analysis', '#Select a random subset to visualize\nimport random\n\ntotal_values = features.join(outcomes)\nprint("Merged features and outcomes to use in correlation matrix")\n\n#Reduce the training set with the number of samples randomly chosen\nX_train_index_subset = sup.get_random_data_subset_index(1000, features)\n\n#Select column values to use in the correlation plot\nfeature_plot=list(range(0,10,1))\n#cols = [\'MA2Norm\', \'MA50Norm\', \'MA200Norm\', \'MA400Norm\', \'MA200NormDiff\', \'MA400NormDiff\']\ncols = total_values.columns[feature_plot]\nprint(feature_plot)\nprint(cols)\n\ncomparison_name = conf[\'class_name\']\nprint("Class name: ", comparison_name)\n\ndf_fv = total_values.iloc[X_train_index_subset, :]')
 
 
 # In[49]:
@@ -746,7 +746,7 @@ get_ipython().run_cell_magic('skip', '$skip_feature_analysis', "m.rc_file_defaul
 # In[51]:
 
 
-get_ipython().run_cell_magic('skip', '$skip_feature_analysis', '#Select a random subset to visualize\nimport random\n\n#Reduce the training set with the number of samples randomly chosen\nX_train_index_subset = sup.get_data_subset_index(1000, X_scaled)')
+get_ipython().run_cell_magic('skip', '$skip_feature_analysis', '#Select a random subset to visualize\nimport random\n\n#Reduce the training set with the number of samples randomly chosen\nX_train_index_subset = sup.get_random_data_subset_index(1000, X_scaled)')
 
 
 # In[52]:
@@ -816,7 +816,7 @@ get_ipython().run_cell_magic('skip', '$skip_feature_analysis', 'import sklearn.d
 import random
 
 #Reduce the training set with the number of samples randomly chosen
-X_train_index_subset = sup.get_data_subset_index(1000, X_scaled)
+X_train_index_subset = sup.get_random_data_subset_index(1000, X_scaled)
 
 relevantFeatureList = []
 selected_feature_list = pd.DataFrame()

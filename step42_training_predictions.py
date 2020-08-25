@@ -1,34 +1,60 @@
+import argparse
 import pickle #Save data
-import step40functions as step40
+import step40_functions as step40
 
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 
-# %% Load input
-model_input_path = "04_Model" + "/" + "prepared_input.pickle"
-f = open(model_input_path,"rb")
-prepared_data = pickle.load(f)
-print("Loaded data: ", prepared_data)
-X_train = prepared_data['X_train']
-y_train = prepared_data['y_train']
-X_test = prepared_data['X_test']
-y_test = prepared_data['y_test']
-y_classes = prepared_data['y_classes']
-scorers = prepared_data['scorers']
-refit_scorer_name = prepared_data['refit_scorer_name']
+def load_input(input_path = "04_Model" + "/" + "prepared_input.pickle"):
+    '''
+    Load input model and data from a prepared pickle file
 
-# %% test
-scorer = scorers[refit_scorer_name]
+    :args:
+        input_path: Input path of pickle file with prepared data
+    :return:
+        X_train: Training data
+        y_train: Training labels as numbers
+        X_test: Test data
+        y_test: Test labels as numbers
+        y_classes: Class names assigned to numbers
+        scorer: Scorer for the evaluation, default f1
 
-# %% Baseline test
-baseline_results = step40.execute_baseline_classifier(X_train, y_train, X_test, y_test, y_classes, scorer)
-print("Baseline results=", baseline_results)
+    '''
+    # %% Load input
+    f = open(input_path,"rb")
+    prepared_data = pickle.load(f)
+    print("Loaded data: ", prepared_data)
+    X_train = prepared_data['X_train']
+    y_train = prepared_data['y_train']
+    X_test = prepared_data['X_test']
+    y_test = prepared_data['y_test']
+    y_classes = prepared_data['y_classes']
+    scorers = prepared_data['scorers']
+    refit_scorer_name = prepared_data['refit_scorer_name']
+    scorer = scorers[refit_scorer_name]
 
-# %% Estimate training duration
-run_training_estimation = True
+    return X_train, y_train, X_test, y_test, y_classes, scorer
 
-if run_training_estimation==True:
-    #Set test range
+
+def run_training_estimation(X_train, y_train, X_test, y_test, scorer):
+    '''
+    Run estimation of scorer (default f1) and duration dependent of subset size of input data
+
+    :args:
+        X_train: Training data
+        y_train: Training labels as numbers
+        X_test: Test data
+        y_test: Test labels as numbers
+        scorer: Scorer for the evaluation, default f1
+    :return:
+        Nothing
+
+    '''
+    # Estimate training duration
+    # run_training_estimation = True
+
+    #if run_training_estimation==True:
+        #Set test range
     test_range = list(range(100, 6500+1, 500))
     #test_range = list(range(100, 1000, 200))
     print("Test range", test_range)
@@ -53,4 +79,32 @@ if run_training_estimation==True:
     plt.title("F1 Score Improvement With More Data")
     plt.show()
 
-print("=== Script end ===")
+def run_training_predictors(data_input_path):
+    '''
+
+
+    '''
+    X_train, y_train, X_test, y_test, y_classes, scorer = load_input(data_input_path)
+
+    #Baseline test
+    baseline_results = step40.execute_baseline_classifier(X_train, y_train, X_test, y_test, y_classes, scorer)
+    print("Baseline results=", baseline_results)
+
+    run_training_estimation(X_train, y_train, X_test, y_test, scorer)
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
+    parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
+                        help='Prepared data', required=False)
+
+    args = parser.parse_args()
+
+    #if not args.pb and not args.xml:
+    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
+
+    # Execute wide search
+    run_training_predictors(data_input_path=args.data_path)
+
+    print("=== Program end ===")

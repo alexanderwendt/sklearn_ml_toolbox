@@ -5,12 +5,12 @@ from IPython.core.display import display
 from imblearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
-import step40functions as step40
-import DataSupportFunctions as sup
+import step40_functions as step40
+import data_handling_support_functions as sup
 import Sklearn_model_utils as modelutil
 import numpy as np
 import copy
-import DatavisualizationFunctions as vis
+import data_visualization_functions as vis
 
 ## %% First run with a wide grid search
 # Minimal set of parameter to test different grid searches
@@ -49,31 +49,31 @@ def execute_wide_search(data_input_path="04_Model" + "/" + "prepared_input.pickl
     results_file_path = prepared_data['paths']['svm_run1_result_filename']
 
     # Define parameters as an array of dicts in case different parameters are used for different optimizations
-    #params_debug = [{'scaler': [StandardScaler()],
-    #                 'sampling': [modelutil.Nosampler(), SMOTE(), SMOTEENN(), ADASYN()],
-    #                 'feat__cols': selected_features[0:2],
-    #                 'svm__kernel': ['linear'],
-    #                 'svm__C': [0.1, 1, 10],
-    #                 'svm__gamma': [0.1, 1, 10],
-    #                 },
-    #                {
-    #                    'scaler': [StandardScaler(), Normalizer()],
-    #                    'sampling': [modelutil.Nosampler()],
-    #                    'feat__cols': selected_features[0:1],
-    #                    'svm__C': [1],  # default C=1
-    #                    'svm__kernel': ['rbf'],
-    #                    'svm__gamma': [1]
-    #                    # Only relevant in rbf, default='auto'=1/n_features
-    #                }]
+    params_debug = [{'scaler': [StandardScaler()],
+                     'sampling': [modelutil.Nosampler(), SMOTE(), SMOTEENN(), ADASYN()],
+                     'feat__cols': selected_features[0:2],
+                     'svm__kernel': ['linear'],
+                     'svm__C': [0.1, 1, 10],
+                     'svm__gamma': [0.1, 1, 10],
+                     },
+                    {
+                        'scaler': [StandardScaler(), Normalizer()],
+                        'sampling': [modelutil.Nosampler()],
+                        'feat__cols': selected_features[0:1],
+                        'svm__C': [1],  # default C=1
+                        'svm__kernel': ['rbf'],
+                        'svm__gamma': [1]
+                        # Only relevant in rbf, default='auto'=1/n_features
+                    }]
 
-    grid_search_run1, params_run1, pipe_run1, results_run1 = step40.run_basic_svm(X_train, y_train, selected_features,
-                                                                          scorers, refit_scorer_name,
-                                                                          subset_share=0.10, n_splits=3,
-                                                                          )
     #grid_search_run1, params_run1, pipe_run1, results_run1 = step40.run_basic_svm(X_train, y_train, selected_features,
     #                                                                      scorers, refit_scorer_name,
-    #                                                                      subset_share=0.01, n_splits=2,
-    #                                                                      parameters=params_debug)
+    #                                                                      subset_share=0.10, n_splits=3,
+    #                                                                      )
+    grid_search_run1, params_run1, pipe_run1, results_run1 = step40.run_basic_svm(X_train, y_train, selected_features,
+                                                                          scorers, refit_scorer_name,
+                                                                          subset_share=0.01, n_splits=2,
+                                                                          parameters=params_debug)
     print('Final score is: ', grid_search_run1.score(X_test, y_test))
 
     result = dict()
@@ -216,8 +216,11 @@ def execute_wide_run(execute_search=True, data_input_path="04_Model" + "/" + "pr
 
 
     #Execute algotihm
-    if execute_search==True:
+    if execute_search=='True':
+        print("Execute grid search")
         execute_wide_search(data_input_path)
+    else:
+        print("No grid search performed. Already existing model loaded.")
 
     #Visualize
     extract_categorical_visualize_graphs(data_input_path)
