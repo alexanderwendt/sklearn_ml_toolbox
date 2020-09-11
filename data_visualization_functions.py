@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib as m
 import pandas as pd
 from sklearn.utils.multiclass import unique_labels
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
 from statsmodels import robust
+import scikitplot as skplt
 import itertools
 from scipy.stats import ks_2samp
 import seaborn as sns
@@ -259,7 +260,8 @@ def plot_confusion_matrix_multiclass(cm, classes, normalize=False, title='Confus
     plt.xlabel('Predicted label')
 
     plt.tight_layout()
-    plt.show()
+    #plt.show()
+    return plt.gcf()
 
 def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues):
     """
@@ -677,3 +679,108 @@ def visualize_parameter_grid_search(param_name, search_cv_parameters, search_cv_
 
     return significance_matrix, medians
 
+def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pred_proba, reduced_class_dict, save_fig_prefix=None):
+    # Calculate Precision, Recall, Accuracy, F1, Confusion Matrix, ROC
+    np.set_printoptions(precision=3)
+
+    print("Accuracy: ", accuracy_score(y_trainsub, y_trainsub_pred))
+    print(classification_report(y_trainsub, y_trainsub_pred, target_names=list(reduced_class_dict.values())))
+
+    cnf_matrix = confusion_matrix(y_trainsub, y_trainsub_pred, labels=list(reduced_class_dict.keys()))
+
+    # Plot non-normalized confusion matrix
+    #matrixSize = len(y_classes) * 2
+    # plt.figure(figsize=(matrixSize, matrixSize))
+    fig_confusion_matrix = plot_confusion_matrix_multiclass(cnf_matrix, classes=list(reduced_class_dict.values()),
+                                             title='Confusion matrix with normalization', normalize=True)
+
+
+    fig_pr_curve = skplt.metrics.plot_precision_recall_curve(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
+    fig_roc_curve = skplt.metrics.plot_roc(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
+
+    if save_fig_prefix != None:
+        fig_confusion_matrix.savefig(save_fig_prefix + '_confusion_matrix', dpi=300)
+        #plt.savefig(save_fig_prefix + '_confusion_matrix', dpi=300)
+        fig_pr_curve.figure.savefig(save_fig_prefix + '_pr_curve')
+        #plt.savefig(save_fig_prefix + '_pr_curve', dpi=300)
+        #plt.savefig(save_fig_prefix + '_roc_curve', dpi=300)
+        fig_roc_curve.figure.savefig(save_fig_prefix + '_roc_curve')
+
+    plt.show()
+
+def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, save_fig_prefix=None):
+    """
+    plots the precision recall curve and shows the current value for each
+    by identifying the classifier's threshold (t).
+    """
+
+    # generate new class predictions based on the adjusted_classes
+    # function above and view the resulting confusion matrix.
+    y_pred_adj = y_adjusted_classes #adjusted_classes(y_scores, t)
+    print(pd.DataFrame(confusion_matrix(y_test, y_pred_adj),
+                       columns=['pred_neg', 'pred_pos'],
+                       index=['neg', 'pos']))
+
+    # plot the curve
+    plt.figure(figsize=(8, 8))
+    plt.title("Precision and Recall curve ^ = current threshold")
+    plt.step(r, p, color='b', alpha=0.2, where='post')
+    plt.fill_between(r, p, step='post', alpha=0.2, color='b')
+    plt.ylim([0.5, 1.01]);
+    plt.xlim([0.5, 1.01]);
+    plt.xlabel('Recall');
+    plt.ylabel('Precision');
+
+    # plot the current threshold on the line
+    close_default_clf = np.argmin(np.abs(thresholds - t))
+    plt.plot(r[close_default_clf], p[close_default_clf], '^', c='k', markersize=15)
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_pr_adjusted')
+
+    plt.show()
+
+def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_threshold, save_fig_prefix=None):
+    """
+    Modified from:
+    Hands-On Machine learning with Scikit-Learn
+    and TensorFlow; p.89
+
+    #https://towardsdatascience.com/fine-tuning-a-classifier-in-scikit-learn-66e048c21e65
+    """
+    plt.figure(figsize=(8, 8))
+    plt.title("Precision and Recall Scores as a function of the decision threshold")
+    plt.plot(thresholds, precisions[:-1], "b--", label="Precision")
+    plt.plot(thresholds, recalls[:-1], "g-", label="Recall")
+    close_default_clf = np.argmin(np.abs(thresholds - optimal_threshold))
+    plt.plot(optimal_threshold, precisions[close_default_clf], 'o', markersize = 12, fillstyle = 'none', c='r', mew=3, label="Optimal threshold")
+    plt.ylabel("Score")
+    plt.xlabel("Decision Threshold")
+    plt.legend(loc='best')
+    plt.grid()
+
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_pr_scores_of_decision_threshold')
+
+    plt.show()
+
+def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
+    """
+    The ROC curve, modified from
+    Hands-On Machine learning with Scikit-Learn and TensorFlow; p.91
+    #https://towardsdatascience.com/fine-tuning-a-classifier-in-scikit-learn-66e048c21e65
+    """
+    plt.figure(figsize=(8,8))
+    plt.title('ROC Curve')
+    plt.plot(fpr, tpr, linewidth=2, label=label)
+    plt.plot([0, 1], [0, 1], 'k--')
+    #plt.plot(closest_zero_p, closest_zero_r, 'o', markersize = 12, fillstyle = 'none', c='r', mew=3)
+    plt.axis([-0.005, 1, 0, 1.005])
+    plt.xticks(np.arange(0,1, 0.05), rotation=90)
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate (Recall)")
+    plt.legend(loc='best')
+
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_roc_curve')
+
+    plt.show()

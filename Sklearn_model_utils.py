@@ -129,3 +129,32 @@ def create_parameter_grid_for_svm(results, top_results=None):
         params_new.append(new_dict)
 
     return params_new
+
+def reduce_classes(y_classes, y_val, y_val_pred):
+    '''
+    Prepare the class list of classes, in case a class does not exist in the y_true and y_pred, which exist in y_train
+
+    '''
+
+    a = np.unique(y_val)
+    b = np.unique(y_val_pred)
+    c = np.hstack((a, b))
+    unique_values = np.unique(c)
+    existing_classes = []
+    [existing_classes.append(y_classes[i]) for i in unique_values]
+    print("Original classes: {}".format(y_classes))
+    print("Remaining classes to use: {}".format(existing_classes))
+
+    reduced_class_dict = dict(zip(c, existing_classes))
+
+    return reduced_class_dict
+
+def adjusted_classes(y_scores, t):
+    """
+    This function adjusts class predictions based on the prediction threshold (t).
+    Will only work for binary classification problems.
+
+    # Create adjusted precision-recall curves
+    # https://towardsdatascience.com/fine-tuning-a-classifier-in-scikit-learn-66e048c21e65
+    """
+    return [1 if y >= t else 0 for y in y_scores]
