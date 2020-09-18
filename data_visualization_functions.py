@@ -9,6 +9,8 @@ import scikitplot as skplt
 import itertools
 from scipy.stats import ks_2samp
 import seaborn as sns
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.manifold import TSNE
 
 import data_handling_support_functions as sup
 
@@ -782,5 +784,35 @@ def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
 
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_roc_curve')
+
+    plt.show()
+
+def plot_decision_boundary(X, y, model, save_fig_prefix=None):
+    X_Train_embedded = TSNE(n_components=2).fit_transform(X)
+    print(X_Train_embedded.shape)
+    # model = LogisticRegression().fit(X,y)
+    #model = optclf
+    y_predicted = model.predict(X)
+    # replace the above by your data and model
+
+    # create meshgrid
+    resolution = 100  # 100x100 background pixels
+    X2d_xmin, X2d_xmax = np.min(X_Train_embedded[:, 0]), np.max(X_Train_embedded[:, 0])
+    X2d_ymin, X2d_ymax = np.min(X_Train_embedded[:, 1]), np.max(X_Train_embedded[:, 1])
+    xx, yy = np.meshgrid(np.linspace(X2d_xmin, X2d_xmax, resolution), np.linspace(X2d_ymin, X2d_ymax, resolution))
+
+    # approximate Voronoi tesselation on resolution x resolution grid using 1-NN
+    background_model = KNeighborsClassifier(n_neighbors=1).fit(X_Train_embedded, y_predicted)
+    voronoiBackground = background_model.predict(np.c_[xx.ravel(), yy.ravel()])
+    voronoiBackground = voronoiBackground.reshape((resolution, resolution))
+
+    # plot
+    plt.figure(figsize=(11.5, 7))
+    plt.contourf(xx, yy, voronoiBackground)
+    plt.scatter(X_Train_embedded[:, 0], X_Train_embedded[:, 1], c=y)
+    plt.title("Decision Boundary Plot Projected")
+
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_decision_boundary_plot')
 
     plt.show()

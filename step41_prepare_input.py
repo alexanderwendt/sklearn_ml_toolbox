@@ -143,7 +143,8 @@ def generate_paths(conf):
     paths['selected_feature_columns_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_selected_feature_columns.csv"
 
     #Model specifics
-    paths['svm_model_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model" + ".sav"
+    paths['svm_evaluated_model_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_evaluated_model" + ".sav"
+    paths['svm_final_model_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_final_model" + ".sav"
     paths['svm_external_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_ext_parameters" + ".json"
     #paths['svm_default_hyper_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_hyper_parameters" + ".json"
 
