@@ -1,3 +1,5 @@
+import pickle
+
 from IPython.core.display import display
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import confusion_matrix
@@ -50,6 +52,52 @@ from scipy.stats import reciprocal
 from scipy.stats import randint as sp_randint
 from sklearn.model_selection import RandomizedSearchCV
 
+def load_training_files(paths_path="04_Model/paths.pickle"):
+    '''
+    Load all prepared and relevant files for trainf the model
+
+
+    '''
+    f = open(paths_path, "rb")
+    paths = pickle.load(f)
+    print("Loaded paths from: ", paths_path)
+
+    model_input_path = paths['model_input']
+    train_record_path = paths['train_record']
+    test_record_path = paths['test_record']
+
+    f = open(model_input_path, "rb")
+    model = pickle.load(f)
+    print("Loaded model input from: ", model_input_path)
+
+    f = open(train_record_path, "rb")
+    train = pickle.load(f)
+    print("Loaded training record: ", train_record_path)
+
+    f = open(test_record_path, "rb")
+    test = pickle.load(f)
+    print("Loaded test record: ", test_record_path)
+
+    return paths, model, train, test
+
+def load_inference_files(paths_path="04_Model/paths.pickle"):
+    '''
+    Load inference path
+
+
+    '''
+
+    f = open(paths_path, "rb")
+    paths = pickle.load(f)
+    print("Loaded paths from: ", paths_path)
+
+    inference_record_path = paths['inference_record']
+
+    f = open(inference_record_path, "rb")
+    inference = pickle.load(f)
+    print("Loaded test record: ", inference_record_path)
+
+    return paths, inference
 
 
 def execute_baseline_classifier(X_train, y_train, X_test, y_test, y_classes, scorer):

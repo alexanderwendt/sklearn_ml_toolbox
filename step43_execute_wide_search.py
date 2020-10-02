@@ -23,7 +23,7 @@ from imblearn.combine import SMOTETomek
 from pickle import dump
 
 
-def execute_wide_search(data_input_path="04_Model" + "/" + "prepared_input.pickle"):
+def execute_wide_search(paths_path = "04_Model/paths.pickle"):
     ''' Execute the wide search algorithm
 
     :args:
@@ -34,19 +34,19 @@ def execute_wide_search(data_input_path="04_Model" + "/" + "prepared_input.pickl
     '''
 
     ### %% Load input
-    #data_input_path = "04_Model" + "/" + "prepared_input.pickle"
-    f = open(data_input_path, "rb")
-    prepared_data = pickle.load(f)
-    print("Loaded data: ", prepared_data)
-    X_train = prepared_data['X_train']
-    y_train = prepared_data['y_train']
-    X_test = prepared_data['X_test']
-    y_test = prepared_data['y_test']
-    y_classes = prepared_data['y_classes']
-    scorers = prepared_data['scorers']
-    refit_scorer_name = prepared_data['refit_scorer_name']
-    selected_features = prepared_data['selected_features']
-    results_file_path = prepared_data['paths']['svm_run1_result_filename']
+    paths, model, train, test = step40.load_training_files(paths_path)
+    #f = open(data_input_path, "rb")
+    #prepared_data = pickle.load(f)
+    #print("Loaded data: ", prepared_data)
+    X_train = train['X']
+    y_train = train['y']
+    X_test = test['X']
+    y_test = test['y']
+    #y_classes = train['label_map']
+    scorers = model['scorers']
+    refit_scorer_name = model['refit_scorer_name']
+    selected_features = model['selected_features']
+    results_file_path = paths['svm_run1_result_filename']
 
     # Define parameters as an array of dicts in case different parameters are used for different optimizations
     params_debug = [{'scaler': [StandardScaler()],
@@ -99,7 +99,7 @@ def execute_wide_search(data_input_path="04_Model" + "/" + "prepared_input.pickl
     print("Stored results of run 1 to ", results_file_path)
 
 
-def extract_categorical_visualize_graphs(data_input_path="04_Model" + "/" + "prepared_input.pickle", top_percentage = 0.2):
+def extract_categorical_visualize_graphs(paths_path = "04_Model/paths.pickle", top_percentage = 0.2):
     '''
     Of the results of a wide search algorithm, find the top x percent (deafult=20%), calculate the median value for
     each parameter and select the parameter value with the best median result.
@@ -114,17 +114,18 @@ def extract_categorical_visualize_graphs(data_input_path="04_Model" + "/" + "pre
     '''
 
     # Get necessary data from the data preparation
-    r = open(data_input_path, "rb")
-    prepared_data = pickle.load(r)
+    paths, model, train, test = step40.load_training_files(paths_path)
+    #r = open(data_input_path, "rb")
+    #prepared_data = pickle.load(r)
 
-    model_name = prepared_data['paths']['dataset_name']
-    model_directory = prepared_data['paths']['model_directory']
-    results_file_path = prepared_data['paths']['svm_run1_result_filename']
-    refit_scorer_name = prepared_data['refit_scorer_name']
-    selected_features = prepared_data['selected_features']
-    feature_dict = prepared_data['feature_dict']
-    X_train = prepared_data['X_train']
-    svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
+    model_name = paths['dataset_name']
+    model_directory = paths['model_directory']
+    results_file_path = paths['svm_run1_result_filename']
+    refit_scorer_name = model['refit_scorer_name']
+    selected_features = model['selected_features']
+    feature_dict = model['feature_dict']
+    X_train = train['X']
+    svm_pipe_first_selection = paths['svm_pipe_first_selection']
 
     s = open(results_file_path, "rb")
     results = pickle.load(s)
@@ -231,7 +232,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 4.3 - Execute wide grid search for SVM')
     parser.add_argument("-exe", '--execute_wide', default=False,
                         help='Execute Training', required=False)
-    parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
+    parser.add_argument("-d", '--data_path', default="04_Model/paths.pickle",
                         help='Prepared data', required=False)
 
     args = parser.parse_args()

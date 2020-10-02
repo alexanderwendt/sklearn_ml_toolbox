@@ -8,6 +8,8 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_sc
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import classification_report, confusion_matrix
 
+import step40_functions as step40
+
 from sklearn.model_selection import train_test_split
 
 import data_visualization_functions as vis
@@ -20,7 +22,7 @@ np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
-def define_precision_recall_threshold(data_input_path="04_Model" + "/" + "prepared_input.pickle"):
+def define_precision_recall_threshold(paths_path = "04_Model/paths.pickle"):
     '''
     Load model data and training data. Check if the problem is a multiclass or single class,
     the precision/recall threshold and save it to a file.
@@ -34,25 +36,26 @@ def define_precision_recall_threshold(data_input_path="04_Model" + "/" + "prepar
 
     # Get data
     # Load file paths
-    f = open(data_input_path, "rb")
-    prepared_data = pickle.load(f)
-    print("Loaded data: ", prepared_data)
+    paths, model, train, test = step40.load_training_files(paths_path)
+    #f = open(data_input_path, "rb")
+    #prepared_data = pickle.load(f)
+    #print("Loaded data: ", prepared_data)
 
-    X_train = prepared_data['X_train']
-    y_train = prepared_data['y_train']
-    X_test = prepared_data['X_test']
-    y_test = prepared_data['y_test']
+    X_train = train['X']
+    y_train = train['y']
+    #X_test = test['X']
+    #y_test = test['y']
 
-    y_classes = prepared_data['y_classes']
-    scorers = prepared_data['scorers']
-    refit_scorer_name = prepared_data['refit_scorer_name']
-    selected_features = prepared_data['selected_features']
-    results_run2_file_path = prepared_data['paths']['svm_run2_result_filename']
-    svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
-    svm_pipe_final_selection = prepared_data['paths']['svm_pipe_final_selection']
-    svm_external_parameters_filename = prepared_data['paths']['svm_external_parameters_filename']
-    model_directory = prepared_data['paths']['model_directory']
-    model_name = prepared_data['paths']['dataset_name']
+    y_classes = train['label_map']
+    #scorers = model['scorers']
+    #refit_scorer_name = model['refit_scorer_name']
+    #selected_features = prepared_data['selected_features']
+    #results_run2_file_path = prepared_data['paths']['svm_run2_result_filename']
+    #svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
+    svm_pipe_final_selection = paths['svm_pipe_final_selection']
+    svm_external_parameters_filename = paths['svm_external_parameters_filename']
+    model_directory = paths['model_directory']
+    model_name = paths['dataset_name']
 
     figure_path_prefix = model_directory + '/images/' + model_name
 

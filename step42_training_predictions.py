@@ -5,7 +5,7 @@ import step40_functions as step40
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 
-def load_input(input_path = "04_Model" + "/" + "prepared_input.pickle"):
+def load_input(paths_path = "04_Model/paths.pickle"):
     '''
     Load input model and data from a prepared pickle file
 
@@ -20,17 +20,20 @@ def load_input(input_path = "04_Model" + "/" + "prepared_input.pickle"):
         scorer: Scorer for the evaluation, default f1
 
     '''
-    # %% Load input
-    f = open(input_path,"rb")
-    prepared_data = pickle.load(f)
-    print("Loaded data: ", prepared_data)
-    X_train = prepared_data['X_train']
-    y_train = prepared_data['y_train']
-    X_test = prepared_data['X_test']
-    y_test = prepared_data['y_test']
-    y_classes = prepared_data['y_classes']
-    scorers = prepared_data['scorers']
-    refit_scorer_name = prepared_data['refit_scorer_name']
+    # Load input
+    paths, model, train, test = step40.load_training_files(paths_path)
+
+    #f = open(input_path,"rb")
+    #prepared_data = pickle.load(f)
+    #print("Loaded data: ", prepared_data)
+
+    X_train = train['X']
+    y_train = train['y']
+    X_test = test['X']
+    y_test = test['y']
+    y_classes = train['label_map']
+    scorers = model['scorers']
+    refit_scorer_name = model['refit_scorer_name']
     scorer = scorers[refit_scorer_name]
 
     return X_train, y_train, X_test, y_test, y_classes, scorer
@@ -96,7 +99,7 @@ def run_training_predictors(data_input_path):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
-    parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
+    parser.add_argument("-d", '--data_path', default="04_Model/paths.pickle",
                         help='Prepared data', required=False)
 
     args = parser.parse_args()

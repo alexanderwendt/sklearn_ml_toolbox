@@ -6,26 +6,28 @@ import numpy as np
 
 import joblib
 
+import step40_functions as step40
 
-def train_final_model(data_input_path="04_Model" + "/" + "prepared_input.pickle"):
+
+def train_final_model(paths_path = "04_Model/paths.pickle"):
     # Get data
-    # Load file paths
-    print("load inputs: ", data_input_path)
-    f = open(data_input_path, "rb")
-    prepared_data = pickle.load(f)
-    print("Loaded data: ", prepared_data)
+    paths, model, train, test = step40.load_training_files(paths_path)
 
-    X_train = prepared_data['X_train']
-    y_train = prepared_data['y_train']
-    X_test = prepared_data['X_test']
-    y_test = prepared_data['y_test']
+    #print("load inputs: ", data_input_path)
+    #f = open(data_input_path, "rb")
+    #prepared_data = pickle.load(f)
+    #print("Loaded data: ", prepared_data)
 
-    y_classes = prepared_data['y_classes']
-    svm_pipe_final_selection = prepared_data['paths']['svm_pipe_final_selection']
-    svm_final_model_filepath = prepared_data['paths']['svm_final_model_filename']
-    svm_external_parameters_filename = prepared_data['paths']['svm_external_parameters_filename']
-    model_directory = prepared_data['paths']['model_directory']
-    model_name = prepared_data['paths']['dataset_name']
+    X_train = train['X']
+    y_train = train['y']
+    X_test = test['X']
+    y_test = test['y']
+    #y_classes = train['label_map']
+
+    svm_pipe_final_selection = paths['svm_pipe_final_selection']
+    svm_final_model_filepath = paths['svm_final_model_filename']
+    model_directory = paths['model_directory']
+    model_name = paths['dataset_name']
 
     figure_path_prefix = model_directory + '/images/' + model_name
 

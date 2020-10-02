@@ -12,6 +12,8 @@ import data_visualization_functions as vis
 
 import Sklearn_model_utils as model_util
 
+import step40_functions as step40
+
 #Global settings
 np.set_printoptions(precision=3)
 
@@ -19,25 +21,21 @@ np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 
 
-def train_model_for_evaluation(data_input_path="04_Model" + "/" + "prepared_input.pickle"):
+def train_model_for_evaluation(paths_path = "04_Model/paths.pickle"):
     # Get data
-    # Load file paths
-    print("load inputs: ", data_input_path)
-    f = open(data_input_path, "rb")
-    prepared_data = pickle.load(f)
-    print("Loaded data: ", prepared_data)
+    paths, model, train, test = step40.load_training_files(paths_path)
 
-    X_train = prepared_data['X_train']
-    y_train = prepared_data['y_train']
-    X_test = prepared_data['X_test']
-    y_test = prepared_data['y_test']
+    X_train = train['X']
+    y_train = train['y']
+    X_test = test['X']
+    y_test = test['y']
+    y_classes = train['label_map']
 
-    y_classes = prepared_data['y_classes']
-    svm_pipe_final_selection = prepared_data['paths']['svm_pipe_final_selection']
-    svm_evaluation_model_filepath = prepared_data['paths']['svm_evaluated_model_filename']
-    svm_external_parameters_filename = prepared_data['paths']['svm_external_parameters_filename']
-    model_directory = prepared_data['paths']['model_directory']
-    model_name = prepared_data['paths']['dataset_name']
+    svm_pipe_final_selection = paths['svm_pipe_final_selection']
+    svm_evaluation_model_filepath = paths['svm_evaluated_model_filename']
+    svm_external_parameters_filename = paths['svm_external_parameters_filename']
+    model_directory = paths['model_directory']
+    model_name = paths['dataset_name']
 
     figure_path_prefix = model_directory + '/images/' + model_name
 

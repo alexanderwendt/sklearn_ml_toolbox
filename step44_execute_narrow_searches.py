@@ -2,27 +2,13 @@ import argparse
 import pickle
 
 from IPython.core.display import display
-from imblearn.pipeline import Pipeline
-from sklearn.svm import SVC
 
 import step40_functions as step40
 import data_visualization_functions_for_SVM as svmvis
-import data_handling_support_functions as sup
-import Sklearn_model_utils as modelutil
-import numpy as np
-import pandas as pd
-import copy
-import data_visualization_functions as vis
 import matplotlib.pyplot as plt
 
 ## %% First run with a wide grid search
 # Minimal set of parameter to test different grid searches
-from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
-from imblearn.over_sampling import SMOTE
-from imblearn.over_sampling import ADASYN
-from imblearn.over_sampling import RandomOverSampler
-from imblearn.combine import SMOTEENN
-from imblearn.combine import SMOTETomek
 from pickle import dump
 
 def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter_svm, pipe_run_random, scorers,
@@ -83,7 +69,7 @@ def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter
 
         print("===============================================================")
 
-    # %%
+    ##
     print("Best parameter limits: ")
     display(new_parameter_rand)
 
@@ -101,7 +87,7 @@ def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter
     return param_final, results_random_search
 
 
-def execute_narrow_search(data_input_path="04_Model" + "/" + "prepared_input.pickle"):
+def execute_narrow_search(paths_path = "04_Model/paths.pickle"):
     '''
     Execute a narrow search on the subset of data
 
@@ -109,27 +95,24 @@ def execute_narrow_search(data_input_path="04_Model" + "/" + "prepared_input.pic
     '''
 
     # Load file paths
-    f = open(data_input_path, "rb")
-    prepared_data = pickle.load(f)
-    print("Loaded data: ", prepared_data)
+    paths, model, train, test = step40.load_training_files(paths_path)
+    #f = open(data_input_path, "rb")
+    #prepared_data = pickle.load(f)
+    #print("Loaded data: ", prepared_data)
 
     #results_run1_file_path = prepared_data['paths']['svm_run1_result_filename']
 
-    X_train = prepared_data['X_train']
-    y_train = prepared_data['y_train']
-    X_test = prepared_data['X_test']
-    y_test = prepared_data['y_test']
-    y_classes = prepared_data['y_classes']
-    scorers = prepared_data['scorers']
-    refit_scorer_name = prepared_data['refit_scorer_name']
-    selected_features = prepared_data['selected_features']
-    results_run2_file_path = prepared_data['paths']['svm_run2_result_filename']
-    svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
-    svm_pipe_final_selection = prepared_data['paths']['svm_pipe_final_selection']
-    model_directory = prepared_data['paths']['model_directory']
-    model_name = prepared_data['paths']['dataset_name']
+    X_train = train['X']
+    y_train = train['y']
+    scorers = model['scorers']
+    refit_scorer_name = model['refit_scorer_name']
+    results_run2_file_path = paths['svm_run2_result_filename']
+    svm_pipe_first_selection = paths['svm_pipe_first_selection']
+    svm_pipe_final_selection = paths['svm_pipe_final_selection']
+    model_directory = paths['model_directory']
+    model_name = paths['dataset_name']
 
-    figure_path_prefix = model_directory + '/images/' + model_name
+    #figure_path_prefix = model_directory + '/images/' + model_name
 
 
     # Load saved results
@@ -166,7 +149,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 4.4 - Execute narrow incremental search for SVM')
     parser.add_argument("-exe", '--execute_narrow', default=True,
                         help='Execute narrow training', required=False)
-    parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
+    parser.add_argument("-d", '--data_path', default="04_Model/paths.pickle",
                         help='Prepared data', required=False)
 
     args = parser.parse_args()
@@ -178,6 +161,6 @@ if __name__ == "__main__":
     #execute_wide_run(execute_search=args.execute_wide, data_input_path=args.data_path)
 
     # Execute narrow search
-    execute_narrow_search(data_input_path=args.data_path)
+    execute_narrow_search(paths_path=args.data_path)
 
     print("=== Program end ===")

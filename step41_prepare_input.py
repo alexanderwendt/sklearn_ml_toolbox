@@ -6,21 +6,12 @@ import json
 
 from pickle import dump #Save data
 
-# %matplotlib notebook
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.svm import SVC
 
-import data_visualization_functions as vis
-import data_visualization_functions_for_SVM as vissvm
-import Sklearn_model_utils as model
-from Sklearn_model_utils import Nosampler, ColumnExtractor
 from IPython.core.display import display
-from sklearn.model_selection import train_test_split
 
 #Import local libraries
-import step40_functions as step40
 import data_handling_support_functions as sup
 
 #Set Global settings
@@ -120,7 +111,9 @@ def generate_paths(conf):
 
     # Generating directories
     print("Directories")
+    paths['annotations'] = "annotations"
     paths['training_data_directory'] = "02_Training_Data"
+    paths['inference_data_directory'] = "03_Test_Prepared_Data"
     paths['target_directory'] = paths['training_data_directory']
     print("Training data directory: ", paths['training_data_directory'])
 
@@ -131,12 +124,19 @@ def generate_paths(conf):
     print("Results directory: ", paths['results_directory'])
 
     # Dump file name
-    paths['model_input_path'] = paths['model_directory'] + "/" + "prepared_input.pickle"
+    paths['model_input'] = paths['model_directory'] + "/" + "model.pickle"
+    paths['paths'] = paths['model_directory'] + "/" + "paths.pickle"
+    paths['train_record'] = paths['training_data_directory'] + "/" + "train.record"
+    paths['test_record'] = paths['training_data_directory'] + "/" + "test.record"
+    paths['inference_record'] = paths['inference_data_directory'] + "/" + "inference.record"
 
-    # Generating filenames for saving the files
+    # Generating filenames for loading the files
     paths['model_features_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_features_for_model" + ".csv"
     paths['model_outcomes_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_outcomes_for_model" + ".csv"
     paths['source_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    paths['inference_features_filename'] = paths['inference_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_inference_features" + ".csv"
+
+
     #Modified labels
     paths['model_labels_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_labels_for_model" + ".csv"
     #Columns for feature selection
@@ -157,26 +157,16 @@ def generate_paths(conf):
     paths['svm_run2_result_filename'] = paths['results_directory'] + "/" + conf['dataset_name'] + "_" + conf[
         'class_name'] + '_results_run2.pkl'
 
+    # Source data files folder paths
+    paths['source_path'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    paths['source_path_inference'] = paths['inference_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
+
     print("=== Paths ===")
     print("Used file paths: ", paths)
-    #print("Prepared Features: ", model_features_filename)
-    #print("Prepared Outcome: ", model_outcomes_filename)
-    #print("Original source: ", source_filename)
-    #print("Labels for the model: ", model_labels_filename)
-    #print("Selected feature columns: ", selected_feature_columns_filename)
-
-    #print("Model to save/load: ", svm_model_filename)
-    #print("External parameters to load: ", svm_external_parameters_filename)
-    #print("Default hyper parameters to load: ", svm_default_hyper_parameters_filename)
-    #print("Saved pipe from for discrete variables: ", svm_pipe_first_selection)
-
-    #Hyperparameter optimization methods
-    # Skip the first hyper parameter search and load values from files instead
-    #skip_first_run_hyperparameter_optimization = conf['use_stored_first_run_hyperparameters']
 
     return paths #skip_first_run_hyperparameter_optimization
 
-def load_files(paths):
+def load_files(paths, do_inference):
     '''
     Load files
 
@@ -188,15 +178,22 @@ def load_files(paths):
         y_classes: dict of class labels and assigned integers
         df_feature_columns: columns of column names for feature selection e.g. through lasso. The type is dataframe
     '''
-    #=== Load features from X ===#
-    df_X = pd.read_csv(paths['model_features_filename'], delimiter=';').set_index('id')
+    if do_inference==True:  #If inference is selected, only X file shall be loaded
+        #=== Load features from X ===#
+        df_X = pd.read_csv(paths['inference_features_filename'], delimiter=';').set_index('id') #Read inference data
+        # === Load y values ===#
+        y = np.zeros(df_X.shape[0]) #For inference, just create an empty y as there is no y
+    else:
+        # === Load features from X ===#
+        df_X = pd.read_csv(paths['model_features_filename'], delimiter=';').set_index('id')   #Read training data
+
+        # === Load y values ===#
+        df_y = pd.read_csv(paths['model_outcomes_filename'], delimiter=';').set_index('id')
+        y = df_y.values.flatten()
+
     print("Loaded feature names for X={}".format(df_X.columns))
     print("X. Shape={}".format(df_X.shape))
     print("Indexes of X={}".format(df_X.index.shape))
-
-    #=== Load y values ===#
-    df_y = pd.read_csv(paths['model_outcomes_filename'], delimiter=';').set_index('id')
-    y = df_y.values.flatten()
     print("y. Shape={}".format(y.shape))
 
     #=== Load classes ===#
@@ -209,7 +206,11 @@ def load_files(paths):
     print("Selected features: {}".format(paths['selected_feature_columns_filename']))
     display(df_feature_columns)
 
-    y_classes = get_class_information(y, y_classes_source)
+    if do_inference==False:
+        print("Inference is done. Therefore no handling of classes.")
+        y_classes = get_class_information(y, y_classes_source)
+    else:
+        y_classes = y_classes_source
 
     return df_X, y, y_classes, df_feature_columns
 
@@ -265,7 +266,7 @@ def create_feature_dict(df_feature_columns, df_X):
 
     return feature_dict
 
-def create_prepared_data(df_X, y, y_classes, df_feature_columns, paths):
+def create_training_validation_data(df_X, y, y_classes, df_feature_columns, test_size=0.2, shuffle_data=False):
     '''
     Create a dict with prepared data like models, training data and paths. This object can then be put into a pickle structure
 
@@ -283,7 +284,7 @@ def create_prepared_data(df_X, y, y_classes, df_feature_columns, paths):
     #Split test and training sets
     ### WARNING: Data is not shuffled for this example ####
     #X_train, X_test, y_train, y_test = train_test_split(df_X, y, random_state=0, test_size=0.2, shuffle=True, stratify = y) #cross validation size 20
-    X_train, X_test, y_train, y_test = train_test_split(df_X, y, random_state=0, test_size=0.2, shuffle=False) #cross validation size 20
+    X_train, X_test, y_train, y_test = train_test_split(df_X, y, random_state=0, test_size=test_size, shuffle=shuffle_data) #cross validation size 20
     print("Total number of samples: {}. X_train: {}, X_test: {}, y_train: {}, y_test: {}".format(df_X.shape[0], X_train.shape, X_test.shape, y_train.shape, y_test.shape))
 
     #
@@ -306,22 +307,47 @@ def create_prepared_data(df_X, y, y_classes, df_feature_columns, paths):
     # Create feature dictionary
     feature_dict = create_feature_dict(df_feature_columns, df_X)
 
-    # Dump prepared data
-    prepared_data = dict()
-    prepared_data['X_train'] = X_train
-    prepared_data['y_train'] = y_train
-    prepared_data['X_test'] =  X_test
-    prepared_data['y_test'] = y_test
-    prepared_data['y_classes'] = y_classes
-    prepared_data['scorers'] = scorers
-    prepared_data['refit_scorer_name'] = refit_scorer_name
-    prepared_data['paths'] = paths
-    prepared_data['selected_features'] = list(feature_dict.values()) #selected_features
-    prepared_data['feature_dict'] = feature_dict
+    # Dump in train and test sets
+    train_record = dict()
+    train_record['X'] = X_train
+    train_record['y'] = y_train
+    train_record['label_map'] = y_classes
 
-    return prepared_data
+    test_record = dict()
+    test_record['X'] = X_test
+    test_record['y'] = y_test
+    test_record['label_map'] = y_classes
 
-def prepare_data(config_file_path):
+
+    # Create prepared data for model
+    model_data = dict()
+    #prepared_data['X_train'] = X_train
+    #prepared_data['y_train'] = y_train
+    #prepared_data['X_test'] =  X_test
+    #prepared_data['y_test'] = y_test
+    #prepared_data['y_classes'] = y_classes
+    model_data['scorers'] = scorers
+    model_data['refit_scorer_name'] = refit_scorer_name
+    #prepared_data['paths'] = paths
+    model_data['selected_features'] = list(feature_dict.values()) #selected_features
+    model_data['feature_dict'] = feature_dict
+
+    return model_data, train_record, test_record
+
+def create_inference_data(df_X, y_classes):
+    '''
+
+
+
+    '''
+    # Dump in train and test sets
+    inference_record = dict()
+    inference_record['X'] = df_X
+    inference_record['label_map'] = y_classes
+
+    return inference_record
+
+def prepare_data(config_file_path, do_inference):
     '''
     Load config file, load training and other files, create a pickle
 
@@ -333,19 +359,42 @@ def prepare_data(config_file_path):
     '''
     conf = load_config(config_file_path)
     paths = generate_paths(conf)
-    df_X, y, y_classes, df_feature_columns = load_files(paths)
-    prepared_data = create_prepared_data(df_X, y, y_classes, df_feature_columns, paths)
+    df_X, y, y_classes, df_feature_columns = load_files(paths, do_inference)
 
-    # Save results
-    dump(prepared_data, open(paths['model_input_path'], 'wb'))
-    print("Stored prepared file input to: ", paths['model_input_path'])
+    if do_inference==False:
+        # Save results
+        model_data, train_record, test_record = create_training_validation_data(df_X, y, y_classes, df_feature_columns)
 
+        #Dump path data
+        dump(paths, open(paths['paths'], 'wb'))
+        print("Stored paths to: ", paths['paths'])
+
+        #Dump model prepararations
+        dump(model_data, open(paths['model_input'], 'wb'))
+        print("Stored model input to: ", paths['model_input'])
+
+        #Dump training data
+        dump(train_record, open(paths['train_record'], 'wb'))
+        print("Stored train record to: ", paths['train_record'])
+
+        #Dump test data
+        dump(test_record, open(paths['test_record'], 'wb'))
+        print("Stored test record to: ", paths['test_record'])
+
+    else:
+        inference_record = create_inference_data(df_X, y_classes)
+
+        #Dump inference set
+        dump(inference_record, open(paths['inference_record'], 'wb'))
+        print("Stored inference record to: ", paths['inference_record'])
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
     parser.add_argument("-conf", '--config_path', default="config_LongTrend_Debug_Training.json",
                         help='Configuration file path', required=False)
+    parser.add_argument("-i", "--do_inference", action='store_true',
+                        help="Set inference if only inference and no training")
 
     args = parser.parse_args()
 
@@ -353,6 +402,6 @@ if __name__ == "__main__":
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
     # Execute wide search
-    prepare_data(args.config_path)
+    prepare_data(args.config_path, args.do_inference)
 
     print("=== Program end ===")

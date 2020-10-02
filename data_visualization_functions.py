@@ -330,7 +330,7 @@ def plotUmap(embedding, y, classList, title, cmapString='RdYlGn'):
 def amplifyForPlot(binaryArray, targetArray, distance):
     return binaryArray * targetArray * (1-distance)
 
-def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, legend):
+def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, legend, save_fig_prefix=None):
     
     y0 = (y_class==0)*1
     y1 = (y_class==1)*1
@@ -351,11 +351,15 @@ def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, le
     plt.ylim([np.min(y_ref)*0.99999, np.max(y_ref)*1.00002])
     plt.grid()
     plt.legend(legend)
-    #plt.show()
+
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_three_class_graph')
+
+    plt.show()
 
 
 # %% pycharm={"is_executing": false}
-def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend):
+def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend, save_fig_prefix=None):
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(y_time, y_ref)
     plt.plot(y_time, amplifyForPlot(binclass, y_ref, offset_binclass), color='orange')
@@ -364,7 +368,23 @@ def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend):
     plt.ylim([np.min(y_ref)*0.99999, np.max(y_ref)*1.00002])
     plt.grid()
     plt.legend(legend)
+
+    if save_fig_prefix != None:
+        plt.savefig(save_fig_prefix + '_two_class_graph')
+
     plt.show()
+
+#def plot_two_class_graph(y_order_train, y_order_train_pred):
+#    plt.figure(num=None, figsize=(11.5, 7), dpi=80, facecolor='w', edgecolor='k')
+#    plt.plot(df_timegraph['Date'][y_order_train.index], df_timegraph['Close'][y_order_train.index])
+#    plt.plot(df_timegraph['Date'][y_order_train.index],
+#             vis.amplifyForPlot(y_order_train['y'].values, df_timegraph['Close'][y_order_train.index].values, 0.00),
+#             color='green')
+#    plt.plot(df_timegraph['Date'][y_order_train.index],
+#             vis.amplifyForPlot(y_order_train_pred['y'].values, df_timegraph['Close'][y_order_train.index].values,
+#                              0.00), color='yellow')
+#    plt.title("Plot results")
+#    plt.show()
 
 def plot_grid_search_validation_curve(grid, param_to_vary, refit_scorer_name, title='Validation Curve', ylim=None, xlim=None, log=None):
     """Plots train and cross-validation scores from a GridSearchCV instance's
