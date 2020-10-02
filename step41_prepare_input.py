@@ -3,6 +3,7 @@
 import argparse
 import importlib #Reload imports for changed functions
 import json
+import os
 
 from pickle import dump #Save data
 
@@ -63,7 +64,7 @@ def generate_default_config():
 
     return default_config
 
-def load_config(config_file_path = "config_LongTrend_Debug_Training.json"):
+def load_config(config_file_path = "config_debug_timedata_omxS30.json"):
     '''
     Load configuration or use a default configuration for testing purposes
 
@@ -83,7 +84,7 @@ def load_config(config_file_path = "config_LongTrend_Debug_Training.json"):
         with open(config_file_path, 'r') as fp:
             conf = json.load(fp)
 
-        print("Loaded notebook parameters from config file: ", config_file_path)
+        print("Loaded parameters from config file: ", config_file_path)
 
     print("Loaded config: ", json.dumps(conf, indent=2))
 
@@ -112,15 +113,17 @@ def generate_paths(conf):
     # Generating directories
     print("Directories")
     paths['annotations'] = "annotations"
-    paths['training_data_directory'] = "02_Training_Data"
-    paths['inference_data_directory'] = "03_Test_Prepared_Data"
-    paths['target_directory'] = paths['training_data_directory']
+    paths['training_data_directory'] = "data_prepared"
+    paths['inference_data_directory'] = "data_inference"
+    paths['model_directory'] = "models" + "/" + paths['dataset_name']
+    paths['results_directory'] = "results"
+
+    if os.path.isdir(paths['model_directory'])==False:
+        os.mkdir(paths['model_directory'])
+        print("Created directory ", paths['model_directory'])
+
     print("Training data directory: ", paths['training_data_directory'])
-
-    paths['model_directory'] = "04_Model"
     print("Model directory: ", paths['model_directory'])
-
-    paths['results_directory'] = "05_Results"
     print("Results directory: ", paths['results_directory'])
 
     # Dump file name
@@ -131,16 +134,15 @@ def generate_paths(conf):
     paths['inference_record'] = paths['inference_data_directory'] + "/" + "inference.record"
 
     # Generating filenames for loading the files
-    paths['model_features_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_features_for_model" + ".csv"
-    paths['model_outcomes_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_outcomes_for_model" + ".csv"
-    paths['source_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    paths['model_features_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_features_for_model" + ".csv"
+    paths['model_outcomes_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_outcomes_for_model" + ".csv"
+    paths['source_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
     paths['inference_features_filename'] = paths['inference_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_inference_features" + ".csv"
 
-
     #Modified labels
-    paths['model_labels_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_labels_for_model" + ".csv"
+    paths['model_labels_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_labels_for_model" + ".csv"
     #Columns for feature selection
-    paths['selected_feature_columns_filename'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_selected_feature_columns.csv"
+    paths['selected_feature_columns_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_selected_feature_columns.csv"
 
     #Model specifics
     paths['svm_evaluated_model_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_evaluated_model" + ".sav"
@@ -158,7 +160,7 @@ def generate_paths(conf):
         'class_name'] + '_results_run2.pkl'
 
     # Source data files folder paths
-    paths['source_path'] = paths['target_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    paths['source_path'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
     paths['source_path_inference'] = paths['inference_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
 
     print("=== Paths ===")
@@ -391,7 +393,7 @@ def prepare_data(config_file_path, do_inference):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
-    parser.add_argument("-conf", '--config_path', default="config_LongTrend_Debug_Training.json",
+    parser.add_argument("-conf", '--config_path', default="config_debug_timedata_omxS30.json",
                         help='Configuration file path', required=False)
     parser.add_argument("-i", "--do_inference", action='store_true',
                         help="Set inference if only inference and no training")
