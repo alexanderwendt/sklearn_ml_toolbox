@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import pickle
 
 import joblib
@@ -28,8 +29,12 @@ def visualize_temporal_data(paths_path = "04_Model/paths.pickle"):
     model_directory = paths['model_directory']
     model_name = paths['dataset_name']
     source_path = paths['source_path']
+    result_directory = paths['result_directory']
 
-    figure_path_prefix = paths['results_directory'] + '/images/' + model_name
+    figure_path_prefix = result_directory + '/eval_images/' + model_name
+    if not os.path.isdir(result_directory + '/eval_images'):
+        os.mkdir(result_directory + '/eval_images')
+        print("Created folder: ", result_directory + '/eval_images')
 
     # Load model external parameters
     with open(svm_external_parameters_filename, 'r') as fp:
@@ -93,7 +98,7 @@ def visualize_temporal_data(paths_path = "04_Model/paths.pickle"):
 
 
 def main():
-    visualize_temporal_data()
+    visualize_temporal_data(paths_path=args.data_path)
 
 
 if __name__ == "__main__":
@@ -101,8 +106,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 4.6 - Train evaluation model for final testing')
     #parser.add_argument("-r", '--retrain_all_data', action='store_true',
     #                    help='Set flag if retraining with all available data shall be performed after ev')
-    #parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
-    #                    help='Prepared data', required=False)
+    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                        help='Prepared data', required=False)
 
     args = parser.parse_args()
 

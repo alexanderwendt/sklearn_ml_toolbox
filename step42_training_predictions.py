@@ -5,7 +5,7 @@ import step40_functions as step40
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 
-def load_input(paths_path = "04_Model/paths.pickle"):
+def load_input(paths_path = "config/paths.pickle"):
     '''
     Load input model and data from a prepared pickle file
 
@@ -99,7 +99,7 @@ def run_training_predictors(data_input_path):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
-    parser.add_argument("-d", '--data_path', default="04_Model/paths.pickle",
+    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
                         help='Prepared data', required=False)
 
     args = parser.parse_args()

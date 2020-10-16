@@ -1,4 +1,5 @@
 import argparse
+import os
 import pickle
 
 from IPython.core.display import display
@@ -23,7 +24,7 @@ from imblearn.combine import SMOTETomek
 from pickle import dump
 
 
-def execute_wide_search(paths_path = "04_Model/paths.pickle"):
+def execute_wide_search(paths_path = "config/paths.pickle"):
     ''' Execute the wide search algorithm
 
     :args:
@@ -47,6 +48,9 @@ def execute_wide_search(paths_path = "04_Model/paths.pickle"):
     refit_scorer_name = model['refit_scorer_name']
     selected_features = model['selected_features']
     results_file_path = paths['svm_run1_result_filename']
+    if not os.path.isdir(os.path.dirname(results_file_path)):
+        os.mkdir(os.path.dirname(results_file_path))
+        print("Directory created: ", os.path.dirname(results_file_path))
 
     # Define parameters as an array of dicts in case different parameters are used for different optimizations
     params_debug = [{'scaler': [StandardScaler()],
@@ -99,7 +103,7 @@ def execute_wide_search(paths_path = "04_Model/paths.pickle"):
     print("Stored results of run 1 to ", results_file_path)
 
 
-def extract_categorical_visualize_graphs(paths_path = "04_Model/paths.pickle", top_percentage = 0.2):
+def extract_categorical_visualize_graphs(paths_path = "config/paths.pickle", top_percentage = 0.2):
     '''
     Of the results of a wide search algorithm, find the top x percent (deafult=20%), calculate the median value for
     each parameter and select the parameter value with the best median result.
@@ -120,6 +124,7 @@ def extract_categorical_visualize_graphs(paths_path = "04_Model/paths.pickle", t
 
     model_name = paths['dataset_name']
     model_directory = paths['model_directory']
+    result_directory = paths['result_directory']
     results_file_path = paths['svm_run1_result_filename']
     refit_scorer_name = model['refit_scorer_name']
     selected_features = model['selected_features']
@@ -157,14 +162,19 @@ def extract_categorical_visualize_graphs(paths_path = "04_Model/paths.pickle", t
     sup.replace_lists_in_grid_search_params_with_strings(selected_features, feature_dict, params_run1_copy)
 
     # Plot the graphs
+    save_fig_prefix = result_directory + '/model_images'
+    if not os.path.isdir(save_fig_prefix):
+        os.mkdir(save_fig_prefix)
+        print("Created folder: ", save_fig_prefix)
+
     _, scaler_medians = vis.visualize_parameter_grid_search('scaler', params_run1, results_subset, refit_scorer_name,
-                                                            save_fig_prefix=model_directory + '/images/' + model_name)
+                                                            save_fig_prefix=save_fig_prefix + "/" + model_name)
     _, sampler_medians = vis.visualize_parameter_grid_search('sampling', params_run1, results_subset, refit_scorer_name,
-                                                             save_fig_prefix=model_directory + '/images/' + model_name)
+                                                             save_fig_prefix=save_fig_prefix + "/" + model_name)
     _, kernel_medians = vis.visualize_parameter_grid_search('svm__kernel', params_run1, results_subset, refit_scorer_name,
-                                                            save_fig_prefix=model_directory + '/images/' + model_name)
+                                                            save_fig_prefix=save_fig_prefix + "/" + model_name)
     _, feat_cols_medians = vis.visualize_parameter_grid_search('feat__cols', params_run1_copy, result_subset_copy, refit_scorer_name,
-                                                               save_fig_prefix=model_directory + '/images/' + model_name)
+                                                               save_fig_prefix=save_fig_prefix + "/" + model_name)
 
     ## Get the best parameters
 
@@ -217,7 +227,7 @@ def execute_wide_run(execute_search=True, data_input_path="04_Model" + "/" + "pr
 
 
     #Execute algotihm
-    if execute_search=='True':
+    if execute_search==True:
         print("Execute grid search")
         execute_wide_search(data_input_path)
     else:
@@ -230,9 +240,9 @@ def execute_wide_run(execute_search=True, data_input_path="04_Model" + "/" + "pr
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Step 4.3 - Execute wide grid search for SVM')
-    parser.add_argument("-exe", '--execute_wide', default=False,
+    parser.add_argument("-exe", '--execute_wide', default=True,
                         help='Execute Training', required=False)
-    parser.add_argument("-d", '--data_path', default="04_Model/paths.pickle",
+    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
                         help='Prepared data', required=False)
 
     args = parser.parse_args()

@@ -67,7 +67,7 @@ def train_final_model(paths_path = "04_Model/paths.pickle"):
 
 
 def main():
-    train_final_model()
+    train_final_model(paths_path=args.data_path)
 
 
 if __name__ == "__main__":
@@ -75,8 +75,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 4.6 - Train evaluation model for final testing')
     #parser.add_argument("-r", '--retrain_all_data', action='store_true',
     #                    help='Set flag if retraining with all available data shall be performed after ev')
-    #parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
-    #                    help='Prepared data', required=False)
+    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                        help='Prepared data', required=False)
 
     args = parser.parse_args()
 

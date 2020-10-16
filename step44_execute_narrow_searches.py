@@ -1,4 +1,5 @@
 import argparse
+import os
 import pickle
 
 from IPython.core.display import display
@@ -87,7 +88,7 @@ def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter
     return param_final, results_random_search
 
 
-def execute_narrow_search(paths_path = "04_Model/paths.pickle"):
+def execute_narrow_search(paths_path = "config/paths.pickle"):
     '''
     Execute a narrow search on the subset of data
 
@@ -110,7 +111,13 @@ def execute_narrow_search(paths_path = "04_Model/paths.pickle"):
     svm_pipe_first_selection = paths['svm_pipe_first_selection']
     svm_pipe_final_selection = paths['svm_pipe_final_selection']
     model_directory = paths['model_directory']
+    result_directory = paths['result_directory']
     model_name = paths['dataset_name']
+    save_fig_prefix = result_directory + '/model_images'
+    if not os.path.isdir(save_fig_prefix):
+        os.mkdir(save_fig_prefix)
+        print("Created folder: ", save_fig_prefix)
+
 
     #figure_path_prefix = model_directory + '/images/' + model_name
 
@@ -125,7 +132,7 @@ def execute_narrow_search(paths_path = "04_Model/paths.pickle"):
     # Execute iterated random search where parameters are even more limited
     param_final, results_run2 = execute_search_iterations_random_search_SVM(X_train, y_train, parameter_svm, pipe_run_best_first_selection, scorers,
                                                 refit_scorer_name,
-                                                save_fig_prefix=model_directory + '/images/' + model_name)
+                                                save_fig_prefix=save_fig_prefix + '/' + model_name)
 
     # Enhance kernel with found parameters
     pipe_run_best_first_selection['svm'].C = param_final['C']
@@ -149,7 +156,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 4.4 - Execute narrow incremental search for SVM')
     parser.add_argument("-exe", '--execute_narrow', default=True,
                         help='Execute narrow training', required=False)
-    parser.add_argument("-d", '--data_path', default="04_Model/paths.pickle",
+    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
                         help='Prepared data', required=False)
 
     args = parser.parse_args()

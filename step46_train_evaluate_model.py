@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import pickle
 
 import joblib
@@ -21,7 +22,7 @@ np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 
 
-def train_model_for_evaluation(paths_path = "04_Model/paths.pickle"):
+def train_model_for_evaluation(paths_path = "config/paths.pickle"):
     # Get data
     paths, model, train, test = step40.load_training_files(paths_path)
 
@@ -35,9 +36,13 @@ def train_model_for_evaluation(paths_path = "04_Model/paths.pickle"):
     svm_evaluation_model_filepath = paths['svm_evaluated_model_filename']
     svm_external_parameters_filename = paths['svm_external_parameters_filename']
     model_directory = paths['model_directory']
+    result_directory = paths['result_directory']
     model_name = paths['dataset_name']
 
-    figure_path_prefix = model_directory + '/images/' + model_name
+    figure_path_prefix = result_directory + '/model_images/' + model_name
+    if not os.path.isdir(result_directory + '/model_images'):
+        os.mkdir(result_directory + '/model_images')
+        print("Created folder: ", result_directory + '/model_images')
 
     # Load model external parameters
     with open(svm_external_parameters_filename, 'r') as fp:
@@ -116,7 +121,7 @@ def train_model_for_evaluation(paths_path = "04_Model/paths.pickle"):
 
 
 def main():
-    train_model_for_evaluation()
+    train_model_for_evaluation(paths_path=args.data_path)
 
 
 if __name__ == "__main__":
@@ -124,8 +129,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 4.6 - Train evaluation model for final testing')
     #parser.add_argument("-r", '--retrain_all_data', action='store_true',
     #                    help='Set flag if retraining with all available data shall be performed after ev')
-    #parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
-    #                    help='Prepared data', required=False)
+    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                        help='Prepared data', required=False)
 
     args = parser.parse_args()
 

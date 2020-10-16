@@ -113,10 +113,11 @@ def generate_paths(conf):
     # Generating directories
     print("Directories")
     paths['annotations'] = "annotations"
-    paths['training_data_directory'] = "data_prepared"
-    paths['inference_data_directory'] = "data_inference"
+    paths['training_data_directory'] = "data_prepared" + "/" + paths['dataset_name']
+    paths['inference_data_directory'] = "data_inference" + "/" + paths['dataset_name']
     paths['model_directory'] = "models" + "/" + paths['dataset_name']
-    paths['results_directory'] = "results"
+    paths['result_directory'] = "results" + "/" + paths['dataset_name']
+    paths['config_directory'] = "config"
 
     if os.path.isdir(paths['model_directory'])==False:
         os.mkdir(paths['model_directory'])
@@ -124,11 +125,11 @@ def generate_paths(conf):
 
     print("Training data directory: ", paths['training_data_directory'])
     print("Model directory: ", paths['model_directory'])
-    print("Results directory: ", paths['results_directory'])
+    print("Results directory: ", paths['result_directory'])
 
     # Dump file name
     paths['model_input'] = paths['model_directory'] + "/" + "model.pickle"
-    paths['paths'] = paths['model_directory'] + "/" + "paths.pickle"
+    paths['paths'] = paths['config_directory'] + "/" + "paths.pickle"
     paths['train_record'] = paths['training_data_directory'] + "/" + "train.record"
     paths['test_record'] = paths['training_data_directory'] + "/" + "test.record"
     paths['inference_record'] = paths['inference_data_directory'] + "/" + "inference.record"
@@ -155,8 +156,8 @@ def generate_paths(conf):
         'class_name'] + '_pipe_run2_final.pkl'
 
     #Results
-    paths['svm_run1_result_filename'] = paths['results_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + '_results_run1.pkl'
-    paths['svm_run2_result_filename'] = paths['results_directory'] + "/" + conf['dataset_name'] + "_" + conf[
+    paths['svm_run1_result_filename'] = paths['result_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + '_results_run1.pkl'
+    paths['svm_run2_result_filename'] = paths['result_directory'] + "/" + conf['dataset_name'] + "_" + conf[
         'class_name'] + '_results_run2.pkl'
 
     # Source data files folder paths

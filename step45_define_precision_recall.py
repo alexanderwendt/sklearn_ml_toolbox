@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import pickle
 import time
 import numpy as np
@@ -22,7 +23,7 @@ np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
-def define_precision_recall_threshold(paths_path = "04_Model/paths.pickle"):
+def define_precision_recall_threshold(paths_path = "config/paths.pickle"):
     '''
     Load model data and training data. Check if the problem is a multiclass or single class,
     the precision/recall threshold and save it to a file.
@@ -55,9 +56,13 @@ def define_precision_recall_threshold(paths_path = "04_Model/paths.pickle"):
     svm_pipe_final_selection = paths['svm_pipe_final_selection']
     svm_external_parameters_filename = paths['svm_external_parameters_filename']
     model_directory = paths['model_directory']
+    result_directory = paths['result_directory']
     model_name = paths['dataset_name']
 
-    figure_path_prefix = model_directory + '/images/' + model_name
+    figure_path_prefix = result_directory + '/model_images/' + model_name
+    if not os.path.isdir(result_directory + '/model_images'):
+        os.mkdir(result_directory + '/model_images')
+        print("Created folder: ", result_directory + '/model_images')
 
     # Check if precision recall can be applied, i.e. it is a binary problem
     if len(y_classes) > 2:
@@ -178,8 +183,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 4.5 - Define precision/recall')
     #parser.add_argument("-exe", '--execute_narrow', default=True,
     #                    help='Execute narrow training', required=False)
-    #parser.add_argument("-d", '--data_path', default="04_Model/prepared_input.pickle",
-    #                    help='Prepared data', required=False)
+    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                        help='Prepared data', required=False)
 
     args = parser.parse_args()
 
@@ -193,6 +198,6 @@ if __name__ == "__main__":
     #execute_narrow_search(data_input_path=args.data_path)
 
     # Define precision/recall
-    define_precision_recall_threshold()
+    define_precision_recall_threshold(paths_path=args.data_path)
 
     print("=== Program end ===")
