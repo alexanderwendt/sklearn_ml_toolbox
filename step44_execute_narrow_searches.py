@@ -4,7 +4,7 @@ import pickle
 
 from IPython.core.display import display
 
-import step40_functions as step40
+import execution_utils as step40
 import data_visualization_functions_for_SVM as svmvis
 import matplotlib.pyplot as plt
 
@@ -115,7 +115,7 @@ def execute_narrow_search(paths_path = "config/paths.pickle"):
     model_name = paths['dataset_name']
     save_fig_prefix = result_directory + '/model_images'
     if not os.path.isdir(save_fig_prefix):
-        os.mkdir(save_fig_prefix)
+        os.makedirs(save_fig_prefix)
         print("Created folder: ", save_fig_prefix)
 
 

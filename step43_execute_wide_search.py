@@ -6,9 +6,9 @@ from IPython.core.display import display
 from imblearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
-import step40_functions as step40
+import execution_utils as step40
 import data_handling_support_functions as sup
-import Sklearn_model_utils as modelutil
+import sklearn_utils as modelutil
 import numpy as np
 import copy
 import data_visualization_functions as vis
@@ -49,7 +49,7 @@ def execute_wide_search(paths_path = "config/paths.pickle"):
     selected_features = model['selected_features']
     results_file_path = paths['svm_run1_result_filename']
     if not os.path.isdir(os.path.dirname(results_file_path)):
-        os.mkdir(os.path.dirname(results_file_path))
+        os.makdir(os.path.dirname(results_file_path))
         print("Directory created: ", os.path.dirname(results_file_path))
 
     # Define parameters as an array of dicts in case different parameters are used for different optimizations
@@ -164,7 +164,7 @@ def extract_categorical_visualize_graphs(paths_path = "config/paths.pickle", top
     # Plot the graphs
     save_fig_prefix = result_directory + '/model_images'
     if not os.path.isdir(save_fig_prefix):
-        os.mkdir(save_fig_prefix)
+        os.makedirs(save_fig_prefix)
         print("Created folder: ", save_fig_prefix)
 
     _, scaler_medians = vis.visualize_parameter_grid_search('scaler', params_run1, results_subset, refit_scorer_name,

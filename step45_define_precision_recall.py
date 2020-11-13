@@ -9,13 +9,13 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_sc
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import classification_report, confusion_matrix
 
-import step40_functions as step40
+import execution_utils as step40
 
 from sklearn.model_selection import train_test_split
 
 import data_visualization_functions as vis
 
-import Sklearn_model_utils as model_util
+import sklearn_utils as model_util
 
 #Global settings
 np.set_printoptions(precision=3)
@@ -61,7 +61,7 @@ def define_precision_recall_threshold(paths_path = "config/paths.pickle"):
 
     figure_path_prefix = result_directory + '/model_images/' + model_name
     if not os.path.isdir(result_directory + '/model_images'):
-        os.mkdir(result_directory + '/model_images')
+        os.makedirs(result_directory + '/model_images')
         print("Created folder: ", result_directory + '/model_images')
 
     # Check if precision recall can be applied, i.e. it is a binary problem

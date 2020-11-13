@@ -38,31 +38,31 @@ from sklearn.metrics import roc_curve, precision_recall_curve, auc, make_scorer,
 #config_file_path = "config_LongTrend_Training.json"
 
 
-def generate_default_config():
-    '''
-    Generate a default configuration
-
-    args:
-        Nothing
-    return:
-        default_config: default configuration
-    '''
-
-    #Default notebook parameters as dict
-    default_config = dict()
-    default_config['use_training_settings'] = True
-    default_config['dataset_name'] = "omxs30_train"
-    default_config['source_path'] = '01_Source/^OMX_1986-2018.csv'
-    default_config['class_name'] = "LongTrend"
-    #Binarize labels
-    default_config['binarize_labels'] = True
-    default_config['class_number'] = 1   #Class number in outcomes, which shall be the "1" class
-    default_config['binary_1_label'] = "Pos. Trend"
-    default_config['binary_0_label'] = "Neg. Trend"
-    #Load model
-    default_config['use_stored_first_run_hyperparameters'] = True
-
-    return default_config
+# def generate_default_config():
+#     '''
+#     Generate a default configuration
+#
+#     args:
+#         Nothing
+#     return:
+#         default_config: default configuration
+#     '''
+#
+#     #Default notebook parameters as dict
+#     default_config = dict()
+#     default_config['use_training_settings'] = True
+#     default_config['dataset_name'] = "omxs30_train"
+#     default_config['source_path'] = '01_Source/^OMX_1986-2018.csv'
+#     default_config['class_name'] = "LongTrend"
+#     #Binarize labels
+#     default_config['binarize_labels'] = True
+#     default_config['class_number'] = 1   #Class number in outcomes, which shall be the "1" class
+#     default_config['binary_1_label'] = "Pos. Trend"
+#     default_config['binary_0_label'] = "Neg. Trend"
+#     #Load model
+#     default_config['use_stored_first_run_hyperparameters'] = True
+#
+#     return default_config
 
 def load_config(config_file_path = "config_debug_timedata_omxS30.json"):
     '''
@@ -76,7 +76,7 @@ def load_config(config_file_path = "config_debug_timedata_omxS30.json"):
     if config_file_path is None:
         # Use file default or set config
         # Use default
-        conf = generate_default_config()
+        raise TypeError
 
     else:
         # A config path was given
@@ -112,15 +112,15 @@ def generate_paths(conf):
 
     # Generating directories
     print("Directories")
-    paths['annotations'] = "annotations"
-    paths['training_data_directory'] = "data_prepared" + "/" + paths['dataset_name']
-    paths['inference_data_directory'] = "data_inference" + "/" + paths['dataset_name']
-    paths['model_directory'] = "models" + "/" + paths['dataset_name']
-    paths['result_directory'] = "results" + "/" + paths['dataset_name']
+    paths['annotations_directory'] = conf['annotations_directory']
+    paths['training_data_directory'] = conf['training_data_directory']
+    paths['inference_data_directory'] = conf['inference_data_directory']
+    paths['model_directory'] = conf['model_directory']
+    paths['result_directory'] = conf['result_directory']
     paths['config_directory'] = "config"
 
     if os.path.isdir(paths['model_directory'])==False:
-        os.mkdir(paths['model_directory'])
+        os.makedirs(paths['model_directory'])
         print("Created directory ", paths['model_directory'])
 
     print("Training data directory: ", paths['training_data_directory'])
@@ -365,6 +365,7 @@ def prepare_data(config_file_path, do_inference):
     df_X, y, y_classes, df_feature_columns = load_files(paths, do_inference)
 
     if do_inference==False:
+        print("=== Prepare training ===")
         # Save results
         model_data, train_record, test_record = create_training_validation_data(df_X, y, y_classes, df_feature_columns)
 
@@ -385,6 +386,7 @@ def prepare_data(config_file_path, do_inference):
         print("Stored test record to: ", paths['test_record'])
 
     else:
+        print("=== Prepare inference ===")
         inference_record = create_inference_data(df_X, y_classes)
 
         #Dump inference set
@@ -394,7 +396,7 @@ def prepare_data(config_file_path, do_inference):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
-    parser.add_argument("-conf", '--config_path', default="config_debug_timedata_omxS30.json",
+    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
                         help='Configuration file path', required=False)
     parser.add_argument("-i", "--do_inference", action='store_true',
                         help="Set inference if only inference and no training")

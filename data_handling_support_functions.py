@@ -1,3 +1,4 @@
+import json
 import random
 import numpy as np
 import pandas as pd
@@ -171,3 +172,30 @@ def replace_lists_in_grid_search_params_with_strings(selected_features, feature_
                 new_value = list(feature_dict.keys())[first_index]
                 params_run1_copy[i]['feat__cols'][k] = new_value
                 print("Replaced {} with {}".format(selected_features[first_index], new_value))
+
+
+def load_config(config_file_path):
+    '''
+    Load configuration or use a default configuration for testing purposes
+
+    args:
+        config_file_path: File path to config
+    return:
+        conf: loaded or default configuration
+    '''
+    if config_file_path is None:
+        # Use file default or set config
+        # Use default
+        raise TypeError
+
+    else:
+        # A config path was given
+        # Load config from path
+        with open(config_file_path, 'r') as fp:
+            conf = json.load(fp)
+
+        print("Loaded parameters from config file: ", config_file_path)
+
+    print("Loaded config: ", json.dumps(conf, indent=2))
+
+    return conf

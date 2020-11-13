@@ -11,9 +11,9 @@ from sklearn.metrics import precision_recall_curve
 
 import data_visualization_functions as vis
 
-import Sklearn_model_utils as model_util
+import sklearn_utils as model_util
 
-import step40_functions as step40
+import execution_utils as step40
 
 #Global settings
 np.set_printoptions(precision=3)
@@ -41,7 +41,7 @@ def train_model_for_evaluation(paths_path = "config/paths.pickle"):
 
     figure_path_prefix = result_directory + '/model_images/' + model_name
     if not os.path.isdir(result_directory + '/model_images'):
-        os.mkdir(result_directory + '/model_images')
+        os.makedirs(result_directory + '/model_images')
         print("Created folder: ", result_directory + '/model_images')
 
     # Load model external parameters

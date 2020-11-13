@@ -6,7 +6,7 @@ import numpy as np
 
 import joblib
 
-import step40_functions as step40
+import execution_utils as step40
 
 
 def train_final_model(paths_path = "04_Model/paths.pickle"):

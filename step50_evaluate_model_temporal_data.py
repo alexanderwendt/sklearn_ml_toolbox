@@ -6,10 +6,10 @@ import pickle
 import joblib
 import pandas as pd
 import matplotlib.dates as mdates
-import Sklearn_model_utils as model_util
+import sklearn_utils as model_util
 import data_visualization_functions as vis
 
-import step40_functions as step40
+import execution_utils as step40
 
 def visualize_temporal_data(paths_path = "04_Model/paths.pickle"):
     # Load intermediate model, which has only been trained on training data
@@ -33,7 +33,7 @@ def visualize_temporal_data(paths_path = "04_Model/paths.pickle"):
 
     figure_path_prefix = result_directory + '/eval_images/' + model_name
     if not os.path.isdir(result_directory + '/eval_images'):
-        os.mkdir(result_directory + '/eval_images')
+        os.makedirs(result_directory + '/eval_images')
         print("Created folder: ", result_directory + '/eval_images')
 
     # Load model external parameters
