@@ -19,13 +19,15 @@ import data_visualization_functions as vis
 import data_handling_support_functions as sup
 
 from pandas.plotting import register_matplotlib_converters
+
 register_matplotlib_converters()
 
-#Global settings
+# Global settings
 np.set_printoptions(precision=3)
 
-#Suppress print out in scientific notiation
+# Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
+
 
 def clean_features_first_pass(features_raw, class_name):
     '''
@@ -49,8 +51,8 @@ def clean_features_first_pass(features_raw, class_name):
 
     print("Features size : ", features.shape)
     display(features.head(5))
-    #print("Outcomes size : ", outcomes.shape)
-    #display(outcomes.head(5))
+    # print("Outcomes size : ", outcomes.shape)
+    # display(outcomes.head(5))
 
     ## Data Cleanup of Features and Outcomes before Features are Modified
 
@@ -78,11 +80,12 @@ def clean_features_first_pass(features_raw, class_name):
     print("\n")
 
     print("feature columns: {}\n".format(features.columns))
-    #print("Outcome column: {}".format(outcomes[class_name].name))
+    # print("Outcome column: {}".format(outcomes[class_name].name))
 
     return features
 
-def load_files(data_directory, dataset_name, class_name):
+
+def load_files(data_directory, dataset_name, class_name, on_inference_data):
     # Constants for all notebooks in the Machine Learning Toolbox
     print("Data source: {}".format(data_directory))
 
@@ -93,17 +96,17 @@ def load_files(data_directory, dataset_name, class_name):
     source_filename = data_directory + "/" + dataset_name + "_source" + ".csv"
     labels_filename = data_directory + "/" + dataset_name + "_labels" + ".csv"
     # Columns for feature selection
-    #selected_feature_columns_filename = data_directory + "/" + dataset_name + "_" + class_name + "_selected_feature_columns.csv"
+    # selected_feature_columns_filename = data_directory + "/" + dataset_name + "_" + class_name + "_selected_feature_columns.csv"
 
     print("=== Paths ===")
     print("Input Features: ", input_features_filename)
-    #print("Output Features: ", model_features_filename)
+    # print("Output Features: ", model_features_filename)
     print("Input Outcomes: ", input_outcomes_filename)
-    #print("Output Outcomes: ", model_outcomes_filename)
+    # print("Output Outcomes: ", model_outcomes_filename)
     print("Labels: ", labels_filename)
     print("Original source: ", source_filename)
-    #print("Labels for the model: ", model_labels_filename)
-    #print("Selected feature columns: ", selected_feature_columns_filename)
+    # print("Labels for the model: ", model_labels_filename)
+    # print("Selected feature columns: ", selected_feature_columns_filename)
 
     ### Load Features and Outcomes
 
@@ -112,12 +115,16 @@ def load_files(data_directory, dataset_name, class_name):
     display(features_raw.head(1))
 
     # === Load Outcomes ===#
-    outcomes_raw = pd.read_csv(input_outcomes_filename, sep=';').set_index('id')  # Set ID to be the data id
-    display(outcomes_raw.head(1))
+    if not on_inference_data:
+        outcomes_raw = pd.read_csv(input_outcomes_filename, sep=';').set_index('id')  # Set ID to be the data id
+        display(outcomes_raw.head(1))
+    else:
+        outcomes_raw =None
+        print("No outcomes available for inference data")
 
     # === Load Source ===#
     # Load original data for visualization
-    data_source_raw = load_data_source(source_filename)
+    data_source_raw = sup.load_data_source(source_filename)
 
     # === Load class labels or modify ===#
     class_labels = load_class_labels(labels_filename)
@@ -125,22 +132,22 @@ def load_files(data_directory, dataset_name, class_name):
     return features_raw, outcomes_raw, data_source_raw, class_labels
 
 
-def load_data_source(source_filename):
-    '''
-
-
-    '''
-    source = pd.read_csv(source_filename, sep=';').set_index('id')  # Set ID to be the data id
-    display(source.head(1))
-
-    source = pd.read_csv(source_filename, delimiter=';').set_index('id')
-    source['Date'] = pd.to_datetime(source['Date'])
-    source['Date'].apply(mdates.date2num)
-    print("Loaded source time graph={}".format(source.columns))
-    print("X. Shape={}".format(source.shape))
-    display(source.head())
-
-    return source
+# def load_data_source(source_filename):
+#     '''
+#
+#
+#     '''
+#     source = pd.read_csv(source_filename, sep=';').set_index('id')  # Set ID to be the data id
+#     display(source.head(1))
+#
+#     source = pd.read_csv(source_filename, delimiter=';').set_index('id')
+#     source['Date'] = pd.to_datetime(source['Date'])
+#     source['Date'].apply(mdates.date2num)
+#     print("Loaded source time graph={}".format(source.columns))
+#     print("X. Shape={}".format(source.shape))
+#     display(source.head())
+#
+#     return source
 
 
 def load_class_labels(labels_filename):
@@ -164,7 +171,8 @@ def load_class_labels(labels_filename):
     # }
     print(class_labels)
 
-    return  class_labels
+    return class_labels
+
 
 def print_characteristics(features_raw, image_save_directory, dataset_name, save_graphs=False):
     for i, d in enumerate(features_raw.dtypes):
@@ -183,12 +191,12 @@ def print_characteristics(features_raw, image_save_directory, dataset_name, save
                 dpi=300)
         plt.show()
 
+
 def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_name):
     # Define file names
     print("Results target: {}".format(result_directory))
 
     ## Analyse the Features Individually
-
 
     # Print graphs for all features
 
@@ -200,19 +208,21 @@ def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_n
     numFeatures = features.shape[1]
     print("Number of features={}".format(numFeatures))
 
-    # Get the number of classes for the supervised learning
-    numClasses = outcomes[class_name].value_counts().shape[0]
-    print("Number of classes={}".format(numClasses))
-
     save_graphs = True  # If set true, then all images are saved into the image save directory.
+
+    # Get the number of classes for the supervised learning
+    if not outcomes is None:
+        numClasses = outcomes[class_name].value_counts().shape[0]
+        print("Number of classes={}".format(numClasses))
+
+        # Print graphs for all features
+        print_characteristics(outcomes, result_directory, dataset_name, save_graphs=save_graphs)
+    else:
+        numClasses = -1
 
     # Print graphs for all features
     print_characteristics(features, result_directory, dataset_name, save_graphs=save_graphs)
 
-    save_graphs = True  # If set true, then all images are saved into the image save directory.
-
-    # Print graphs for all features
-    print_characteristics(outcomes, result_directory, dataset_name, save_graphs=save_graphs)
 
 def main():
     conf = sup.load_config(args.config_path)
@@ -235,21 +245,23 @@ def main():
         os.makedirs("tmp")
         print("Created directory: ", "tmp")
 
-    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(data_directory, conf['dataset_name'], conf['class_name'])
+    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(data_directory, conf['dataset_name'],
+                                                                                conf['class_name'], args.on_inference_data)
     ## Data Cleanup of Features and Outcomes before Features are Modified
     features_cleaned1 = clean_features_first_pass(features_raw, class_labels)
 
     analyze_raw_data(features_cleaned1, outcomes_cleaned1, result_directory, conf['dataset_name'], conf['class_name'])
 
-    #Save structures for further processing
+    # Save structures for further processing
     # Dump path data
-    dump((features_cleaned1, outcomes_cleaned1, class_labels, data_source_raw, data_directory, result_directory), open(data_preparation_dump_file_path, 'wb'))
+    dump((features_cleaned1, outcomes_cleaned1, class_labels, data_source_raw, data_directory, result_directory),
+         open(data_preparation_dump_file_path, 'wb'))
     print("Stored paths to: ", data_preparation_dump_file_path)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Step 3.1 - Analyze Data')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
+    # parser.add_argument("-r", '--retrain_all_data', action='store_true',
     #                    help='Set flag if retraining with all available data shall be performed after ev')
     parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
                         help='Configuration file path', required=False)
@@ -258,10 +270,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    #if not args.pb and not args.xml:
+    # if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
     main()
-
 
     print("=== Program end ===")

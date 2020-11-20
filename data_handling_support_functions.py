@@ -2,6 +2,8 @@ import json
 import random
 import numpy as np
 import pandas as pd
+import matplotlib.dates as mdates
+
 
 def inverse_dict(dictionary):
     '''
@@ -199,3 +201,43 @@ def load_config(config_file_path):
     print("Loaded config: ", json.dumps(conf, indent=2))
 
     return conf
+
+def load_data_source(source_filename):
+    '''
+
+
+    '''
+    source = pd.read_csv(source_filename, sep=';').set_index('id')  # Set ID to be the data id
+    print(source.head(1))
+
+    source = pd.read_csv(source_filename, delimiter=';').set_index('id')
+    source['Date'] = pd.to_datetime(source['Date'])
+    source['Date'].apply(mdates.date2num)
+    print("Loaded source time graph={}".format(source.columns))
+    print("X. Shape={}".format(source.shape))
+    print(source.head())
+
+    return source
+
+def load_class_labels(labels_path):
+    '''
+
+
+    '''
+
+    # === Load Class Labels ===#
+    # Get classes into a dict from outcomes
+    # class_labels = dict(zip(outcomes_raw[class_name].unique(), list(range(1,len(outcomes_raw[class_name].unique())+1, 1))))
+    # print(class_labels)
+    # Load class labels file
+    df_y_classes = pd.read_csv(labels_path, delimiter=';', header=None)
+    class_labels = inverse_dict(df_y_classes.set_index(df_y_classes.columns[0]).to_dict()[1])
+    print("Loaded  classes from file", class_labels)
+    # === Define classes manually ===#
+    # class_labels = {
+    #    0 : 'class1',
+    #    1 : 'class2'
+    # }
+    print(class_labels)
+
+    return class_labels

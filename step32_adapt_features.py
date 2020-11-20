@@ -158,34 +158,6 @@ def main():
                                  key))  # Classes are saved inverse to the labelling in the file, i.e. first value, then key
     print("Saved class names and id to " + model_labels_filename)
 
-    #annotations_directory = conf['annotations_directory']
-
-    #if not args.on_inference_data:
-    #    data_directory = conf['training_data_directory']
-    #    result_directory = conf['result_directory'] + "/analysis_training"
-    #else:
-    #    data_directory = conf['inference_data_directory']
-    #    result_directory = conf['result_directory'] + "/analysis_inference"
-
-    #if not os.path.isdir(result_directory):
-    #    os.makedirs(result_directory)
-    #    print("Created directory: ", result_directory)
-
-    #data_preparation_dump_file_path = os.path.join("tmp", "step31out.pickle")
-    #if not os.path.isdir("tmp"):
-    #    os.makedirs("tmp")
-    #    print("Created directory: ", "tmp")
-
-    #features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(data_directory, conf['dataset_name'], conf['class_name'])
-    ## Data Cleanup of Features and Outcomes before Features are Modified
-    #features_cleaned1 = clean_features_first_pass(features_raw, class_labels)
-
-    #analyze_raw_data(features_cleaned1, outcomes_cleaned1, result_directory, conf['dataset_name'], conf['class_name'])
-
-    #Save structures for further processing
-    # Dump path data
-    #dump((features_cleaned1, outcomes_cleaned1, class_labels, data_directory, result_directory), open(data_preparation_dump_file_path, 'wb'))
-    #print("Stored paths to: ", data_preparation_dump_file_path)
 
 if __name__ == "__main__":
 

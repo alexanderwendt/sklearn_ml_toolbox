@@ -25,71 +25,6 @@ np.set_printoptions(suppress=True)
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, precision_recall_curve, auc, make_scorer, recall_score, accuracy_score, precision_score, f1_score, confusion_matrix
 
-#Load skip cell kernel extension
-#Source: https://stackoverflow.com/questions/26494747/simple-way-to-choose-which-cells-to-run-in-ipython-notebook-during-run-all
-# #%%skip True  #skips cell
-# #%%skip False #won't skip
-#should_skip = True
-# #%%skip $should_skip
-# %load_ext skip_kernel_extension
-
-# Load config files
-#config_file_path = "config_LongTrend_Debug_Training.json"
-#config_file_path = "config_LongTrend_Training.json"
-
-
-# def generate_default_config():
-#     '''
-#     Generate a default configuration
-#
-#     args:
-#         Nothing
-#     return:
-#         default_config: default configuration
-#     '''
-#
-#     #Default notebook parameters as dict
-#     default_config = dict()
-#     default_config['use_training_settings'] = True
-#     default_config['dataset_name'] = "omxs30_train"
-#     default_config['source_path'] = '01_Source/^OMX_1986-2018.csv'
-#     default_config['class_name'] = "LongTrend"
-#     #Binarize labels
-#     default_config['binarize_labels'] = True
-#     default_config['class_number'] = 1   #Class number in outcomes, which shall be the "1" class
-#     default_config['binary_1_label'] = "Pos. Trend"
-#     default_config['binary_0_label'] = "Neg. Trend"
-#     #Load model
-#     default_config['use_stored_first_run_hyperparameters'] = True
-#
-#     return default_config
-
-def load_config(config_file_path = "config_debug_timedata_omxS30.json"):
-    '''
-    Load configuration or use a default configuration for testing purposes
-
-    args:
-        config_file_path: File path to config
-    return:
-        conf: loaded or default configuration
-    '''
-    if config_file_path is None:
-        # Use file default or set config
-        # Use default
-        raise TypeError
-
-    else:
-        # A config path was given
-        # Load config from path
-        with open(config_file_path, 'r') as fp:
-            conf = json.load(fp)
-
-        print("Loaded parameters from config file: ", config_file_path)
-
-    print("Loaded config: ", json.dumps(conf, indent=2))
-
-    return conf
-
 def generate_paths(conf):
     '''
     Generate paths to save the files that we generate during the machine learning cycle. It adapt paths according to
@@ -360,7 +295,7 @@ def prepare_data(config_file_path, do_inference):
         Nothing
 
     '''
-    conf = load_config(config_file_path)
+    conf = sup.load_config(config_file_path)
     paths = generate_paths(conf)
     df_X, y, y_classes, df_feature_columns = load_files(paths, do_inference)
 
