@@ -4,6 +4,8 @@ import os
 import numpy as np
 import pandas as pd
 import scipy.stats
+import matplotlib.pyplot as plt
+import numpy as np
 from math import sqrt
 import matplotlib.pyplot as plt
 import matplotlib as m
@@ -11,7 +13,14 @@ from matplotlib import ticker
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
 from statsmodels.stats.diagnostic import acorr_ljungbox
-
+import numpy as np
+import sklearn.datasets as ds
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.artist import setp
 from sklearn.manifold import TSNE
 
 import data_visualization_functions as vis
@@ -198,8 +207,7 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
 
     '''
 
-    import matplotlib.pyplot as plt
-    import numpy as np
+
 
     # Feature Visualization
     # Here, feature selection and visulization of datasets is performed Methods - Feature visualization through
@@ -220,6 +228,7 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
 
     plot_correlation_matrix(conf, features, image_save_directory, total_values_scaled)
 
+    #fixme: check this
     plot_correlation_matrix2(conf, image_save_directory, total_values_scaled)
 
     plot_spearman_correlation_matrix(conf, image_save_directory, total_values_scaled)
@@ -292,53 +301,28 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     #plot_parallel_coordinates(X_train_index_subset, cols, comparison_name, total_values)
 
     #### t-SNE Parameter Grid Search
-    find_tsne_parmeters(X_train_scaled_subset, y_train_scaled_subset, class_labels)
+    calibrate_tsne = False
+    if calibrate_tsne:
+        find_tsne_parmeters(X_train_scaled_subset, y_train_scaled_subset, class_labels)
 
     # t-SNE plot
     plot_t_sne(X_train_scaled_subset, y_train_scaled_subset, class_labels, conf, image_save_directory)
 
     ### UMAP Cluster Analysis
-    # Use a supervised / unsupervised analysis to make the clusters
-
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-
-    sns.set(style='white', context='poster')
-
-    # import umap
-    import umap.umap_ as umap  # Work around from https://github.com/lmcinnes/umap/issues/24
-
-    # %time #Time of the whole cell
-    embeddingUnsupervised = umap.UMAP(n_neighbors=5).fit_transform(X_scaled)
-    # %time #Time of the whole cell
-    embeddingSupervised = umap.UMAP(n_neighbors=5).fit_transform(X_scaled, y=y)
-
-
-    vis.plotUmap(embeddingUnsupervised, y, list(class_labels.values()), 'Dataset unsupervised clustering',
-                 cmapString='RdYlGn')
-    plt.savefig(image_save_directory + '/' + conf['dataset_name'] + '_UMAP_Unsupervised', dpi=300)
-    vis.plotUmap(embeddingSupervised, y, list(class_labels.values()), 'Dataset supervised clustering')
-    plt.savefig(image_save_directory + '/' + conf['dataset_name'] + '_UMAP_Supervised', dpi=300)
-
-
+    plot_umap(X_scaled, class_labels, conf, image_save_directory, y)
 
     ### PCA Analysis
 
+    plot_pca(X_scaled, class_labels, conf, image_save_directory, y)
 
 
-    import sklearn.datasets as ds
-    from sklearn.decomposition import PCA
-    from sklearn.preprocessing import StandardScaler
-    import seaborn as sns
+def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
 
     m.rc_file_defaults()  # Reset sns
-
     pca_trafo = PCA().fit(X_scaled);
     pca_values = pca_trafo.transform(X_scaled)
     # from adjustText import adjust_text
     targets = np.array(y).flatten()
-
     fig, ax1 = plt.subplots(figsize=(10, 8))
     plt.semilogy(pca_trafo.explained_variance_ratio_, '--o');
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
@@ -348,58 +332,94 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     plt.xticks(np.arange(0, len(pca_trafo.explained_variance_ratio_)))
     plt.hlines(0.95, 0, len(pca_trafo.explained_variance_ratio_.cumsum()), colors='red', linestyles='solid',
                label='95% variance covered')
-    plt.savefig(image_save_directory + '/' + conf['dataset_name'] + '_PCA_Variance_Coverage', dpi=300)
+
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_PCA_Variance_Coverage'), dpi=300)
+
+    plt.show()
+
 
     fig = plt.figure()
     sns.heatmap(np.log(pca_trafo.inverse_transform(np.eye(X_scaled.shape[1]))), cmap="hot", cbar=True)
-
     necessary_components = pca_trafo.explained_variance_ratio_.cumsum()[
         pca_trafo.explained_variance_ratio_.cumsum() < 0.95]
     print("95% variance covered with the {} first components. Values={}".format(len(necessary_components),
                                                                                 necessary_components))
-
     plt.figure(figsize=(10, 10))
     # plt.scatter(pca_values[:,0], pca_values[:,1], c=targets, edgecolor='none', label=class_labels.values(), alpha=0.5)
     for i, t in enumerate(set(targets)):
         idx = targets == t
         plt.scatter(pca_values[idx, 0], pca_values[idx, 1], label=class_labels[t], edgecolor='none', alpha=0.5)
-
     plt.legend(labels=class_labels.values(), bbox_to_anchor=(1, 1));
     plt.xlabel('Component 1')
     plt.ylabel('Component 2')
 
-    plt.savefig(image_save_directory + '/' + conf['dataset_name'] + '_PCA_Plot', dpi=300)
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_PCA_Plot'), dpi=300)
+
+    plt.show()
+
+
+def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
+    # Use a supervised / unsupervised analysis to make the clusters
+
+    sns.set(style='white', context='poster')
+    # import umap
+    import umap.umap_ as umap  # Work around from https://github.com/lmcinnes/umap/issues/24
+    # %time #Time of the whole cell
+    embeddingUnsupervised = umap.UMAP(n_neighbors=5).fit_transform(X_scaled)
+    # %time #Time of the whole cell
+    embeddingSupervised = umap.UMAP(n_neighbors=5).fit_transform(X_scaled, y=y)
+    vis.plotUmap(embeddingUnsupervised, y, list(class_labels.values()), 'Dataset unsupervised clustering',
+                 cmapString='RdYlGn')
+
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_UMAP_Unsupervised'), dpi=300)
+
+    plt.show()
+
+    vis.plotUmap(embeddingSupervised, y, list(class_labels.values()), 'Dataset supervised clustering')
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_UMAP_Supervised'), dpi=300)
 
     plt.show()
 
 
 def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
     # Optimize t-sne plot
-    tne_gridsearch = False
+    #tne_gridsearch = False
     # Create a TSNE grid search with two variables
     perplex = [5, 10, 30, 50, 100]
     exaggregation = [5, 12, 20, 50, 100]
     # learning_rate = [10, 50, 200]
     fig, axarr = plt.subplots(len(perplex), len(exaggregation), figsize=(15, 15))
-    if tne_gridsearch == True:
-        # for m,l in enumerate(learning_rate):
-        for k, p in enumerate(perplex):
-            # print("i {}, p {}".format(i, p))
-            for j, e in enumerate(exaggregation):
-                # print("j {}, e {}".format(j, e))
-                X_embedded = TSNE(n_components=2, perplexity=p, early_exaggeration=e, n_iter=5000,
-                                  n_iter_without_progress=1000, learning_rate=10).fit_transform(
-                    X_scaled_subset)
+    #if tne_gridsearch == True:
+    # for m,l in enumerate(learning_rate):
+    for k, p in enumerate(perplex):
+        # print("i {}, p {}".format(i, p))
+        for j, e in enumerate(exaggregation):
+            # print("j {}, e {}".format(j, e))
+            X_embedded = TSNE(n_components=2, perplexity=p, early_exaggeration=e, n_iter=5000,
+                              n_iter_without_progress=1000, learning_rate=10).fit_transform(
+                X_scaled_subset)
 
-                for i, t in enumerate(set(y_scaled_subset)):
-                    idx = y_scaled_subset == t
-                    axarr[k, j].scatter(X_embedded[idx, 0], X_embedded[idx, 1], label=class_labels[t])
+            for i, t in enumerate(set(y_scaled_subset)):
+                idx = y_scaled_subset == t
+                axarr[k, j].scatter(X_embedded[idx, 0], X_embedded[idx, 1], label=class_labels[t])
 
-                axarr[k, j].set_title("p={}, e={}".format(p, e))
+            axarr[k, j].set_title("p={}, e={}".format(p, e))
 
-                # clear_output(wait=True)
-                print('perplex paramater={}/{}, exaggregation parameterj={}/{}'.format(k, len(perplex), j,
-                                                                                       len(exaggregation)))
+            # clear_output(wait=True)
+            print('perplex paramater={}/{}, exaggregation parameterj={}/{}'.format(k, len(perplex), j,
+                                                                                   len(exaggregation)))
     fig.subplots_adjust(hspace=0.3)
 
     plt.gcf()
@@ -620,7 +640,7 @@ def plot_correlation_matrix(conf, features, image_save_directory, total_values):
     print(total_values.columns[feature_plot])
     # http://benalexkeen.com/correlation-in-python/
     # https://stackoverflow.com/questions/26975089/making-the-labels-of-the-scatterplot-vertical-and-horizontal-in-pandas
-    from matplotlib.artist import setp
+
     m.rc_file_defaults()  # Reset sns
     axs = pd.plotting.scatter_matrix(total_values.iloc[:, feature_plot], figsize=(15, 15), alpha=0.2, diagonal='kde')
     n = len(features.iloc[:, feature_plot].columns)
@@ -689,7 +709,8 @@ def main():
 
     image_save_directory = conf['result_directory'] + "/analysis_data_analysis"
 
-    analyze_timegraph(source, features, image_save_directory)
+    #analyze_timegraph(source, features, image_save_directory)
+    analyse_features(features, y, class_labels, source, conf, image_save_directory)
 
 
 
