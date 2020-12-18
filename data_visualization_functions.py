@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as m
@@ -11,6 +13,8 @@ from scipy.stats import ks_2samp
 import seaborn as sns
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.manifold import TSNE
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.stats.diagnostic import acorr_ljungbox
 
 import data_handling_support_functions as sup
 
@@ -330,7 +334,7 @@ def plotUmap(embedding, y, classList, title, cmapString='RdYlGn'):
 def amplifyForPlot(binaryArray, targetArray, distance):
     return binaryArray * targetArray * (1-distance)
 
-def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, legend, save_fig_prefix=None):
+def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, legend, title="Prediction Results", save_fig_prefix=None):
     
     y0 = (y_class==0)*1
     y1 = (y_class==1)*1
@@ -347,30 +351,34 @@ def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, le
     plt.plot(y_time, plot_data_OK, color='grey')
     plt.plot(y_time, plot_data_blim, color='green')
     plt.plot(y_time, plot_data_tlim, color='red')
-    plt.title("Prediction Results")
+    plt.title(title)
     plt.ylim([np.min(y_ref)*0.99999, np.max(y_ref)*1.00002])
     plt.grid()
     plt.legend(legend)
 
-    if save_fig_prefix != None:
-        plt.savefig(save_fig_prefix + '_three_class_graph')
+    if save_fig_prefix:
+        if not os.path.isdir(save_fig_prefix):
+            os.makedirs(save_fig_prefix)
+        plt.savefig(os.path.join(save_fig_prefix, title + '_three_class_graph'), dpi=300)
 
     plt.show()
 
 
 # %% pycharm={"is_executing": false}
-def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend, save_fig_prefix=None):
+def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend, title="Prediction Results", save_fig_prefix=None):
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(y_time, y_ref)
     plt.plot(y_time, amplifyForPlot(binclass, y_ref, offset_binclass), color='orange')
     #plt.title(conf['source_path'])
-    plt.title("Prediction Results")
+    plt.title(title)
     plt.ylim([np.min(y_ref)*0.99999, np.max(y_ref)*1.00002])
     plt.grid()
     plt.legend(legend)
 
-    if save_fig_prefix != None:
-        plt.savefig(save_fig_prefix + '_two_class_graph')
+    if save_fig_prefix:
+        if not os.path.isdir(save_fig_prefix):
+            os.makedirs(save_fig_prefix)
+        plt.savefig(os.path.join(save_fig_prefix, title + '_two_class_graph'), dpi=300)
 
     plt.show()
 
@@ -836,3 +844,77 @@ def plot_decision_boundary(X, y, model, save_fig_prefix=None):
         plt.savefig(save_fig_prefix + '_decision_boundary_plot')
 
     plt.show()
+
+def plot_autocorrelation(feature, title, mode=None, lags=None, xlim=None, ylim=None, image_save_directory=None):
+    '''
+    Plot autocorrelations or partial autocorrelations
+
+    '''
+
+    if mode=="pacf":
+        plot_pacf(feature, lags=lags)
+        plt.title("Partial Autocorrelation of " + title + ", lags=" + str(lags))
+        savepath = os.path.join(image_save_directory, "AC_" + title + "_lags_" + str(lags))
+    else:
+        plot_acf(feature, lags=lags)
+        plt.title("Autocorrelation of " + title + ", lags=" + str(lags))
+        savepath = os.path.join(image_save_directory, "PAC_" + title + "_lags_" + str(lags))
+
+    print("=====================================")
+    print("Title: ", plt.gcf().axes[0].get_title())
+
+
+    plt.xlabel("Lag")
+    plt.ylabel("Correlation")
+    if xlim:
+        plt.xlim(xlim)
+    if ylim:
+        plt.ylim(ylim)
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(savepath)
+
+    print(
+        "Plot the total autocorrelation of the price.The dark blue values are "
+        "the correlation of the price with the lag." +
+        "The light blue cone is the confidence interval. If the correlation is > cone, "
+        "the value is significant.")
+
+    print("Ljung-Box statistics: p-value=", acorr_ljungbox(feature, lags=None, boxpierce="Ljung-Box")[1])
+    print("If p values > 0.05 then there are significant autocorrelations.")
+
+    plt.show()
+
+def plot_temporal_correlation_feature(X_scaled, conf, image_save_directory, source, y_scaled):
+    '''
+
+    https://towardsdatascience.com/four-ways-to-quantify-synchrony-between-time-series-data-b99136c4a9c9
+
+    '''
+
+    window_size = 90
+    # Only for time series continuous correlation
+    # Check correlations for the following attributes
+    for col in X_scaled.columns:
+        # cols = ['MA100Norm', 'RSI20']
+        # col_index = [X_scaled.columns.get_loc(c) for c in cols if c in X_scaled]
+        col_index = [X_scaled.columns.get_loc(col)]
+
+        #FIXME: Drop columns to well specified
+        tmp = X_scaled.iloc[:, col_index].join(source['Date']).join(y_scaled).reset_index().set_index('Date').drop(
+            columns=['id'])
+        # display(tmp)
+        #tmp.dropna().resample('Q').apply(lambda x: x.corr(method='spearman')).iloc[:, -1].unstack().iloc[:, :-1].plot(
+        #    title='Correlation of Features to Outcome', figsize=(8, 2))
+        tmp.dropna().interpolate()[tmp.columns[0]].rolling(window=window_size, center=True).corr(tmp[tmp.columns[-1]]).plot(
+            title='Correlation of Feature ' + tmp.columns[0] + ' to Outcome ' + tmp.columns[-1], figsize=(8, 2))
+        plt.ylim(-1, 1)
+        plt.hlines([-0.2, 0.2], xmin=tmp.index[0], xmax=tmp.index[-1], colors='r')
+
+        if image_save_directory:
+            if not os.path.isdir(image_save_directory):
+                os.makedirs(image_save_directory)
+            plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_Temporal_Correlation_feature_{}_to_Outcome_{}'.format(col, tmp.columns[-1])), dpi=300)
+
+        plt.show()

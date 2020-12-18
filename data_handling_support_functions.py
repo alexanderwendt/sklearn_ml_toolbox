@@ -1,3 +1,4 @@
+import configparser
 import json
 import random
 import numpy as np
@@ -176,7 +177,7 @@ def replace_lists_in_grid_search_params_with_strings(selected_features, feature_
                 print("Replaced {} with {}".format(selected_features[first_index], new_value))
 
 
-def load_config(config_file_path):
+def load_config_bak(config_file_path):
     '''
     Load configuration or use a default configuration for testing purposes
 
@@ -201,6 +202,14 @@ def load_config(config_file_path):
     print("Loaded config: ", json.dumps(conf, indent=2))
 
     return conf
+
+def load_config(config_file_path):
+    #config_path = Path(sys.path[0], "config", "classification.cfg")
+    config = configparser.ConfigParser()
+    config.read(config_file_path)
+
+    return config
+
 
 def load_data_source(source_filename):
     '''
@@ -241,3 +250,32 @@ def load_class_labels(labels_path):
     print(class_labels)
 
     return class_labels
+
+def load_features(conf):
+    '''
+
+
+    '''
+
+    training_data_directory = conf["training_data_directory"]
+    dataset_name = conf["dataset_name"]
+    class_name = conf["class_name"]
+
+    model_features_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_features_for_model" + ".csv"
+    model_outcomes_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_outcomes_for_model" + ".csv"
+    model_labels_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_labels_for_model" + ".csv"
+
+    # === Load Features ===#
+    features = pd.read_csv(model_features_filename, sep=';').set_index('id')  # Set ID to be the data id
+    print(features.head(1))
+
+    # === Load y values ===#
+    df_y = pd.read_csv(model_outcomes_filename, delimiter=';').set_index('id')
+    y = df_y.values.flatten()
+
+    #=== Load classes ===#
+    class_labels = load_class_labels(model_labels_filename)
+
+    print("Loaded files to analyse")
+
+    return features, y, df_y, class_labels

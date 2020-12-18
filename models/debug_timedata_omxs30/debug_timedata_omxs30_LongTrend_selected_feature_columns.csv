@@ -1,0 +1,14 @@
+Lasso;Tree;Backward_Elimination;RecursiveTop3;RecursiveTop6;RecursiveTop9;RecursiveTop12;Manual;All
+MA200Norm;RSI14_diff;NormKurs50;MA200Norm;MA200Norm;MA200Norm;MA200Norm;MA200Norm;NormKurs50
+RSI3sign;RSI9_diff;NormKurs200;NormKurs200;NormKurs200;NormKurs200;NormKurs200;MA50Norm;NormKurs200
+NumberRise50;MA200NormDiff;NumberRise200;NumberRise50;NumberRise50;NumberRise50;NumberRise50;NormKurs200;NumberRise50
+NormKurs50;MA50NormDiff;MA50Norm;;NormKurs50;NormKurs50;NormKurs50;NormKurs50;NumberRise200
+NormKurs200;RSI_9;MA200Norm;;MA50Norm;MA50Norm;MA50Norm;NumberRise200;MA50Norm
+;RSI_14;RSI_9;;RSI_14;RSI_14;RSI_14;NumberRise50;MA200Norm
+;NumberRise50;RSI3sign;;;NumberRise200;NumberRise200;RSI3sign;MA50NormDiff
+;NumberRise200;;;;RSI3sign;RSI3sign;RSI_9;MA200NormDiff
+;MA50Norm;;;;RSI_9;RSI_9;;RSI_9
+;NormKurs50;;;;;MA50NormDiff;;RSI_14
+;MA200Norm;;;;;RSI14_diff;;RSI9_diff
+;NormKurs200;;;;;RSI9_diff;;RSI14_diff
+;;;;;;;;RSI3sign
