@@ -1,21 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 2X Data generation: Generate ground truth for stock markets based on OHLC data
+License_info: TBD
+"""
+
+# Futures
+
+# Built-in/Generic Imports
+
+# Libs
 import argparse
 import os
-
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import datetime
 from statsmodels.nonparametric.smoothers_lowess import lowess
 import numpy as np
 from scipy.ndimage.interpolation import shift
-
-import data_visualization_functions as vis
-import custom_methods as custom
-import data_handling_support_functions as sup
-
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
+
+# Own modules
+import data_handling_support_functions as sup
+import custom_methods as custom
+import data_visualization_functions as vis
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+# Global settings
+np.set_printoptions(precision=3)
+# Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+
+parser = argparse.ArgumentParser(description='Step 2.0 - Generate features and outcomes from raw data')
+# parser.add_argument("-r", '--retrain_all_data', action='store_true',
+#                    help='Set flag if retraining with all available data shall be performed after ev')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+# parser.add_argument("-i", "--on_inference_data", action='store_true',
+#                    help="Set inference if only inference and no training")
+
+args = parser.parse_args()
+
 
 def generate_custom_class_labels():
     '''
@@ -545,17 +580,6 @@ def main():
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 2.0 - Generate features and outcomes from raw data')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
-                        help='Configuration file path', required=False)
-    #parser.add_argument("-i", "--on_inference_data", action='store_true',
-    #                    help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
     #if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 

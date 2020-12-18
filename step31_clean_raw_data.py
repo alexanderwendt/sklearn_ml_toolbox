@@ -1,32 +1,59 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 3X Preprocessing: Clean raw data
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
+
+# Libs
 import argparse
-import json
 import os
 from pickle import dump
-
 import numpy as np
 import pandas as pd
-import matplotlib.dates as mdates
-import datetime
-import scipy.stats
-from math import sqrt
 import matplotlib.pyplot as plt
-import matplotlib as m
 from IPython.core.display import display
-from matplotlib.ticker import FuncFormatter, MaxNLocator
+#from matplotlib.ticker import FuncFormatter, MaxNLocator
 from pandas.core.dtypes.common import is_string_dtype
+from pandas.plotting import register_matplotlib_converters
 
+# Own modules
 import data_visualization_functions as vis
 import data_handling_support_functions as sup
 
-from pandas.plotting import register_matplotlib_converters
-
-register_matplotlib_converters()
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
 
 # Global settings
 np.set_printoptions(precision=3)
 
 # Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
+
+register_matplotlib_converters()
+
+parser = argparse.ArgumentParser(description='Step 3.1 - Analyze Data')
+# parser.add_argument("-r", '--retrain_all_data', action='store_true',
+#                    help='Set flag if retraining with all available data shall be performed after ev')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+parser.add_argument("-i", "--on_inference_data", action='store_true',
+                    help="Set inference if only inference and no training")
+
+args = parser.parse_args()
 
 
 def clean_features_first_pass(features_raw, class_name):
@@ -227,14 +254,14 @@ def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_n
 def main():
     conf = sup.load_config(args.config_path)
 
-    annotations_directory = conf['annotations_directory']
+    annotations_directory = os.path.join(conf['Paths'].get('annotations_directory'))
 
     if not args.on_inference_data:
-        data_directory = conf['training_data_directory']
-        result_directory = conf['result_directory'] + "/analysis_training"
+        data_directory = conf['Paths'].get('training_data_directory')
+        result_directory = os.path.join(conf['Paths'].get('result_directory'), "analysis_training")
     else:
-        data_directory = conf['inference_data_directory']
-        result_directory = conf['result_directory'] + "/analysis_inference"
+        data_directory = conf['Paths'].get('inference_data_directory')
+        result_directory = os.path.join(conf['Paths'].get('result_directory', "analysis_inference"))
 
     if not os.path.isdir(result_directory):
         os.makedirs(result_directory)
@@ -245,12 +272,12 @@ def main():
         os.makedirs("tmp")
         print("Created directory: ", "tmp")
 
-    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(data_directory, conf['dataset_name'],
-                                                                                conf['class_name'], args.on_inference_data)
+    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(data_directory, conf['Common'].get('dataset_name'),
+                                                                                conf['Common'].get('class_name'), args.on_inference_data)
     ## Data Cleanup of Features and Outcomes before Features are Modified
     features_cleaned1 = clean_features_first_pass(features_raw, class_labels)
 
-    analyze_raw_data(features_cleaned1, outcomes_cleaned1, result_directory, conf['dataset_name'], conf['class_name'])
+    analyze_raw_data(features_cleaned1, outcomes_cleaned1, result_directory, conf['Common'].get('dataset_name'), conf['Common'].get('class_name'))
 
     # Save structures for further processing
     # Dump path data
@@ -260,16 +287,6 @@ def main():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Step 3.1 - Analyze Data')
-    # parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    parser.add_argument("-i", "--on_inference_data", action='store_true',
-                        help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
     # if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 

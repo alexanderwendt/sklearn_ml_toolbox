@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 
 """
-Adapt dimensions of generated features and outcomes
+Step 2X Data Generation: Adapt dimensions of generated features and outcomes
 License_info: TBD
 """
 
 # Futures
-from __future__ import print_function
+#from __future__ import print_function
 
 # Built-in/Generic Imports
-#import os
-#import sys
 
 # Libs
+import os
 import pandas as pd
 import numpy as np
+import argparse
 
 # Own modules
 import data_handling_support_functions as sup
@@ -31,8 +31,20 @@ __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
 
+# Global settings
+np.set_printoptions(precision=3)
+# Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
 
-import argparse
+parser = argparse.ArgumentParser(description='Step 2.0 - Generate features and outcomes from raw data')
+# parser.add_argument("-r", '--retrain_all_data', action='store_true',
+#                    help='Set flag if retraining with all available data shall be performed after ev')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+# parser.add_argument("-i", "--on_inference_data", action='store_true',
+#                    help="Set inference if only inference and no training")
+
+args = parser.parse_args()
 
 
 def cut_unusable_parts_of_dataframe(df, head_index=-1, tail_index=-1):
@@ -100,13 +112,13 @@ def main():
     conf = sup.load_config(args.config_path)
 
     #image_save_directory = conf['result_directory'] + "/data_preparation_images"
-    outcomes_filename_uncut = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_outcomes_uncut" + ".csv"
-    features_filename_uncut = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_features_uncut" + ".csv"
+    outcomes_filename_uncut = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_outcomes_uncut" + ".csv")
+    features_filename_uncut = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_features_uncut" + ".csv")
     #labels_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_labels" + ".csv"
 
-    outcomes_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_outcomes" + ".csv"
-    features_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_features" + ".csv"
-    source_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    outcomes_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_outcomes" + ".csv")
+    features_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_features" + ".csv")
+    source_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_source" + ".csv")
 
     print("=== Paths ===")
     print("Features: ", features_filename)
@@ -114,7 +126,7 @@ def main():
     print("Source: ", source_filename)
 
     # Load only a subset of the whole raw data to create a debug dataset
-    source_uncut = custom.load_source(conf['source_path']) #.iloc[0:1000, :]
+    source_uncut = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
     features_uncut = pd.read_csv(features_filename_uncut, sep=';').set_index('id')
     outcomes_uncut = pd.read_csv(outcomes_filename_uncut, sep=';').set_index('id')
 
@@ -167,16 +179,6 @@ def main():
     print("Saved source graph to " + source_filename)
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 2.0 - Generate features and outcomes from raw data')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    #parser.add_argument("-i", "--on_inference_data", action='store_true',
-    #                    help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
 
     #if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")

@@ -1,4 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 2X Data generation: Generate ground truth for stock markets based on OHLC data
+License_info: TBD
+"""
+
+# Futures
+
+# Built-in/Generic Imports
+
+# Libs
 import argparse
+import os
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -7,10 +21,45 @@ import numpy as np
 import pandas_ta as ta
 
 from math import ceil
+import argparse
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.nonparametric.smoothers_lowess import lowess
+import numpy as np
+from scipy.ndimage.interpolation import shift
+from pandas.plotting import register_matplotlib_converters
 
+# Own modules
 import data_visualization_functions as vis
 import custom_methods as custom
 import data_handling_support_functions as sup
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+# Global settings
+np.set_printoptions(precision=3)
+# Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+register_matplotlib_converters()
+
+parser = argparse.ArgumentParser(description='Step 2.1 - Generate features from raw data')
+# parser.add_argument("-r", '--retrain_all_data', action='store_true',
+#                    help='Set flag if retraining with all available data shall be performed after ev')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+# parser.add_argument("-i", "--on_inference_data", action='store_true',
+#                    help="Set inference if only inference and no training")
+
+args = parser.parse_args()
 
 
 def generate_smoothed_trigger(values, alpha=0.5, tailclip=0.1):
@@ -510,17 +559,18 @@ def get_periodical_indicators(source):
 def main():
     conf = sup.load_config(args.config_path)
 
-    image_save_directory = conf['result_directory'] + "/data_preparation_images"
+    image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_preparation_images")
     #outcomes_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_outcomes" + ".csv"
-    features_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_features_uncut" + ".csv"
+    features_filename_uncut = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_features_uncut" + ".csv")
+    #features_filename_uncut = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_features_uncut" + ".csv"
 
 
     #Load only a subset of the whole raw data to create a debug dataset
-    source = custom.load_source(conf['source_path']) #.iloc[0:1000, :]
+    source = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
     #Plot source
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(source['Date'], source['Close'])
-    plt.title(conf['source_path'])
+    plt.title(conf['Paths'].get('source_path'))
     plt.show()
 
     # Define features df
@@ -600,24 +650,13 @@ def main():
 
     # Save features to a csv file
     print("Features shape {}".format(features.shape))
-    features.to_csv(features_filename, sep=';', index=True, header=True)
-    print("Saved features to " + features_filename)
+    features.to_csv(features_filename_uncut, sep=';', index=True, header=True)
+    print("Saved features to " + features_filename_uncut)
 
-    print("=== Data for {} prepared to be trained ===".format(conf['dataset_name']))
+    print("=== Data for {} prepared to be trained ===".format(conf['Common'].get('dataset_name')))
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 2.1 - Generate features from raw data')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    #parser.add_argument("-i", "--on_inference_data", action='store_true',
-    #                    help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
     #if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 

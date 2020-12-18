@@ -1,15 +1,58 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 3X Preprocessing: Adapt features for Machine Learning
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
+
+# Libs
 import argparse
 import os
 import pickle
-import pandas as pd
-import numpy as np
-from IPython.core.display import display
-import matplotlib.pyplot as plt
-
 import missingno as msno
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from IPython.core.display import display
+#from matplotlib.ticker import FuncFormatter, MaxNLocator
+#from pandas.core.dtypes.common import is_string_dtype
+from pandas.plotting import register_matplotlib_converters
 
+# Own modules
 import data_handling_support_functions as sup
 import data_visualization_functions as vis
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+# Global settings
+np.set_printoptions(precision=3)
+# Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+register_matplotlib_converters()
+
+parser = argparse.ArgumentParser(description='Step 3.2 - Adapt features')
+# parser.add_argument("-r", '--retrain_all_data', action='store_true',
+#                    help='Set flag if retraining with all available data shall be performed after ev')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+# parser.add_argument("-i", "--on_inference_data", action='store_true',
+#                    help="Set inference if only inference and no training")
+
+args = parser.parse_args()
 
 
 def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, conf):
@@ -59,21 +102,22 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
     ### Binarize Multiclass Dataset
 
     # If the binarize setting is used, then binarize the class of the outcome.
-    if conf['binarize_labels'] == True:
-        binarized_outcome = (outcomes[conf['class_name']] == conf['class_number']).astype(np.int_)
+    if conf['Classes'].getboolean('binarize_labels') == True:
+        binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Classes'].get('class_number')).astype(np.int_)
         y = binarized_outcome.values.flatten()
-        print("y was binarized. Classes before: {}. Classes after: {}".format(np.unique(outcomes[conf['class_name']]),
+        print("y was binarized. Classes before: {}. Classes after: {}".format(np.unique(outcomes[conf['Common'].get('class_name')]),
                                                                               np.unique(y)))
 
         # Redefine class labels
         class_labels = {
-            0: conf['binary_0_label'],
-            1: conf['binary_1_label']
+            0: conf['Classes'].get('binary_0_label'),
+            1: conf['Classes'].get('binary_1_label')
         }
 
         print("Class labels redefined to: {}".format(class_labels))
+        print("y labels: {}".format(class_labels))
     else:
-        y = outcomes[conf['class_name']].values.flatten()
+        y = outcomes[conf['Common'].get('class_name')].values.flatten()
         print("No binarization was made. Classes: {}".format(np.unique(y)))
 
     # y = outcomes[class_name].values.flatten()
@@ -81,7 +125,6 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
     # class_labels_inverse = sup.inverse_dict(class_labels)
 
     print("y shape: {}".format(y.shape))
-    print("y labels: {}".format(class_labels))
     print("y unique classes: {}".format(np.unique(y, axis=0)))
 
     ## Determine Missing Data
@@ -129,12 +172,12 @@ def main():
     (features_cleaned1, outcomes_cleaned1, class_labels,
      data_source_raw, data_directory, result_directory) = pickle.load(open(data_preparation_dump_file_path, "rb" ))
 
-    dataset_name = conf['dataset_name']
-    class_name = conf['class_name']
+    dataset_name = conf['Common'].get('dataset_name')
+    class_name = conf['Common'].get('class_name')
 
-    model_features_filename = data_directory + "/" + dataset_name + "_" + class_name + "_features_for_model" + ".csv"
-    model_outcomes_filename = data_directory + "/" + dataset_name + "_" + class_name + "_outcomes_for_model" + ".csv"
-    model_labels_filename = data_directory + "/" + dataset_name + "_" + class_name + "_labels_for_model" + ".csv"
+    model_features_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_features_for_model" + ".csv")
+    model_outcomes_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_outcomes_for_model" + ".csv")
+    model_labels_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_labels_for_model" + ".csv")
 
     features, y, class_labels = adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_directory, conf)
 
@@ -146,7 +189,7 @@ def main():
 
     # === Save the selected outcome to a csv file ===#
     print("outcome shape {}".format(y.shape))
-    y_true = pd.DataFrame(y, columns=[conf['class_name']], index=outcomes_cleaned1.index)
+    y_true = pd.DataFrame(y, columns=[class_name], index=outcomes_cleaned1.index)
     y_true.to_csv(model_outcomes_filename, sep=';', index=True, header=True)
     print("Saved features to " + model_outcomes_filename)
 
@@ -160,21 +203,6 @@ def main():
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 3.1 - Analyze Data')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    #parser.add_argument("-i", "--on_inference_data", action='store_true',
-    #                    help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
     main()
-
 
     print("=== Program end ===")
