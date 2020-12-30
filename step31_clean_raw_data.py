@@ -39,13 +39,12 @@ __status__ = 'Experiental'
 
 # Global settings
 np.set_printoptions(precision=3)
-
 # Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
 register_matplotlib_converters()
 
-parser = argparse.ArgumentParser(description='Step 3.1 - Analyze Data')
+parser = argparse.ArgumentParser(description='Step 3.1 - Clean raw data')
 # parser.add_argument("-r", '--retrain_all_data', action='store_true',
 #                    help='Set flag if retraining with all available data shall be performed after ev')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
@@ -157,25 +156,6 @@ def load_files(data_directory, dataset_name, class_name, on_inference_data):
     class_labels = load_class_labels(labels_filename)
 
     return features_raw, outcomes_raw, data_source_raw, class_labels
-
-
-# def load_data_source(source_filename):
-#     '''
-#
-#
-#     '''
-#     source = pd.read_csv(source_filename, sep=';').set_index('id')  # Set ID to be the data id
-#     display(source.head(1))
-#
-#     source = pd.read_csv(source_filename, delimiter=';').set_index('id')
-#     source['Date'] = pd.to_datetime(source['Date'])
-#     source['Date'].apply(mdates.date2num)
-#     print("Loaded source time graph={}".format(source.columns))
-#     print("X. Shape={}".format(source.shape))
-#     display(source.head())
-#
-#     return source
-
 
 def load_class_labels(labels_filename):
     '''

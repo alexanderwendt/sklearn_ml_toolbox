@@ -1,25 +1,56 @@
-import argparse
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 4X Training: Evaluate training model
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
 import json
 import os
-import pickle
-
-import joblib
-import numpy as np
 import time
 
+# Libs
+import json
+import joblib
 from sklearn.metrics import precision_recall_curve
-
-import data_visualization_functions as vis
-
 import sklearn_utils as model_util
+import argparse
+from pandas.plotting import register_matplotlib_converters
+import pickle
+import numpy as np
 
+# Own modules
+import data_visualization_functions as vis
+import data_handling_support_functions as sup
 import execution_utils as step40
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+register_matplotlib_converters()
 
 #Global settings
 np.set_printoptions(precision=3)
-
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
+
+parser = argparse.ArgumentParser(description='Step 4.6 - Train evaluation model for final testing')
+parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                    help='Prepared data', required=False)
+
+args = parser.parse_args()
 
 
 def train_model_for_evaluation(paths_path = "config/paths.pickle"):
@@ -125,18 +156,6 @@ def main():
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 4.6 - Train evaluation model for final testing')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
-                        help='Prepared data', required=False)
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
     main()
 
 

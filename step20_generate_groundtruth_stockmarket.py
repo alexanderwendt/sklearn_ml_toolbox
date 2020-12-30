@@ -153,7 +153,7 @@ def find_tops_bottoms(source):
     plt.plot(source['Date'], tops[:])
     plt.plot(source['Date'], bottoms[:])
     plt.title("OMXS30 Tops and Bottoms")
-    plt.show()
+    plt.show(block = False)
 
     latestBottoms = calculateLatestEvent(bottoms)
     latestTops = calculateLatestEvent(tops)
@@ -163,7 +163,7 @@ def find_tops_bottoms(source):
     plt.plot(source['Date'], latestTops[:])
     plt.plot(source['Date'], latestBottoms[:])
     plt.title("OMXS30 Latest Tops and Bottoms")
-    plt.show()
+    plt.show(block = False)
 
     return bottoms, tops, latestTops, latestBottoms
 
@@ -257,7 +257,12 @@ def calculate_lowess(source, days_to_consider):
     '''
     # Fraction for the lowess smoothing function
 
+
     '''
+    if sum(np.isnan(source['Close']))>0:
+        raise Exception("Notice: If there are any NaN in the data, these rows are removed. It causes a dimension problem.")
+        #print("Notice: If there are any NaN in the data, these rows are removed. It causes a dimension problem.")
+
     frac = days_to_consider / len(source['Close'])
     filtered = lowess(source['Close'], source['Date'], frac=frac)
     # Calculate the dlowess/dt to see if it is raising or declining
@@ -440,11 +445,11 @@ def generate_features_outcomes(conf, source):
 
     pos_trend_long, fig_long = calculate_lowess(source, 300)
     plt.gca()
-    plt.show()
+    plt.show(block = False)
 
     pos_trend_short, fig_short = calculate_lowess(source, 10)
     plt.gca()
-    plt.show()
+    plt.show(block = False)
 
     y1day, y5day, y20day, ylong = calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_trend_long, pos_trend_short)
     y1day, y5day, y20day, ylong = clean_bad_signals_1(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
@@ -480,10 +485,13 @@ def main():
     outcomes_filename_raw = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_outcomes_uncut" + ".csv")
     labels_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_labels" + ".csv")
 
-    #if args.on_inference_data:
-    #    cut_data = False
-    #else:
-    #    cut_data = True
+    if os.path.isdir(conf['Paths'].get('training_data_directory'))==False:
+        os.makedirs(conf['Paths'].get('training_data_directory'))
+        print("Created directory ", conf['Paths'].get('training_data_directory'))
+
+    if os.path.isdir(conf['Paths'].get('result_directory'))==False:
+        os.makedirs(conf['Paths'].get('result_directory'))
+        print("Created directory ", conf['Paths'].get('result_directory'))
 
     #Load only a subset of the whole raw data to create a debug dataset
     source = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
@@ -491,7 +499,7 @@ def main():
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(source['Date'], source['Close'])
     plt.title(conf['Paths'].get('source_path'))
-    plt.show()
+    plt.show(block = False)
 
     y_labels = generate_custom_class_labels()
     outcomes = generate_features_outcomes(conf, source)

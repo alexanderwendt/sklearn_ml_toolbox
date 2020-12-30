@@ -1,27 +1,67 @@
-import argparse
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 4X Training: Train wide Search
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
 import os
+
+# Libs
+import argparse
+from pandas.plotting import register_matplotlib_converters
 import pickle
+from pickle import dump
 
 from IPython.core.display import display
 from imblearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
-import execution_utils as step40
-import data_handling_support_functions as sup
 import sklearn_utils as modelutil
 import numpy as np
 import copy
-import data_visualization_functions as vis
 
-## %% First run with a wide grid search
-# Minimal set of parameter to test different grid searches
 from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
 from imblearn.over_sampling import SMOTE
 from imblearn.over_sampling import ADASYN
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.combine import SMOTEENN
 from imblearn.combine import SMOTETomek
-from pickle import dump
+
+# Own modules
+import data_visualization_functions as vis
+import data_handling_support_functions as sup
+import execution_utils as step40
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+register_matplotlib_converters()
+
+#Global settings
+np.set_printoptions(precision=3)
+#Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+
+parser = argparse.ArgumentParser(description='Step 4.3 - Execute wide grid search for SVM')
+parser.add_argument("-exe", '--execute_wide', default=True,
+                    help='Execute Training', required=False)
+parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                    help='Prepared data', required=False)
+
+args = parser.parse_args()
 
 
 def execute_wide_search(paths_path = "config/paths.pickle"):
@@ -238,17 +278,6 @@ def execute_wide_run(execute_search=True, data_input_path="04_Model" + "/" + "pr
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 4.3 - Execute wide grid search for SVM')
-    parser.add_argument("-exe", '--execute_wide', default=True,
-                        help='Execute Training', required=False)
-    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
-                        help='Prepared data', required=False)
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
     # Execute wide search
     execute_wide_run(execute_search=args.execute_wide, data_input_path=args.data_path)

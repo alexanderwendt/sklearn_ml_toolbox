@@ -103,7 +103,7 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
 
     # If the binarize setting is used, then binarize the class of the outcome.
     if conf['Classes'].getboolean('binarize_labels') == True:
-        binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Classes'].get('class_number')).astype(np.int_)
+        binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Classes'].getint('class_number')).astype(np.int)
         y = binarized_outcome.values.flatten()
         print("y was binarized. Classes before: {}. Classes after: {}".format(np.unique(outcomes[conf['Common'].get('class_name')]),
                                                                               np.unique(y)))

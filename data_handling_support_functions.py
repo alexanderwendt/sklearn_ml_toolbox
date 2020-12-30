@@ -257,9 +257,9 @@ def load_features(conf):
 
     '''
 
-    training_data_directory = conf["training_data_directory"]
-    dataset_name = conf["dataset_name"]
-    class_name = conf["class_name"]
+    training_data_directory = conf['Paths'].get("training_data_directory")
+    dataset_name = conf['Common'].get("dataset_name")
+    class_name = conf['Common'].get("class_name")
 
     model_features_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_features_for_model" + ".csv"
     model_outcomes_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_outcomes_for_model" + ".csv"

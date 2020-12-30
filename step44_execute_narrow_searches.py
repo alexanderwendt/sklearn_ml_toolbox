@@ -1,5 +1,26 @@
-import argparse
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 4X Training: Train narrow search
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
 import os
+
+# Libs
+import argparse
+from pandas.plotting import register_matplotlib_converters
+import pickle
+from pickle import dump
+
+from imblearn.pipeline import Pipeline
+from sklearn.svm import SVC
+
 import pickle
 
 from IPython.core.display import display
@@ -11,6 +32,41 @@ import matplotlib.pyplot as plt
 ## %% First run with a wide grid search
 # Minimal set of parameter to test different grid searches
 from pickle import dump
+
+import sklearn_utils as modelutil
+import numpy as np
+import copy
+
+from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
+from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import ADASYN
+from imblearn.over_sampling import RandomOverSampler
+from imblearn.combine import SMOTEENN
+from imblearn.combine import SMOTETomek
+
+# Own modules
+import data_visualization_functions as vis
+import data_handling_support_functions as sup
+import execution_utils as step40
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+register_matplotlib_converters()
+
+#Global settings
+np.set_printoptions(precision=3)
+#Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+
+
 
 def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter_svm, pipe_run_random, scorers,
                                                 refit_scorer_name, save_fig_prefix):

@@ -1,9 +1,52 @@
-import argparse
-import pickle #Save data
-import execution_utils as step40
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+"""
+Step 3X Preprocessing: Feature Selection
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
+#import os
+
+# Libs
+import argparse
+import numpy as np
+from pandas.plotting import register_matplotlib_converters
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
+
+# Own modules
+#import data_visualization_functions as vis
+#import data_handling_support_functions as sup
+import execution_utils as step40
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+register_matplotlib_converters()
+
+#Global settings
+np.set_printoptions(precision=3)
+#Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+
+parser = argparse.ArgumentParser(description='Step 4.2 - Calculate predictions for training like estimated time')
+parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                    help='Prepared data', required=False)
+
+args = parser.parse_args()
+
 
 def load_input(paths_path = "config/paths.pickle"):
     '''
@@ -97,12 +140,6 @@ def run_training_predictors(data_input_path):
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
-    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
-                        help='Prepared data', required=False)
-
-    args = parser.parse_args()
 
     #if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 2X Data generation: Generate ground truth for stock markets based on OHLC data
+Step 2X Data generation: Generate features for stock markets based on OHLC data
 License_info: TBD
 """
 
@@ -11,13 +11,6 @@ License_info: TBD
 # Built-in/Generic Imports
 
 # Libs
-import argparse
-import os
-
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-
 import pandas_ta as ta
 
 from math import ceil
@@ -571,7 +564,7 @@ def main():
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(source['Date'], source['Close'])
     plt.title(conf['Paths'].get('source_path'))
-    plt.show()
+    plt.show(block = False)
 
     # Define features df
     features = pd.DataFrame(index=source.index)
@@ -657,9 +650,6 @@ def main():
 
 
 if __name__ == "__main__":
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
     main()
 
 

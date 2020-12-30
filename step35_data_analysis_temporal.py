@@ -1,15 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 3X Preprocessing: Data analysis for temporal data
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
+import os
+
+# Libs
+
 import argparse
-
-from statsmodels.stats.diagnostic import acorr_ljungbox
-
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
-
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import matplotlib as m
 import matplotlib.pyplot as plt
+from pandas.plotting import register_matplotlib_converters
+
+# Own modules
+import data_visualization_functions as vis
+import data_handling_support_functions as sup
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+register_matplotlib_converters()
+
+#Global settings
+np.set_printoptions(precision=3)
+#Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+
+parser = argparse.ArgumentParser(description='Step 3.5 - Analyze Data Temporal Analysis')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+
+args = parser.parse_args()
 
 
 def rescale(conf, features, y):
@@ -28,7 +66,7 @@ def rescale(conf, features, y):
     print("Scaled values")
     print(X_scaled.iloc[0:2, :])
     scaler.fit(y.reshape(-1, 1))
-    y_scaled = pd.DataFrame(data=scaler.transform(y.reshape(-1, 1)), index=features.index, columns=[conf['class_name']])
+    y_scaled = pd.DataFrame(data=scaler.transform(y.reshape(-1, 1)), index=features.index, columns=[conf['Common'].get('class_name')])
     print("Unscaled values")
     print(y[0:10])
     print("Scaled values")
@@ -123,40 +161,24 @@ def analyze_timegraph(source, features, y, conf, image_save_directory):
     #Plot temporal correlation
     X_scaled, y_scaled = rescale(conf, features, y)
     # Correlation graphs for temporal correlation
-    vis.plot_temporal_correlation_feature(X_scaled, conf, image_save_directory, source, y_scaled)
+    vis.plot_temporal_correlation_feature(X_scaled, conf['Common'].get('dataset_name'), image_save_directory, source, y_scaled)
 
 
 def main():
     conf = sup.load_config(args.config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = conf["training_data_directory"] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    source_filename = conf['Paths'].get("training_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['result_directory'] + "/analysis_data_analysis"
+    image_save_directory = conf['Paths'].get('result_directory') + "/analysis_data_analysis"
 
     analyze_timegraph(source, features, y, conf, image_save_directory)
     #analyse_features(features, y, class_labels, source, conf, image_save_directory)
 
 
-
-
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Step 3.4 - Analyze Data Temporal Analysis')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    #parser.add_argument("-i", "--on_inference_data", action='store_true',
-    #                    help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
     main()
-
 
     print("=== Program end ===")

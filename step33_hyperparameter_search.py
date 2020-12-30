@@ -1,13 +1,56 @@
-import argparse
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 3X Preprocessing: Hyperparameter search for T-SNE
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
 import os
 
+# Libs
+import argparse
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+from IPython.core.display import display
+#from matplotlib.ticker import FuncFormatter, MaxNLocator
+#from pandas.core.dtypes.common import is_string_dtype
+from pandas.plotting import register_matplotlib_converters
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
 
+# Own modules
 import data_handling_support_functions as sup
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+#Global settings
+np.set_printoptions(precision=3)
+#Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+
+parser = argparse.ArgumentParser(description='Step 3.3 - Search Hyperparameters for unsupervised methods')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+# parser.add_argument("-i", "--on_inference_data", action='store_true',
+#                    help="Set inference if only inference and no training")
+
+args = parser.parse_args()
 
 def find_tsne_parmeters(X_scaled_subset, y_subset, class_labels, conf, image_save_directory):
     # Optimize t-sne plot
@@ -43,7 +86,7 @@ def find_tsne_parmeters(X_scaled_subset, y_subset, class_labels, conf, image_sav
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_TSNE_Calibration_Plot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_TSNE_Calibration_Plot'), dpi=300)
 
 
     plt.show()
@@ -53,10 +96,10 @@ def main():
     conf = sup.load_config(args.config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = conf["training_data_directory"] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    source_filename = conf['Paths'].get("training_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['result_directory'] + "/analysis_data_analysis"
+    image_save_directory = conf['Paths'].get('result_directory') + "/analysis_data_analysis"
 
     scaler = StandardScaler()  # Because normal distribution. Don't use minmax scaler for PCA or unsupervised learning
     # as the axis shall be centered and not shifted.
@@ -82,17 +125,6 @@ def main():
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 3.1 - Analyze Data')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    #parser.add_argument("-i", "--on_inference_data", action='store_true',
-    #                    help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
     #if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 

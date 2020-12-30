@@ -1,81 +1,64 @@
-import argparse
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 3X Preprocessing: Data analysis
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
 import os
 
-import numpy as np
+# Libs
+from pandas.plotting import register_matplotlib_converters
+import argparse
 import pandas as pd
-import scipy.stats
-import matplotlib.pyplot as plt
-import numpy as np
-from math import sqrt
-import matplotlib.pyplot as plt
 import matplotlib as m
 from matplotlib import ticker
-from matplotlib.ticker import FuncFormatter, MaxNLocator
-from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
-from statsmodels.stats.diagnostic import acorr_ljungbox
 import numpy as np
-import sklearn.datasets as ds
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-import seaborn as sns
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib.artist import setp
 from sklearn.manifold import TSNE
-
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
 
 import matplotlib.pyplot as plt
 
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
 
-import matplotlib.dates as mdates
-
 import seaborn as sns
 
 from sklearn import preprocessing
 
 from pandas.plotting import register_matplotlib_converters
+
+# Own modules
+import data_visualization_functions as vis
+import data_handling_support_functions as sup
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
 register_matplotlib_converters()
 
 #Global settings
 np.set_printoptions(precision=3)
-
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
-# def load_features(conf):
-#     '''
-#
-#
-#     '''
-#
-#     training_data_directory = conf["training_data_directory"]
-#     dataset_name = conf["dataset_name"]
-#     class_name = conf["class_name"]
-#
-#     model_features_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_features_for_model" + ".csv"
-#     model_outcomes_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_outcomes_for_model" + ".csv"
-#     model_labels_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_labels_for_model" + ".csv"
-#
-#     # === Load Features ===#
-#     features = pd.read_csv(model_features_filename, sep=';').set_index('id')  # Set ID to be the data id
-#     print(features.head(1))
-#
-#     # === Load y values ===#
-#     df_y = pd.read_csv(model_outcomes_filename, delimiter=';').set_index('id')
-#     y = df_y.values.flatten()
-#
-#     #=== Load classes ===#
-#     class_labels = sup.load_class_labels(model_labels_filename)
-#
-#     print("Loaded files to analyse")
-#
-#     return features, y, df_y, class_labels
+parser = argparse.ArgumentParser(description='Step 3.4 - Analyze Data')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
 
-
+args = parser.parse_args()
 
 
 def analyse_features(features, y, class_labels, source, conf, image_save_directory):
@@ -142,7 +125,7 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     # Select a random subset to visualize
     import random
 
-    df_y = y_scaled = pd.DataFrame(data=y.reshape(-1, 1), index=features.index, columns=[conf['class_name']])
+    df_y = y_scaled = pd.DataFrame(data=y.reshape(-1, 1), index=features.index, columns=[conf['Common'].get('class_name')])
     total_values = features.join(df_y)
     print("Merged features and outcomes to use in correlation matrix unscaled")
 
@@ -158,7 +141,7 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     print(feature_plot)
     print(cols)
 
-    comparison_name = conf['class_name']
+    comparison_name = conf['Common'].get('class_name')
     print("Class name: ", comparison_name)
 
     df_fv = total_values.iloc[X_train_index_subset, :]
@@ -208,7 +191,7 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_PCA_Variance_Coverage'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Variance_Coverage'), dpi=300)
 
     plt.show()
 
@@ -231,7 +214,7 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_PCA_Plot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Plot'), dpi=300)
 
     plt.show()
 
@@ -252,7 +235,7 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_UMAP_Unsupervised'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_UMAP_Unsupervised'), dpi=300)
 
     plt.show()
 
@@ -260,7 +243,7 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_UMAP_Supervised'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_UMAP_Supervised'), dpi=300)
 
     plt.show()
 
@@ -328,7 +311,7 @@ def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_T-SNE_Plot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_T-SNE_Plot'), dpi=300)
 
     plt.show()
 
@@ -398,7 +381,7 @@ def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_sa
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_Parallel_Coordinates'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Parallel_Coordinates'), dpi=300)
 
     plt.show()
 
@@ -420,14 +403,14 @@ def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_Hierarchical_Linkage'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Hierarchical_Linkage'), dpi=300)
 
     plt.show()
 
 
 def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
     m.rc_file_defaults()  # Reset sns
-    corr = X_scaled.corrwith(y_scaled[conf['class_name']], axis=0)
+    corr = X_scaled.corrwith(y_scaled[conf['Common'].get('class_name')], axis=0)
     corr.sort_values().plot.barh(color='blue', title='Strength of Correlation', figsize=(10, 25))
     print(corr)
     plt.gcf()
@@ -435,7 +418,7 @@ def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_Correlation_Strength'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Correlation_Strength'), dpi=300)
 
     plt.show()
 
@@ -454,7 +437,7 @@ def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_Spearman_Correlation_Plot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Spearman_Correlation_Plot'), dpi=300)
 
     plt.show()
 
@@ -464,7 +447,7 @@ def plot_correlation_matrix2(conf, image_save_directory, total_values):
     # https://blog.insightdatascience.com/data-visualization-in-python-advanced-functionality-in-seaborn-20d217f1a9a6
     feature_plot = list(range(0, 10, 1))
     feature_plot.extend([-1])
-    g = sns.pairplot(total_values.iloc[0:1000, feature_plot], hue=conf['class_name'], diag_kind="hist")
+    g = sns.pairplot(total_values.iloc[0:1000, feature_plot], hue=conf['Common'].get('class_name'), diag_kind="hist")
     # total_values.columns[-1]
     g.map_upper(sns.regplot)
     g.map_lower(sns.residplot)
@@ -477,7 +460,7 @@ def plot_correlation_matrix2(conf, image_save_directory, total_values):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_Pairplot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Pairplot'), dpi=300)
 
     plt.show()
 
@@ -508,7 +491,7 @@ def plot_correlation_matrix(conf, features, image_save_directory, total_values):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf["dataset_name"] + "_Scatter-Matrix"), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get("dataset_name") + "_Scatter-Matrix"), dpi=300)
     plt.show()
 
 
@@ -528,7 +511,7 @@ def rescale(conf, features, y):
     print("Scaled values")
     print(X_scaled.iloc[0:2, :])
     scaler.fit(y.reshape(-1, 1))
-    y_scaled = pd.DataFrame(data=scaler.transform(y.reshape(-1, 1)), index=features.index, columns=[conf['class_name']])
+    y_scaled = pd.DataFrame(data=scaler.transform(y.reshape(-1, 1)), index=features.index, columns=[conf['Common'].get('class_name')])
     print("Unscaled values")
     print(y[0:10])
     print("Scaled values")
@@ -541,32 +524,20 @@ def main():
     conf = sup.load_config(args.config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = conf["training_data_directory"] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    source_filename = conf['Paths'].get("training_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['result_directory'] + "/analysis_data_analysis"
+    image_save_directory = conf['Paths'].get('result_directory') + "/analysis_data_analysis"
 
     #analyze_timegraph(source, features, y, conf, image_save_directory)
+    print("WARNING: If a singular matrix occurs in a calculation, probably the outcome is "
+          "only one value.")
     analyse_features(features, y, class_labels, source, conf, image_save_directory)
 
 
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 3.1 - Analyze Data')
-    #parser.add_argument("-r", '--retrain_all_data', action='store_true',
-    #                    help='Set flag if retraining with all available data shall be performed after ev')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    #parser.add_argument("-i", "--on_inference_data", action='store_true',
-    #                    help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
     main()
 
 

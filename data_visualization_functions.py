@@ -361,7 +361,7 @@ def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, le
             os.makedirs(save_fig_prefix)
         plt.savefig(os.path.join(save_fig_prefix, title + '_three_class_graph'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 # %% pycharm={"is_executing": false}
@@ -380,7 +380,7 @@ def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend, title
             os.makedirs(save_fig_prefix)
         plt.savefig(os.path.join(save_fig_prefix, title + '_two_class_graph'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 #def plot_two_class_graph(y_order_train, y_order_train_pred):
 #    plt.figure(num=None, figsize=(11.5, 7), dpi=80, facecolor='w', edgecolor='k')
@@ -475,7 +475,7 @@ def plot_grid_search_validation_curve(grid, param_to_vary, refit_scorer_name, ti
     plt.legend(loc='lower right')
     plt.grid()
 
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_heatmap_xy(scores, parameters, xlabel, ylabel, title, normalizeScale=False):
@@ -539,7 +539,7 @@ def plot_heatmap_xy(scores, parameters, xlabel, ylabel, title, normalizeScale=Fa
 
     # cbar_ax = fig.add_axes([0.95, 0.15, 0.05, 0.8])
     cbar = fig.colorbar(im1, ax=ax)  # cax=axs[1])
-    plt.show()
+    plt.show(block = False)
 
 # #%matplotlib inline
 # For an identical distribution, we cannot reject the null hypothesis since the p-value is high, 41%. To reject the null
@@ -736,7 +736,7 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
         #plt.savefig(save_fig_prefix + '_roc_curve', dpi=300)
         fig_roc_curve.figure.savefig(save_fig_prefix + '_roc_curve')
 
-    plt.show()
+    plt.show(block = False)
 
 def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, save_fig_prefix=None):
     """
@@ -767,7 +767,7 @@ def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, 
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_pr_adjusted')
 
-    plt.show()
+    plt.show(block = False)
 
 def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_threshold, save_fig_prefix=None):
     """
@@ -791,7 +791,7 @@ def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_pr_scores_of_decision_threshold')
 
-    plt.show()
+    plt.show(block = False)
 
 def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
     """
@@ -813,7 +813,7 @@ def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_roc_curve')
 
-    plt.show()
+    plt.show(block = False)
 
 def plot_decision_boundary(X, y, model, save_fig_prefix=None):
     X_Train_embedded = TSNE(n_components=2).fit_transform(X)
@@ -843,7 +843,7 @@ def plot_decision_boundary(X, y, model, save_fig_prefix=None):
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_decision_boundary_plot')
 
-    plt.show()
+    plt.show(block = False)
 
 def plot_autocorrelation(feature, title, mode=None, lags=None, xlim=None, ylim=None, image_save_directory=None):
     '''
@@ -884,9 +884,9 @@ def plot_autocorrelation(feature, title, mode=None, lags=None, xlim=None, ylim=N
     print("Ljung-Box statistics: p-value=", acorr_ljungbox(feature, lags=None, boxpierce="Ljung-Box")[1])
     print("If p values > 0.05 then there are significant autocorrelations.")
 
-    plt.show()
+    plt.show(block = False)
 
-def plot_temporal_correlation_feature(X_scaled, conf, image_save_directory, source, y_scaled):
+def plot_temporal_correlation_feature(X_scaled, dataset_name, image_save_directory, source, y_scaled):
     '''
 
     https://towardsdatascience.com/four-ways-to-quantify-synchrony-between-time-series-data-b99136c4a9c9
@@ -915,6 +915,6 @@ def plot_temporal_correlation_feature(X_scaled, conf, image_save_directory, sour
         if image_save_directory:
             if not os.path.isdir(image_save_directory):
                 os.makedirs(image_save_directory)
-            plt.savefig(os.path.join(image_save_directory, conf['dataset_name'] + '_Temporal_Correlation_feature_{}_to_Outcome_{}'.format(col, tmp.columns[-1])), dpi=300)
+            plt.savefig(os.path.join(image_save_directory, dataset_name + '_Temporal_Correlation_feature_{}_to_Outcome_{}'.format(col, tmp.columns[-1])), dpi=300)
 
-        plt.show()
+        plt.show(block = False)

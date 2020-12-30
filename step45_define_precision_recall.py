@@ -1,27 +1,62 @@
-import argparse
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 4X Training: Define Precision/Recall coefficent for binary classes
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
 import json
 import os
-import pickle
 import time
-import numpy as np
 
+# Libs
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, roc_auc_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import classification_report, confusion_matrix
 
-import execution_utils as step40
-
 from sklearn.model_selection import train_test_split
-
-import data_visualization_functions as vis
 
 import sklearn_utils as model_util
 
+import argparse
+from pandas.plotting import register_matplotlib_converters
+import pickle
+
+import numpy as np
+
+# Own modules
+import data_visualization_functions as vis
+import data_handling_support_functions as sup
+import execution_utils as step40
+
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
+
+register_matplotlib_converters()
+
 #Global settings
 np.set_printoptions(precision=3)
-
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
+
+parser = argparse.ArgumentParser(description='Step 4.5 - Define precision/recall')
+parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                    help='Prepared data', required=False)
+
+args = parser.parse_args()
+
 
 def define_precision_recall_threshold(paths_path = "config/paths.pickle"):
     '''
@@ -179,23 +214,6 @@ def get_optimal_precision_recall_threshold(X_train_full, y_train_full, y_classes
     return optimal_threshold
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 4.5 - Define precision/recall')
-    #parser.add_argument("-exe", '--execute_narrow', default=True,
-    #                    help='Execute narrow training', required=False)
-    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
-                        help='Prepared data', required=False)
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
-    # Execute wide search
-    #execute_wide_run(execute_search=args.execute_wide, data_input_path=args.data_path)
-
-    # Execute narrow search
-    #execute_narrow_search(data_input_path=args.data_path)
 
     # Define precision/recall
     define_precision_recall_threshold(paths_path=args.data_path)

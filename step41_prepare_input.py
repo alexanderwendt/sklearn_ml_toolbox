@@ -1,29 +1,54 @@
-# %% Script for testing step 4
-# Import libraries
-import argparse
-import importlib #Reload imports for changed functions
-import json
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 3X Preprocessing: Feature Selection
+License_info: TBD
+"""
+
+# Futures
+#from __future__ import print_function
+
+# Built-in/Generic Imports
 import os
 
-from pickle import dump #Save data
-
+# Libs
+import argparse
 import numpy as np
 import pandas as pd
+from pandas.plotting import register_matplotlib_converters
+from pickle import dump #Save data
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_curve, precision_recall_curve, auc, make_scorer, recall_score, accuracy_score, precision_score, f1_score, confusion_matrix
 
-from IPython.core.display import display
-
-#Import local libraries
+# Own modules
+#import data_visualization_functions as vis
 import data_handling_support_functions as sup
 
-#Set Global settings
-#Print settings as precision 3
-np.set_printoptions(precision=3)
+__author__ = 'Alexander Wendt'
+__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
+                'Embedded Machine Learning'
+__credits__ = ['']
+__license__ = 'TBD'
+__version__ = '0.2.0'
+__maintainer__ = 'Alexander Wendt'
+__email__ = 'alexander.wendt@tuwien.ac.at'
+__status__ = 'Experiental'
 
+register_matplotlib_converters()
+
+#Global settings
+np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, precision_recall_curve, auc, make_scorer, recall_score, accuracy_score, precision_score, f1_score, confusion_matrix
+parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
+                    help='Configuration file path', required=False)
+parser.add_argument("-i", "--do_inference", action='store_true',
+                    help="Set inference if only inference and no training")
+
+args = parser.parse_args()
 
 def generate_paths(conf):
     '''
@@ -43,15 +68,18 @@ def generate_paths(conf):
     paths = dict()
 
     # Model name
-    paths['dataset_name'] = conf['dataset_name']
+    dataset_name = conf['Common'].get('dataset_name')
+    class_name = conf['Common'].get('class_name')
+    dataset_class_prefix = dataset_name + "_" + class_name
+    paths['dataset_name'] = conf['Common'].get('dataset_name')
 
     # Generating directories
     print("Directories")
-    paths['annotations_directory'] = conf['annotations_directory']
-    paths['training_data_directory'] = conf['training_data_directory']
-    paths['inference_data_directory'] = conf['inference_data_directory']
-    paths['model_directory'] = conf['model_directory']
-    paths['result_directory'] = conf['result_directory']
+    paths['annotations_directory'] = conf['Paths'].get('annotations_directory')
+    paths['training_data_directory'] = conf['Paths'].get('training_data_directory')
+    paths['inference_data_directory'] = conf['Paths'].get('inference_data_directory')
+    paths['model_directory'] = conf['Paths'].get('model_directory')
+    paths['result_directory'] = conf['Paths'].get('result_directory')
     paths['config_directory'] = "config"
 
     if os.path.isdir(paths['model_directory'])==False:
@@ -70,39 +98,37 @@ def generate_paths(conf):
     paths['inference_record'] = paths['inference_data_directory'] + "/" + "inference.record"
 
     # Generating filenames for loading the files
-    paths['model_features_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_features_for_model" + ".csv"
-    paths['model_outcomes_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_outcomes_for_model" + ".csv"
-    paths['source_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
-    paths['inference_features_filename'] = paths['inference_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_inference_features" + ".csv"
+    paths['model_features_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_features_for_model" + ".csv"
+    paths['model_outcomes_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_outcomes_for_model" + ".csv"
+    paths['source_filename'] = paths['training_data_directory'] + "/" + dataset_name + "_source" + ".csv"
+    paths['inference_features_filename'] = paths['inference_data_directory'] + "/" + dataset_class_prefix + "_inference_features" + ".csv"
 
     #Modified labels
-    paths['model_labels_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_labels_for_model" + ".csv"
+    paths['model_labels_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_labels_for_model" + ".csv"
     #Columns for feature selection
-    paths['selected_feature_columns_filename'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_selected_feature_columns.csv"
+    paths['selected_feature_columns_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_selected_feature_columns.csv"
 
     #Model specifics
-    paths['svm_evaluated_model_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_evaluated_model" + ".sav"
-    paths['svm_final_model_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_final_model" + ".sav"
-    paths['svm_external_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_ext_parameters" + ".json"
+    paths['svm_evaluated_model_filename'] = paths['model_directory'] + "/" + dataset_class_prefix + "_svm_evaluated_model" + ".sav"
+    paths['svm_final_model_filename'] = paths['model_directory'] + "/" + dataset_class_prefix + "_svm_final_model" + ".sav"
+    paths['svm_external_parameters_filename'] = paths['model_directory'] + "/" + dataset_class_prefix + "_svm_model_ext_parameters" + ".json"
     #paths['svm_default_hyper_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_hyper_parameters" + ".json"
 
-    paths['svm_pipe_first_selection'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + '_pipe_run1_selection.pkl'
-    paths['svm_pipe_final_selection'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf[
-        'class_name'] + '_pipe_run2_final.pkl'
+    paths['svm_pipe_first_selection'] = paths['model_directory'] + "/" + dataset_class_prefix + '_pipe_run1_selection.pkl'
+    paths['svm_pipe_final_selection'] = paths['model_directory'] + "/" + dataset_class_prefix + '_pipe_run2_final.pkl'
 
     #Results
-    paths['svm_run1_result_filename'] = paths['result_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + '_results_run1.pkl'
-    paths['svm_run2_result_filename'] = paths['result_directory'] + "/" + conf['dataset_name'] + "_" + conf[
-        'class_name'] + '_results_run2.pkl'
+    paths['svm_run1_result_filename'] = paths['result_directory'] + "/" + dataset_class_prefix + '_results_run1.pkl'
+    paths['svm_run2_result_filename'] = paths['result_directory'] + "/" + dataset_class_prefix + '_results_run2.pkl'
 
     # Source data files folder paths
-    paths['source_path'] = paths['training_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
-    paths['source_path_inference'] = paths['inference_data_directory'] + "/" + conf['dataset_name'] + "_source" + ".csv"
+    paths['source_path'] = paths['training_data_directory'] + "/" + dataset_name + "_source" + ".csv"
+    paths['source_path_inference'] = paths['inference_data_directory'] + "/" + dataset_name + "_source" + ".csv"
 
     print("=== Paths ===")
     print("Used file paths: ", paths)
 
-    return paths #skip_first_run_hyperparameter_optimization
+    return paths
 
 def load_files(paths, do_inference):
     '''
@@ -142,7 +168,7 @@ def load_files(paths, do_inference):
     #=== Load list of feature columns ===#
     df_feature_columns = pd.read_csv(paths['selected_feature_columns_filename'], delimiter=';')
     print("Selected features: {}".format(paths['selected_feature_columns_filename']))
-    display(df_feature_columns)
+    print(df_feature_columns)
 
     if do_inference==False:
         print("Inference is done. Therefore no handling of classes.")
@@ -330,18 +356,6 @@ def prepare_data(config_file_path, do_inference):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Step 4.1 - Prepare data for machine learning algorithms')
-    parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.json",
-                        help='Configuration file path', required=False)
-    parser.add_argument("-i", "--do_inference", action='store_true',
-                        help="Set inference if only inference and no training")
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
-    # Execute wide search
     prepare_data(args.config_path, args.do_inference)
 
     print("=== Program end ===")
