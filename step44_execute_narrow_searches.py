@@ -3,7 +3,22 @@
 
 """
 Step 4X Training: Train narrow search
-License_info: TBD
+License_info: ISC
+ISC License
+
+Copyright (c) 2020, Alexander Wendt
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 # Futures
@@ -53,7 +68,7 @@ __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
                 'Embedded Machine Learning'
 __credits__ = ['']
-__license__ = 'TBD'
+__license__ = 'ISC'
 __version__ = '0.2.0'
 __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
@@ -66,7 +81,12 @@ np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
+parser = argparse.ArgumentParser(description='Step 4.4 - Execute narrow incremental search for SVM')
+#parser.add_argument("-exe", '--execute_narrow', default=False, action='store_true', help='Execute narrow training')
+parser.add_argument("-d", '--data_path', default="config/paths.pickle",
+                    help='Prepared data', required=False)
 
+args = parser.parse_args()
 
 def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter_svm, pipe_run_random, scorers,
                                                 refit_scorer_name, save_fig_prefix):
@@ -120,9 +140,12 @@ def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter
         ax_enhanced = svmvis.add_best_results_to_random_search_visualization(ax, results_random_search, selection)
 
         plt.gca()
+        plt.tight_layout()
         plt.savefig(save_fig_prefix + '_' + 'run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
                     + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection), dpi=300)
-        plt.show()
+        plt.show(block = False)
+        plt.pause(0.01)
+        plt.close()
 
         print("===============================================================")
 
@@ -208,20 +231,6 @@ def execute_narrow_search(paths_path = "config/paths.pickle"):
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Step 4.4 - Execute narrow incremental search for SVM')
-    parser.add_argument("-exe", '--execute_narrow', default=True,
-                        help='Execute narrow training', required=False)
-    parser.add_argument("-d", '--data_path', default="config/paths.pickle",
-                        help='Prepared data', required=False)
-
-    args = parser.parse_args()
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
-    # Execute wide search
-    #execute_wide_run(execute_search=args.execute_wide, data_input_path=args.data_path)
 
     # Execute narrow search
     execute_narrow_search(paths_path=args.data_path)

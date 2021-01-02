@@ -11,9 +11,9 @@ call conda activate env_ml
 echo #===========================================#
 echo # Generate Dataset #
 echo #===========================================#
-rem python step20_generate_groundtruth_stockmarket.py --config_path=%config_file%
-rem python step21_generate_features.py --config_path=%config_file%
-rem python step22_dimension_adapter.py --config_path=%config_file%
+python step20_generate_groundtruth_stockmarket.py --config_path=%config_file%
+python step21_generate_features.py --config_path=%config_file%
+python step22_dimension_adapter.py --config_path=%config_file%
 
 echo #===========================================#
 echo # Data Analysis and Preprocessing #
@@ -28,14 +28,13 @@ rem python step36_feature_selection.py --config_path=%config_file%
 echo #===========================================#
 echo # Model Training #
 echo #===========================================#
-python step41_prepare_input.py --config_path=%config_file%
-python step42_training_predictions.py --data_path="config/paths.pickle"
-python step43_execute_wide_search.py --data_path="config/paths.pickle" --execute_wide -debug
-python step43_execute_wide_search.py --data_path="config/paths.pickle" -debug
-python step44_execute_narrow_searches.py --data_path="config/paths.pickle"
-python step45_define_precision_recall.py --data_path="config/paths.pickle"
-python step46_train_evaluate_model.py --data_path="config/paths.pickle"
-python step47_train_final_model.py --data_path="config/paths.pickle"
+rem python step41_prepare_input.py --config_path=%config_file%
+rem python step42_training_predictions.py --data_path="config/paths.pickle"
+rem python step43_execute_wide_search.py --data_path="config/paths.pickle" --execute_wide=True
+rem python step44_execute_narrow_searches.py --data_path="config/paths.pickle" --execute_narrow=True
+rem python step45_define_precision_recall.py --data_path="config/paths.pickle"
+rem python step46_train_evaluate_model.py --data_path="config/paths.pickle"
+rem python step47_train_final_model.py --data_path="config/paths.pickle"
 
 echo #=================================================#
 echo # Training Model Evaluation for Temporal Datasets #

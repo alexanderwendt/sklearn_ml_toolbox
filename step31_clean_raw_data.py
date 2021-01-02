@@ -196,7 +196,7 @@ def print_characteristics(features_raw, image_save_directory, dataset_name, save
             plt.savefig(
                 image_save_directory + '/' + dataset_name + '_{}-{}'.format(i, features_raw.columns[i]),
                 dpi=300)
-        plt.show()
+        plt.show(block = False)
 
 
 def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_name):
@@ -222,6 +222,9 @@ def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_n
         numClasses = outcomes[class_name].value_counts().shape[0]
         print("Number of classes={}".format(numClasses))
 
+        if not unique_cols(outcomes):
+            raise Exception("Data processing error. At least one column has all the same values.")
+
         # Print graphs for all features
         print_characteristics(outcomes, result_directory, dataset_name, save_graphs=save_graphs)
     else:
@@ -230,6 +233,19 @@ def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_n
     # Print graphs for all features
     print_characteristics(features, result_directory, dataset_name, save_graphs=save_graphs)
 
+    # Check if raw data has useless values, i.e. all values of one column are the same
+    if not unique_cols(features):
+        raise Exception("Data processing error. At least one column has all the same values.")
+
+
+def unique_cols(df):
+    '''
+    Check if all values of a column of a dataframe are the same. If yes, then columns are unique. If False,
+    the columns have to be processed.
+
+    '''
+    a = df.to_numpy() # df.values (pandas<0.24)
+    return sum((a[0] == a).all(0))==0
 
 def main():
     conf = sup.load_config(args.config_path)

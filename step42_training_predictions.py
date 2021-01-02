@@ -116,14 +116,14 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer):
     plt.xlabel('Number of training examples')
     plt.ylabel('Duration [s]')
     plt.title("Training Duration")
-    plt.show()
+    plt.show(block = False)
 
     plt.figure()
     plt.plot(xaxis, scores)
     plt.xlabel('Number of training examples')
     plt.ylabel('F1-Score on cross validation set (=the rest). Size={}'.format(X_test.shape[0]))
     plt.title("F1 Score Improvement With More Data")
-    plt.show()
+    plt.show(block = False)
 
 def run_training_predictors(data_input_path):
     '''

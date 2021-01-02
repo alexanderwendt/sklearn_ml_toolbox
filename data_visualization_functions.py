@@ -55,7 +55,10 @@ def paintBarChartForMissingValues(xlabels, yvalues):
     plt.tight_layout()
     fig.subplots_adjust(bottom=0.3)
     bar = plt.bar(xlabels, yvalues, color=barColors, width=1.0, capsize=10, edgecolor='black')
-    plt.show()
+
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 def paintBarChartForCategorical(series, xlegend="Feature Label", ylegend="Share of Feature Labels", title="Distribution of Labels for Feature"):
     ''' Plot bar chart for categorical values, ranked by occurence
@@ -105,7 +108,6 @@ def paintBarChartForCategorical(series, xlegend="Feature Label", ylegend="Share 
     plt.tight_layout()
     fig.subplots_adjust(bottom=0.3, left=0.1)
     bar = plt.bar(xlabel_string, series, color=barColors, width=1.0, capsize=10, edgecolor='black')
-    #plt.show()
 	
     return fig
 
@@ -189,7 +191,6 @@ def paintHistogram(df, colName):
     plt.text(median * 1.01, plt.gca().get_ylim()[1] * 0.90, 'Median={}'.format(round(median, 2)))
     plt.text((median + 2*s_mad) * 1.01, plt.gca().get_ylim()[1] * 0.93, 'Median+2s_mad={}'.format(round(median + 2*s_mad, 2)))
     plt.text((median - 2*s_mad) * 1.01, plt.gca().get_ylim()[1] * 0.93, 'Median-2s_mad={}'.format(round(median - 2*s_mad, 2)))
-    #plt.show()
 
     # Get data
     print("Feature characteristics for {}:".format(colName))
@@ -266,7 +267,6 @@ def plot_confusion_matrix_multiclass(cm, classes, normalize=False, title='Confus
     plt.xlabel('Predicted label')
 
     plt.tight_layout()
-    #plt.show()
     return plt.gcf()
 
 def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues):
@@ -361,7 +361,9 @@ def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, le
             os.makedirs(save_fig_prefix)
         plt.savefig(os.path.join(save_fig_prefix, title + '_three_class_graph'), dpi=300)
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 
 # %% pycharm={"is_executing": false}
@@ -380,7 +382,9 @@ def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend, title
             os.makedirs(save_fig_prefix)
         plt.savefig(os.path.join(save_fig_prefix, title + '_two_class_graph'), dpi=300)
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 #def plot_two_class_graph(y_order_train, y_order_train_pred):
 #    plt.figure(num=None, figsize=(11.5, 7), dpi=80, facecolor='w', edgecolor='k')
@@ -475,7 +479,9 @@ def plot_grid_search_validation_curve(grid, param_to_vary, refit_scorer_name, ti
     plt.legend(loc='lower right')
     plt.grid()
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_heatmap_xy(scores, parameters, xlabel, ylabel, title, normalizeScale=False):
@@ -539,7 +545,9 @@ def plot_heatmap_xy(scores, parameters, xlabel, ylabel, title, normalizeScale=Fa
 
     # cbar_ax = fig.add_axes([0.95, 0.15, 0.05, 0.8])
     cbar = fig.colorbar(im1, ax=ax)  # cax=axs[1])
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 # #%matplotlib inline
 # For an identical distribution, we cannot reject the null hypothesis since the p-value is high, 41%. To reject the null
@@ -587,10 +595,8 @@ def calculate_significance_matrix(parameter_name, unique_param_values, results, 
     plt.title("Statistical Difference Significance Matrix for " + parameter_name)
 
     fig = plt.gcf()
-    #plt.show()
 
     return statistics_df, fig
-    # plt.show()
 
 def plotOverlayedHistorgrams(parameter_name, unique_param_values, results, median_results, refit_scorer_name):
     '''Plot layered histograms from feature distributions
@@ -690,20 +696,32 @@ def visualize_parameter_grid_search(param_name, search_cv_parameters, search_cv_
     fig1 = paintBarChartForCategorical(source, title='Distribution of Labels for Feature <{}>'.format(source.name))
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_' + param_name + '_categorical_bar', dpi=300)
-    fig1.show()
+    #plt.ion()
+    plt.show(block=False)
+    #plt.show()
+    plt.pause(0.1)
+    plt.close()
 
     # Significance matrix for distributions
     significance_matrix, fig2 = calculate_significance_matrix(param_name, unique_list, search_cv_results, refit_scorer_name)
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_' + param_name + '_significance_matrix', dpi=300)
-    fig2.show()
+    #plt.ion()
+    plt.show(block=False)
+    #plt.show()
+    plt.pause(0.1)
+    plt.close()
 
     # Overlayed histograms
     medians = sup.get_median_values_from_distributions(param_name, unique_list, search_cv_results, refit_scorer_name)
     fig3 = plotOverlayedHistorgrams(param_name, unique_list, search_cv_results, medians, refit_scorer_name)
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_' + param_name + '_overlayed_histograms', dpi=300)
-    fig3.show()
+    #plt.ion()
+    plt.show(block=False)
+    #plt.show()
+    plt.pause(0.1)
+    plt.close()
 
     print("Method end")
 
@@ -724,19 +742,38 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
     fig_confusion_matrix = plot_confusion_matrix_multiclass(cnf_matrix, classes=list(reduced_class_dict.values()),
                                              title='Confusion matrix with normalization', normalize=True)
 
-
-    fig_pr_curve = skplt.metrics.plot_precision_recall_curve(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
-    fig_roc_curve = skplt.metrics.plot_roc(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
-
     if save_fig_prefix != None:
         fig_confusion_matrix.savefig(save_fig_prefix + '_confusion_matrix', dpi=300)
-        #plt.savefig(save_fig_prefix + '_confusion_matrix', dpi=300)
+
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
+
+    fig_pr_curve = skplt.metrics.plot_precision_recall_curve(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
+    if save_fig_prefix != None:
         fig_pr_curve.figure.savefig(save_fig_prefix + '_pr_curve')
-        #plt.savefig(save_fig_prefix + '_pr_curve', dpi=300)
-        #plt.savefig(save_fig_prefix + '_roc_curve', dpi=300)
+
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
+
+    fig_roc_curve = skplt.metrics.plot_roc(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
+    if save_fig_prefix != None:
         fig_roc_curve.figure.savefig(save_fig_prefix + '_roc_curve')
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
+
+#    if save_fig_prefix != None:
+#        fig_confusion_matrix.savefig(save_fig_prefix + '_confusion_matrix', dpi=300)
+#        #plt.savefig(save_fig_prefix + '_confusion_matrix', dpi=300)
+#        fig_pr_curve.figure.savefig(save_fig_prefix + '_pr_curve')
+#        #plt.savefig(save_fig_prefix + '_pr_curve', dpi=300)
+#        #plt.savefig(save_fig_prefix + '_roc_curve', dpi=300)
+#        fig_roc_curve.figure.savefig(save_fig_prefix + '_roc_curve')
+
+
 
 def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, save_fig_prefix=None):
     """
@@ -767,7 +804,9 @@ def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, 
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_pr_adjusted')
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_threshold, save_fig_prefix=None):
     """
@@ -791,7 +830,9 @@ def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_pr_scores_of_decision_threshold')
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
     """
@@ -813,7 +854,9 @@ def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_roc_curve')
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 def plot_decision_boundary(X, y, model, save_fig_prefix=None):
     X_Train_embedded = TSNE(n_components=2).fit_transform(X)
@@ -843,7 +886,9 @@ def plot_decision_boundary(X, y, model, save_fig_prefix=None):
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_decision_boundary_plot')
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 def plot_autocorrelation(feature, title, mode=None, lags=None, xlim=None, ylim=None, image_save_directory=None):
     '''
@@ -884,7 +929,9 @@ def plot_autocorrelation(feature, title, mode=None, lags=None, xlim=None, ylim=N
     print("Ljung-Box statistics: p-value=", acorr_ljungbox(feature, lags=None, boxpierce="Ljung-Box")[1])
     print("If p values > 0.05 then there are significant autocorrelations.")
 
-    plt.show(block = False)
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
 
 def plot_temporal_correlation_feature(X_scaled, dataset_name, image_save_directory, source, y_scaled):
     '''
@@ -907,7 +954,7 @@ def plot_temporal_correlation_feature(X_scaled, dataset_name, image_save_directo
         # display(tmp)
         #tmp.dropna().resample('Q').apply(lambda x: x.corr(method='spearman')).iloc[:, -1].unstack().iloc[:, :-1].plot(
         #    title='Correlation of Features to Outcome', figsize=(8, 2))
-        tmp.dropna().interpolate()[tmp.columns[0]].rolling(window=window_size, center=True).corr(tmp[tmp.columns[-1]]).plot(
+        fig = tmp.dropna().interpolate()[tmp.columns[0]].rolling(window=window_size, center=True).corr(tmp[tmp.columns[-1]]).plot(
             title='Correlation of Feature ' + tmp.columns[0] + ' to Outcome ' + tmp.columns[-1], figsize=(8, 2))
         plt.ylim(-1, 1)
         plt.hlines([-0.2, 0.2], xmin=tmp.index[0], xmax=tmp.index[-1], colors='r')
@@ -917,4 +964,6 @@ def plot_temporal_correlation_feature(X_scaled, dataset_name, image_save_directo
                 os.makedirs(image_save_directory)
             plt.savefig(os.path.join(image_save_directory, dataset_name + '_Temporal_Correlation_feature_{}_to_Outcome_{}'.format(col, tmp.columns[-1])), dpi=300)
 
-        plt.show(block = False)
+        plt.show(block=False)
+        plt.pause(0.1)
+        plt.close()

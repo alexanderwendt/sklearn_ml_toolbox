@@ -149,13 +149,13 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
     msno.matrix(features)
     plt.gcf()
     plt.savefig(os.path.join(result_dir,'_missing_numbers_matrix'))
-    plt.show()
+    plt.show(block = False)
 
     if features.isnull().values.sum() > 0:
         plt.gcf()
         msno.heatmap(features)
         plt.savefig(os.path.join(result_dir, '_missing_numbers_heatmap'))
-        plt.show()
+        plt.show(block = False)
 
     #### View Prepared Binary Features
     # We need some more plots for the binary data types.

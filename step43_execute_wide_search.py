@@ -3,7 +3,22 @@
 
 """
 Step 4X Training: Train wide Search
-License_info: TBD
+License_info: ISC
+ISC License
+
+Copyright (c) 2020, Alexander Wendt
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 # Futures
@@ -42,7 +57,7 @@ __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
                 'Embedded Machine Learning'
 __credits__ = ['']
-__license__ = 'TBD'
+__license__ = 'ISC'
 __version__ = '0.2.0'
 __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
@@ -56,15 +71,15 @@ np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 
 parser = argparse.ArgumentParser(description='Step 4.3 - Execute wide grid search for SVM')
-parser.add_argument("-exe", '--execute_wide', default=True,
-                    help='Execute Training', required=False)
+parser.add_argument("-exe", '--execute_wide', default=False, action='store_true', help='Execute Wide Training run')
+parser.add_argument("-debug", '--debug_parameters', default=False, action='store_true', help='Use debug parameters')
 parser.add_argument("-d", '--data_path', default="config/paths.pickle",
                     help='Prepared data', required=False)
 
 args = parser.parse_args()
 
 
-def execute_wide_search(paths_path = "config/paths.pickle"):
+def execute_wide_search(paths_path = "config/paths.pickle", use_debug_parameters=False):
     ''' Execute the wide search algorithm
 
     :args:
@@ -110,14 +125,19 @@ def execute_wide_search(paths_path = "config/paths.pickle"):
                         # Only relevant in rbf, default='auto'=1/n_features
                     }]
 
-    #grid_search_run1, params_run1, pipe_run1, results_run1 = step40.run_basic_svm(X_train, y_train, selected_features,
-    #                                                                      scorers, refit_scorer_name,
-    #                                                                      subset_share=0.10, n_splits=3,
-    #                                                                      )
-    grid_search_run1, params_run1, pipe_run1, results_run1 = step40.run_basic_svm(X_train, y_train, selected_features,
-                                                                          scorers, refit_scorer_name,
-                                                                          subset_share=0.01, n_splits=2,
-                                                                          parameters=params_debug)
+    if use_debug_parameters:
+        grid_search_run1, params_run1, pipe_run1, results_run1 = step40.run_basic_svm(X_train, y_train,
+                                                                                      selected_features,
+                                                                                      scorers, refit_scorer_name,
+                                                                                      subset_share=0.01, n_splits=2,
+                                                                                      parameters=params_debug)
+    else:
+
+        grid_search_run1, params_run1, pipe_run1, results_run1 = step40.run_basic_svm(X_train, y_train, selected_features,
+                                                                              scorers, refit_scorer_name,
+                                                                              subset_share=0.10, n_splits=3,
+                                                                              )
+
     print('Final score is: ', grid_search_run1.score(X_test, y_test))
 
     result = dict()
@@ -136,10 +156,11 @@ def execute_wide_search(paths_path = "config/paths.pickle"):
     # print("Number of NaN results: {}. Replace them with 0".format(np.sum(results_run1['mean_test_' + refit_scorer_name].isna())))
     # results_run1[results_run1['mean_test_' + refit_scorer_name].isna()]=0
     # print("Result size after dropping NAs=", results_run1.shape)
-    display(result['result'].round(4).head(10))
+    print(result['result'].round(4).head(10))
 
     # Save results
     dump(result, open(results_file_path, 'wb'))
+    result['result'].to_csv(results_file_path + ".csv")
     print("Stored results of run 1 to ", results_file_path)
 
 
@@ -187,7 +208,7 @@ def extract_categorical_visualize_graphs(paths_path = "config/paths.pickle", top
     # number of results to consider
     #top_percentage = 0.2
     number_results = np.int(results_run1.shape[0] * top_percentage)
-    print("The top {} of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
+    print("The top {}% of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
     results_subset = results_run1.iloc[0:number_results,:]
 
     ## %% Plot graphs
@@ -268,8 +289,10 @@ def execute_wide_run(execute_search=True, data_input_path="04_Model" + "/" + "pr
 
     #Execute algotihm
     if execute_search==True:
+        if args.debug_parameters:
+            print("WARNING: Debug parameters are used, which only use a small subset of the search.")
         print("Execute grid search")
-        execute_wide_search(data_input_path)
+        execute_wide_search(data_input_path, use_debug_parameters=args.debug_parameters)
     else:
         print("No grid search performed. Already existing model loaded.")
 

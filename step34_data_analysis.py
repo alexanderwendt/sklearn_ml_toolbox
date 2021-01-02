@@ -86,42 +86,23 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
 
     ### Feature and Outcomes Correlation Matrix
 
-    plot_correlation_matrix(conf, features, image_save_directory, total_values_scaled)
+    #plot_correlation_matrix(conf, features, image_save_directory, total_values_scaled)
 
     #fixme: Class names not correct shown
-    plot_correlation_matrix2(conf, image_save_directory, total_values_scaled)
+    #plot_correlation_matrix2(conf, image_save_directory, total_values_scaled)
 
-    plot_spearman_correlation_matrix(conf, image_save_directory, total_values_scaled)
+    #plot_spearman_correlation_matrix(conf, image_save_directory, total_values_scaled)
 
-    #subx = X_scaled.iloc[1000:2000, 0:4]
-    #suby = y_scaled.iloc[1000:2000]
+    #plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled)
 
-    #print(subx)
-    #print(suby)
-
-    #type(suby)
-    #subx.corrwith(suby[conf['class_name']], drop=True)
+    #from tabulate import tabulate
+    #print(tabulate(X_scaled, headers='keys', tablefmt='psql'))
 
 
-    # import seaborn as sns
-
-
-    plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled)
-
-    # tmp = X_scaled.iloc[:,[0]].join(df_timegraph).join(y_scaled).reset_index().set_index('Time').drop(columns=['id', 'High', 'Low', 'Close'])
-    # tmp
-    # tmp.dropna().resample('M').apply(lambda x: x.corr()).iloc[:,-1].unstack().iloc[:,:-1]
-    # fig = plt.Figure()
-    # plt.scatter(tmp.iloc[:,1], tmp.iloc[:,0])
 
     plot_hierarchical_linkage(X_scaled, conf, image_save_directory)
 
-
-
-
     ### Feature visualization with Parallel Coordinates
-
-
     # Select a random subset to visualize
     import random
 
@@ -193,15 +174,19 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Variance_Coverage'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
     fig = plt.figure()
     sns.heatmap(np.log(pca_trafo.inverse_transform(np.eye(X_scaled.shape[1]))), cmap="hot", cbar=True)
-    necessary_components = pca_trafo.explained_variance_ratio_.cumsum()[
-        pca_trafo.explained_variance_ratio_.cumsum() < 0.95]
-    print("95% variance covered with the {} first components. Values={}".format(len(necessary_components),
-                                                                                necessary_components))
+    necessary_components = pca_trafo.explained_variance_ratio_.cumsum()[pca_trafo.explained_variance_ratio_.cumsum() < 0.95]
+    print("95% variance covered with the {} first components. Values={}".format(len(necessary_components), necessary_components))
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Heatmap'), dpi=300)
+
+
     plt.figure(figsize=(10, 10))
     # plt.scatter(pca_values[:,0], pca_values[:,1], c=targets, edgecolor='none', label=class_labels.values(), alpha=0.5)
     for i, t in enumerate(set(targets)):
@@ -216,7 +201,7 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Plot'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
@@ -237,7 +222,7 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_UMAP_Unsupervised'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
     vis.plotUmap(embeddingSupervised, y, list(class_labels.values()), 'Dataset supervised clustering')
     if image_save_directory:
@@ -245,7 +230,7 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_UMAP_Supervised'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
@@ -278,7 +263,7 @@ def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
     fig.subplots_adjust(hspace=0.3)
 
     plt.gcf()
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_directory):
@@ -313,7 +298,7 @@ def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_T-SNE_Plot'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_save_directory):
@@ -383,7 +368,7 @@ def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_sa
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Parallel_Coordinates'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
@@ -405,7 +390,7 @@ def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Hierarchical_Linkage'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
@@ -420,7 +405,7 @@ def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Correlation_Strength'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
@@ -439,7 +424,7 @@ def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Spearman_Correlation_Plot'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 
 def plot_correlation_matrix2(conf, image_save_directory, total_values):
@@ -462,7 +447,7 @@ def plot_correlation_matrix2(conf, image_save_directory, total_values):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Pairplot'), dpi=300)
 
-    plt.show()
+    plt.show(block = False)
 
 def plot_correlation_matrix(conf, features, image_save_directory, total_values):
     # Select column values to use in the correlation plot
@@ -492,7 +477,7 @@ def plot_correlation_matrix(conf, features, image_save_directory, total_values):
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get("dataset_name") + "_Scatter-Matrix"), dpi=300)
-    plt.show()
+    plt.show(block = False)
 
 
 def rescale(conf, features, y):

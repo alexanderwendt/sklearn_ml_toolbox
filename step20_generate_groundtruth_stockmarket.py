@@ -510,8 +510,10 @@ def main():
     #    # Drop from the timerows too
     #    source_cut = source.drop(source.tail(50).index, inplace=False)
     #else:
-    source_cut = source
-    outcomes_cut = outcomes
+
+    # Drop the 50 last values as they cannot be used for prediction as +50 days ahead is predicted
+    source_cut = source.drop(source.tail(50).index, inplace=False)
+    outcomes_cut = outcomes.drop(outcomes.tail(50).index, inplace=False)
 
     vis.plot_three_class_graph(outcomes_cut['1dTrend'].values,
                                source_cut['Close'], source_cut['Date'],
@@ -537,28 +539,31 @@ def main():
                                title=conf['Common'].get('dataset_name') + '_Groud_Truth_LongTrend',
                                save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(outcomes_cut['1dTrend'] - 1,
+    def binarize(outcomes, class_number):
+        return (outcomes == class_number).astype(np.int)
+
+    vis.plot_two_class_graph(binarize(outcomes_cut['1dTrend'], conf['Classes'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
                              save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(outcomes_cut['5dTrend'] - 1,
+    vis.plot_two_class_graph(binarize(outcomes_cut['5dTrend'], conf['Classes'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
                              save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(outcomes_cut['20dTrend'] - 1,
+    vis.plot_two_class_graph(binarize(outcomes_cut['20dTrend'], conf['Classes'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
                              save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(outcomes_cut['LongTrend'] - 1,
+    vis.plot_two_class_graph(binarize(outcomes_cut['LongTrend'], conf['Classes'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
@@ -575,8 +580,8 @@ def main():
 
     # Save file
     # Save outcomes to a csv file
-    print("Outcomes shape {}".format(outcomes.shape))
-    outcomes.to_csv(outcomes_filename_raw, sep=';', index=True, header=True)
+    print("Outcomes shape {}".format(outcomes_cut.shape))
+    outcomes_cut.to_csv(outcomes_filename_raw, sep=';', index=True, header=True)
     print("Saved outcomes to " + outcomes_filename_raw)
 
     # Save y labels to a csv file as a dict

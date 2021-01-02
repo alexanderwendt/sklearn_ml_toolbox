@@ -89,7 +89,7 @@ def find_tsne_parmeters(X_scaled_subset, y_subset, class_labels, conf, image_sav
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_TSNE_Calibration_Plot'), dpi=300)
 
 
-    plt.show()
+    plt.show(block = False)
 
 
 def main():

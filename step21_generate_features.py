@@ -589,8 +589,8 @@ def main():
     rsi_change_features = get_rsi_difference(source)
     features = features.join(rsi_change_features)
 
-    rsi_signal_features = get_rsi_signal(source)
-    features = features.join(rsi_signal_features)
+    #rsi_signal_features = get_rsi_signal(source)
+    #features = features.join(rsi_signal_features)
 
     stoch_features = get_stochastics(source)
     features = features.join(stoch_features)
