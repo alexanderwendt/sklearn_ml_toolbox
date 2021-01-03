@@ -64,8 +64,8 @@ parser = argparse.ArgumentParser(description='Step 3.1 - Clean raw data')
 #                    help='Set flag if retraining with all available data shall be performed after ev')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
                     help='Configuration file path', required=False)
-parser.add_argument("-i", "--on_inference_data", action='store_true',
-                    help="Set inference if only inference and no training")
+#parser.add_argument("-i", "--on_inference_data", action='store_true',
+#                    help="Set inference if only inference and no training")
 
 args = parser.parse_args()
 
@@ -126,7 +126,7 @@ def clean_features_first_pass(features_raw, class_name):
     return features
 
 
-def load_files(data_directory, dataset_name, class_name, on_inference_data):
+def load_files(data_directory, dataset_name, annotations_filename):
     # Constants for all notebooks in the Machine Learning Toolbox
     print("Data source: {}".format(data_directory))
 
@@ -135,7 +135,7 @@ def load_files(data_directory, dataset_name, class_name, on_inference_data):
     input_outcomes_filename = data_directory + "/" + dataset_name + "_outcomes" + ".csv"
 
     source_filename = data_directory + "/" + dataset_name + "_source" + ".csv"
-    labels_filename = data_directory + "/" + dataset_name + "_labels" + ".csv"
+    #labels_filename = data_directory + "/" + dataset_name + "_labels" + ".csv"
     # Columns for feature selection
     # selected_feature_columns_filename = data_directory + "/" + dataset_name + "_" + class_name + "_selected_feature_columns.csv"
 
@@ -144,7 +144,7 @@ def load_files(data_directory, dataset_name, class_name, on_inference_data):
     # print("Output Features: ", model_features_filename)
     print("Input Outcomes: ", input_outcomes_filename)
     # print("Output Outcomes: ", model_outcomes_filename)
-    print("Labels: ", labels_filename)
+    #print("Labels: ", labels_filename)
     print("Original source: ", source_filename)
     # print("Labels for the model: ", model_labels_filename)
     # print("Selected feature columns: ", selected_feature_columns_filename)
@@ -153,12 +153,13 @@ def load_files(data_directory, dataset_name, class_name, on_inference_data):
 
     # === Load Features ===#
     features_raw = pd.read_csv(input_features_filename, sep=';').set_index('id')  # Set ID to be the data id
-    display(features_raw.head(1))
+    print(features_raw.head(1))
 
     # === Load Outcomes ===#
-    if not on_inference_data:
+    if os.path.isfile(input_outcomes_filename):
+        #if not on_inference_data:
         outcomes_raw = pd.read_csv(input_outcomes_filename, sep=';').set_index('id')  # Set ID to be the data id
-        display(outcomes_raw.head(1))
+        print(outcomes_raw.head(1))
     else:
         outcomes_raw =None
         print("No outcomes available for inference data")
@@ -168,7 +169,9 @@ def load_files(data_directory, dataset_name, class_name, on_inference_data):
     data_source_raw = sup.load_data_source(source_filename)
 
     # === Load class labels or modify ===#
-    class_labels = load_class_labels(labels_filename)
+    #Load annotations
+    #annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
+    class_labels = load_class_labels(annotations_filename)
 
     return features_raw, outcomes_raw, data_source_raw, class_labels
 
@@ -262,17 +265,16 @@ def unique_cols(df):
     a = df.to_numpy() # df.values (pandas<0.24)
     return sum((a[0] == a).all(0))==0
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
 
-    annotations_directory = os.path.join(conf['Paths'].get('annotations_directory'))
-
-    if not args.on_inference_data:
-        data_directory = conf['Paths'].get('training_data_directory')
-        result_directory = os.path.join(conf['Paths'].get('result_directory'), "data_preparation_training")
-    else:
-        data_directory = conf['Paths'].get('inference_data_directory')
-        result_directory = os.path.join(conf['Paths'].get('result_directory', "data_preparation_inference"))
+    #if not on_inference_data:
+    data_directory = conf['Paths'].get('prepared_data_directory')
+    result_directory = os.path.join(conf['Paths'].get('result_directory'), "data_preparation")
+    annotations_filename = conf["Paths"].get("annotations_file")
+    #else:
+    #    data_directory = conf['Paths'].get('inference_data_directory')
+    #    result_directory = os.path.join(conf['Paths'].get('result_directory', "data_preparation_inference"))
 
     if not os.path.isdir(result_directory):
         os.makedirs(result_directory)
@@ -284,7 +286,7 @@ def main():
         print("Created directory: ", "tmp")
 
     features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(data_directory, conf['Common'].get('dataset_name'),
-                                                                                conf['Common'].get('class_name'), args.on_inference_data)
+                                                                                annotations_filename)
     ## Data Cleanup of Features and Outcomes before Features are Modified
     features_cleaned1 = clean_features_first_pass(features_raw, class_labels)
 
@@ -298,9 +300,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
-    main()
+    main(args.config_path)
 
     print("=== Program end ===")

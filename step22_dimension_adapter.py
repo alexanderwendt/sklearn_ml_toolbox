@@ -123,17 +123,18 @@ def clean_nan(df):
     #print(source_nonan.head(5))
     #print(source_nonan.tail(5))
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
 
     #image_save_directory = conf['result_directory'] + "/data_preparation_images"
-    outcomes_filename_uncut = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_outcomes_uncut" + ".csv")
-    features_filename_uncut = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_features_uncut" + ".csv")
+    prepared_data_directory = conf['Paths'].get('prepared_data_directory')
+    outcomes_filename_uncut = os.path.join(prepared_data_directory, conf['Common'].get('dataset_name') + "_outcomes_uncut" + ".csv")
+    features_filename_uncut = os.path.join(prepared_data_directory, conf['Common'].get('dataset_name') + "_features_uncut" + ".csv")
     #labels_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_labels" + ".csv"
 
-    outcomes_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_outcomes" + ".csv")
-    features_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_features" + ".csv")
-    source_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_source" + ".csv")
+    outcomes_filename = os.path.join(prepared_data_directory, conf['Common'].get('dataset_name') + "_outcomes" + ".csv")
+    features_filename = os.path.join(prepared_data_directory, conf['Common'].get('dataset_name') + "_features" + ".csv")
+    source_filename = os.path.join(prepared_data_directory, conf['Common'].get('dataset_name') + "_source" + ".csv")
 
     print("=== Paths ===")
     print("Features: ", features_filename)
@@ -143,32 +144,44 @@ def main():
     # Load only a subset of the whole raw data to create a debug dataset
     source_uncut = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
     features_uncut = pd.read_csv(features_filename_uncut, sep=';').set_index('id')
-    outcomes_uncut = pd.read_csv(outcomes_filename_uncut, sep=';').set_index('id')
+    if os.path.isfile(outcomes_filename_uncut):
+        outcomes_uncut = pd.read_csv(outcomes_filename_uncut, sep=';').set_index('id')
+        print("Outcomes file found. Adapting dimensions for training data.")
+    else:
+        outcomes_uncut = None
+        print("Outcomes file not found. Adapting dimensions for inference data.")
 
     print("Source shape: ", source_uncut.shape)
     print("Features shape: ", features_uncut.shape)
     print("Outcomes shape: ", outcomes_uncut.shape)
 
     # Cut outcomes and by last 50 as smoothing was used
-    outcomes_reduced1 = cut_unusable_parts_of_dataframe(outcomes_uncut, tail_index=50)
+    #outcomes_reduced1 = cut_unusable_parts_of_dataframe(outcomes_uncut, tail_index=50)
 
-    # Cut NaNs
+    #Clean features # Cut NaNs
     features_reduced1 = clean_nan(features_uncut)
-    intersection_index = outcomes_reduced1.index.intersection(features_reduced1.index)
 
-    # Cut all dataframes to have the same index
+    if not outcomes_uncut is None:
+        intersection_index = outcomes_uncut.index.intersection(features_reduced1.index)
+
+        # Cut all dataframes to have the same index
+        outcomes = outcomes_uncut.loc[intersection_index]
+        print("Cut outcomes shape: ", outcomes.shape)
+    else:
+        intersection_index = features_reduced1.index
+        print("Nothing will be cut. Size of features will be used.")
+
     features = features_reduced1.loc[intersection_index]
-    outcomes = outcomes_reduced1.loc[intersection_index]
     source = source_uncut.loc[intersection_index]
 
     print("Cut source shape: ", source.shape)
     print("Cut features shape: ", features.shape)
-    print("Cut outcomes shape: ", outcomes.shape)
+
 
     # Cut for subsets
     subset_start = 0
-    #subset_stop = features.shape[0]
-    subset_stop = 1000
+    subset_stop = features.shape[0]
+    #subset_stop = 1000
 
     features_subset = cut_dataframe_subset(features, subset_start, subset_stop)
     outcomes_subset = cut_dataframe_subset(outcomes, subset_start, subset_stop)
@@ -198,4 +211,4 @@ if __name__ == "__main__":
     #if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
-    main()
+    main(args.config_path)

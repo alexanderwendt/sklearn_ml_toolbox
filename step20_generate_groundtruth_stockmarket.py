@@ -67,28 +67,28 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 args = parser.parse_args()
 
 
-def generate_custom_class_labels():
-    '''
-
-
-    '''
-
-    ## Class Generation
-    #Here, 4 classes will be generated:
-    #- LongTerm
-    #- Intermediate term 20d
-    #- Short term 5d
-    #- very short term 1 d
-
-    #### Create labels
-
-    y_labels = {
-        'neutral': 0,
-        'positive': 1,
-        'negative': 2
-    }
-
-    return y_labels
+# def generate_custom_class_labels():
+#     '''
+#
+#
+#     '''
+#
+#     ## Class Generation
+#     #Here, 4 classes will be generated:
+#     #- LongTerm
+#     #- Intermediate term 20d
+#     #- Short term 5d
+#     #- very short term 1 d
+#
+#     #### Create labels
+#
+#     y_labels = {
+#         'neutral': 0,
+#         'positive': 1,
+#         'negative': 2
+#     }
+#
+#     return y_labels
 
 def find_tops_bottoms(source):
     ### Calculate Tops and Bottoms
@@ -481,8 +481,8 @@ def generate_features_outcomes(conf, source):
     return outcomes
 
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
     # Load annotations file
     annotations_filename = conf["Paths"].get("annotations_file")
     annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
@@ -585,18 +585,19 @@ def main():
     print("Saved outcomes to " + outcomes_filename_raw)
 
     # Save y labels to a csv file as a dict
-    print("Class labels length {}".format(len(y_labels)))
-    with open(labels_filename, 'w') as f:
-        for key in y_labels.keys():
-            f.write("%s;%s\n" % (key, y_labels[key]))
-    print("Saved class names and id to " + labels_filename)
+    #print("Class labels length {}".format(len(y_labels)))
+    #with open(labels_filename, 'w') as f:
+    #    for key in y_labels.keys():
+    #        f.write("%s;%s\n" % (key, y_labels[key]))
+    #print("Saved class names and id to " + labels_filename)
+    print("Annotations are not saved. They are always loaded from the source.")
 
 
 if __name__ == "__main__":
     #if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
-    main()
+    main(args.config_path)
 
 
     print("=== Program end ===")

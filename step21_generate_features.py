@@ -564,12 +564,12 @@ def get_periodical_indicators(source):
 #     i = CDL3INSIDE(close, high, low, close)
 #     display(np.sum(pattern1))
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
 
     image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_generation")
     #outcomes_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_outcomes" + ".csv"
-    features_filename_uncut = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_features_uncut" + ".csv")
+    features_filename_uncut = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Common'].get('dataset_name') + "_features_uncut" + ".csv")
     #features_filename_uncut = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_features_uncut" + ".csv"
 
 
@@ -665,7 +665,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(args.config_path)
 
 
     print("=== Program end ===")
