@@ -3,7 +3,22 @@
 
 """
 Step 3X Preprocessing: Feature Selection
-License_info: TBD
+License_info: ISC
+ISC License
+
+Copyright (c) 2020, Alexander Wendt
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 # Futures
@@ -28,7 +43,7 @@ __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
                 'Embedded Machine Learning'
 __credits__ = ['']
-__license__ = 'TBD'
+__license__ = 'ISC'
 __version__ = '0.2.0'
 __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
@@ -79,10 +94,10 @@ def load_input(paths_path = "config/paths.pickle"):
     refit_scorer_name = model['refit_scorer_name']
     scorer = scorers[refit_scorer_name]
 
-    return X_train, y_train, X_test, y_test, y_classes, scorer
+    return X_train, y_train, X_test, y_test, y_classes, scorer, paths
 
 
-def run_training_estimation(X_train, y_train, X_test, y_test, scorer):
+def run_training_estimation(X_train, y_train, X_test, y_test, scorer, save_fig_prefix=None):
     '''
     Run estimation of scorer (default f1) and duration dependent of subset size of input data
 
@@ -130,7 +145,10 @@ def run_training_predictors(data_input_path):
 
 
     '''
-    X_train, y_train, X_test, y_test, y_classes, scorer = load_input(data_input_path)
+    X_train, y_train, X_test, y_test, y_classes, scorer, paths = load_input(data_input_path)
+
+    result_directory = paths['result_directory']
+    save_fig_prefix = result_directory + '/model_images'
 
     #Baseline test
     baseline_results = step40.execute_baseline_classifier(X_train, y_train, X_test, y_test, y_classes, scorer)

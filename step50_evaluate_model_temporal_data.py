@@ -3,7 +3,22 @@
 
 """
 Step 5 Evaluation Temporal Data: Evaluate model for temporal data
-License_info: TBD
+License_info: ISC
+ISC License
+
+Copyright (c) 2020, Alexander Wendt
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 # Futures
@@ -32,7 +47,7 @@ __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
                 'Embedded Machine Learning'
 __credits__ = ['']
-__license__ = 'TBD'
+__license__ = 'ISC'
 __version__ = '0.2.0'
 __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
@@ -72,10 +87,10 @@ def visualize_temporal_data(paths_path = "04_Model/paths.pickle"):
     source_path = paths['source_path']
     result_directory = paths['result_directory']
 
-    figure_path_prefix = result_directory + '/eval_images/' + model_name
-    if not os.path.isdir(result_directory + '/eval_images'):
-        os.makedirs(result_directory + '/eval_images')
-        print("Created folder: ", result_directory + '/eval_images')
+    figure_path_prefix = result_directory + '/evaluation/' + model_name
+    if not os.path.isdir(result_directory + '/evaluation'):
+        os.makedirs(result_directory + '/evaluation')
+        print("Created folder: ", result_directory + '/evaluation')
 
     # Load model external parameters
     with open(svm_external_parameters_filename, 'r') as fp:

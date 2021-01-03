@@ -3,7 +3,22 @@
 
 """
 Step 3X Preprocessing: Adapt features for Machine Learning
-License_info: TBD
+License_info: ISC
+ISC License
+
+Copyright (c) 2020, Alexander Wendt
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 # Futures
@@ -19,7 +34,6 @@ import missingno as msno
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from IPython.core.display import display
 #from matplotlib.ticker import FuncFormatter, MaxNLocator
 #from pandas.core.dtypes.common import is_string_dtype
 from pandas.plotting import register_matplotlib_converters
@@ -32,7 +46,7 @@ __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
                 'Embedded Machine Learning'
 __credits__ = ['']
-__license__ = 'TBD'
+__license__ = 'ISC'
 __version__ = '0.2.0'
 __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
@@ -79,7 +93,7 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
         features[col] = pd.to_numeric(features[col])
         # df_dig[col] = np.int64(df_dig[col])
 
-    display(features.head(5))
+    print(features.head(5))
 
     # Create one-hot-encoding for certain classes and replace the original class
     # onehotlabels = pd.get_dummies(df_dig.iloc[:,1])

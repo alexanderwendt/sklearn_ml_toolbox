@@ -3,7 +3,22 @@
 
 """
 Step 2X Data generation: Generate ground truth for stock markets based on OHLC data
-License_info: TBD
+License_info: ISC
+ISC License
+
+Copyright (c) 2020, Alexander Wendt
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 # Futures
@@ -30,7 +45,7 @@ __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
                 'Embedded Machine Learning'
 __credits__ = ['']
-__license__ = 'TBD'
+__license__ = 'ISC'
 __version__ = '0.2.0'
 __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
@@ -468,25 +483,17 @@ def generate_features_outcomes(conf, source):
 
 def main():
     conf = sup.load_config(args.config_path)
+    # Load annotations file
+    annotations_filename = conf["Paths"].get("annotations_file")
+    annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
 
     # Generating filenames for saving the files
-    #features_filename = target_directory + "/" + conf['Common'].get('dataset_name') + "_features" + ".csv"
-    #outcomes_filename = target_directory + "/" + conf['Common'].get('dataset_name') + "_outcomes" + ".csv"
-    #labels_filename = target_directory + "/" + conf['Common'].get('dataset_name') + "_labels" + ".csv"
-    #source_filename = target_directory + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
+    image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_generation")
+    outcomes_filename_raw = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Common'].get('dataset_name') + "_outcomes_uncut" + ".csv")
+    labels_filename = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Common'].get('dataset_name') + "_labels" + ".csv")
 
-    #print("=== Paths ===")
-    #print("Features: ", features_filename)
-    #print("Outcomes: ", outcomes_filename)
-    #print("Labels: ", labels_filename)
-    #print("Original source: ", source_filename)
-
-    image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_preparation_images")
-    outcomes_filename_raw = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_outcomes_uncut" + ".csv")
-    labels_filename = os.path.join(conf['Paths'].get('training_data_directory'), conf['Common'].get('dataset_name') + "_labels" + ".csv")
-
-    if os.path.isdir(conf['Paths'].get('training_data_directory'))==False:
-        os.makedirs(conf['Paths'].get('training_data_directory'))
+    if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
+        os.makedirs(conf['Paths'].get('prepared_data_directory'))
         print("Created directory ", conf['Paths'].get('training_data_directory'))
 
     if os.path.isdir(conf['Paths'].get('result_directory'))==False:
@@ -501,15 +508,8 @@ def main():
     plt.title(conf['Paths'].get('source_path'))
     plt.show(block = False)
 
-    y_labels = generate_custom_class_labels()
+    y_labels = annotations #generate_custom_class_labels()
     outcomes = generate_features_outcomes(conf, source)
-
-    #if cut_data == True:
-    #    # Drop the 50 last values as they cannot be used for prediction as +50 days ahead is predicted
-    #    outcomes_cut = outcomes.drop(outcomes.tail(50).index, inplace=False)
-    #    # Drop from the timerows too
-    #    source_cut = source.drop(source.tail(50).index, inplace=False)
-    #else:
 
     # Drop the 50 last values as they cannot be used for prediction as +50 days ahead is predicted
     source_cut = source.drop(source.tail(50).index, inplace=False)

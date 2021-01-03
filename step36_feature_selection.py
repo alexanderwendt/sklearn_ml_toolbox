@@ -103,6 +103,7 @@ def execute_lasso_feature_selection(X_scaled, y, conf, image_save_directory):
     m.rcParams['figure.figsize'] = (8.0, 10.0)
     imp_coef.plot(kind="barh")
     plt.title("Feature importance using Lasso Model")
+    plt.tight_layout()
 
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
@@ -143,6 +144,7 @@ def execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory)
     imp_treecoef.plot(kind="barh")
     plt.title("Feature importance using Tree Search Model")
     plt.vlines(threshold, 0, len(X_scaled.columns), color='red')
+    plt.tight_layout()
 
     if image_save_directory:
         if not os.path.isdir(image_save_directory):

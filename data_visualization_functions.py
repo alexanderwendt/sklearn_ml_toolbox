@@ -732,7 +732,12 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
     np.set_printoptions(precision=3)
 
     print("Accuracy: ", accuracy_score(y_trainsub, y_trainsub_pred))
-    print(classification_report(y_trainsub, y_trainsub_pred, target_names=list(reduced_class_dict.values())))
+    report = classification_report(y_trainsub, y_trainsub_pred, target_names=list(reduced_class_dict.values()), output_dict=True)
+    df = pd.DataFrame(report).transpose()
+    if save_fig_prefix != None:
+        df.to_csv(save_fig_prefix + '_classification_report.csv')
+
+    print(report)
 
     cnf_matrix = confusion_matrix(y_trainsub, y_trainsub_pred, labels=list(reduced_class_dict.keys()))
 
