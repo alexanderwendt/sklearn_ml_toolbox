@@ -90,9 +90,9 @@ def generate_paths(conf):
 
     # Generating directories
     print("Directories")
-    paths['annotations_directory'] = conf['Paths'].get('annotations_directory')
-    paths['training_data_directory'] = conf['Paths'].get('training_data_directory')
-    paths['inference_data_directory'] = conf['Paths'].get('inference_data_directory')
+    #paths['annotations_directory'] = conf['Paths'].get('annotations_directory')
+    paths['prepared_data_directory'] = conf['Paths'].get('prepared_data_directory')
+    #paths['inference_data_directory'] = conf['Paths'].get('inference_data_directory')
     paths['model_directory'] = conf['Paths'].get('model_directory')
     paths['result_directory'] = conf['Paths'].get('result_directory')
     paths['config_directory'] = "config"
@@ -101,27 +101,27 @@ def generate_paths(conf):
         os.makedirs(paths['model_directory'])
         print("Created directory ", paths['model_directory'])
 
-    print("Training data directory: ", paths['training_data_directory'])
+    print("Prepared data directory: ", paths['prepared_data_directory'])
     print("Model directory: ", paths['model_directory'])
     print("Results directory: ", paths['result_directory'])
 
     # Dump file name
     paths['model_input'] = paths['model_directory'] + "/" + "model.pickle"
     paths['paths'] = paths['config_directory'] + "/" + "paths.pickle"
-    paths['train_record'] = paths['training_data_directory'] + "/" + "train.record"
-    paths['test_record'] = paths['training_data_directory'] + "/" + "test.record"
-    paths['inference_record'] = paths['inference_data_directory'] + "/" + "inference.record"
+    paths['train_record'] = paths['prepared_data_directory'] + "/" + "train.record"
+    paths['test_record'] = paths['prepared_data_directory'] + "/" + "test.record"
+    paths['inference_record'] = paths['prepared_data_directory'] + "/" + "inference.record"
 
     # Generating filenames for loading the files
-    paths['model_features_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_features_for_model" + ".csv"
-    paths['model_outcomes_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_outcomes_for_model" + ".csv"
-    paths['source_filename'] = paths['training_data_directory'] + "/" + dataset_name + "_source" + ".csv"
-    paths['inference_features_filename'] = paths['inference_data_directory'] + "/" + dataset_class_prefix + "_inference_features" + ".csv"
+    paths['model_features_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_features_for_model" + ".csv"
+    paths['model_outcomes_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_outcomes_for_model" + ".csv"
+    paths['source_filename'] = paths['prepared_data_directory'] + "/" + dataset_name + "_source" + ".csv"
+    #paths['inference_features_filename'] = paths['inference_data_directory'] + "/" + dataset_class_prefix + "_inference_features" + ".csv"
 
     #Modified labels
-    paths['model_labels_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_labels_for_model" + ".csv"
+    paths['model_labels_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_labels_for_model" + ".csv"
     #Columns for feature selection
-    paths['selected_feature_columns_filename'] = paths['training_data_directory'] + "/" + dataset_class_prefix + "_selected_feature_columns.csv"
+    paths['selected_feature_columns_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_selected_feature_columns.csv"
 
     #Model specifics
     paths['svm_evaluated_model_filename'] = paths['model_directory'] + "/" + dataset_class_prefix + "_svm_evaluated_model" + ".sav"
@@ -137,8 +137,8 @@ def generate_paths(conf):
     paths['svm_run2_result_filename'] = paths['result_directory'] + "/" + dataset_class_prefix + '_results_run2.pkl'
 
     # Source data files folder paths
-    paths['source_path'] = paths['training_data_directory'] + "/" + dataset_name + "_source" + ".csv"
-    paths['source_path_inference'] = paths['inference_data_directory'] + "/" + dataset_name + "_source" + ".csv"
+    paths['source_path'] = paths['prepared_data_directory'] + "/" + dataset_name + "_source" + ".csv"
+    #paths['source_path_inference'] = paths['inference_data_directory'] + "/" + dataset_name + "_source" + ".csv"
 
     print("=== Paths ===")
     print("Used file paths: ", paths)
@@ -305,14 +305,8 @@ def create_training_validation_data(df_X, y, y_classes, df_feature_columns, test
 
     # Create prepared data for model
     model_data = dict()
-    #prepared_data['X_train'] = X_train
-    #prepared_data['y_train'] = y_train
-    #prepared_data['X_test'] =  X_test
-    #prepared_data['y_test'] = y_test
-    #prepared_data['y_classes'] = y_classes
     model_data['scorers'] = scorers
     model_data['refit_scorer_name'] = refit_scorer_name
-    #prepared_data['paths'] = paths
     model_data['selected_features'] = list(feature_dict.values()) #selected_features
     model_data['feature_dict'] = feature_dict
 

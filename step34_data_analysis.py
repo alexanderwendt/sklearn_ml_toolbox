@@ -520,14 +520,14 @@ def rescale(conf, features, y):
     return X_scaled, y_scaled
 
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = conf['Paths'].get("training_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
+    source_filename = conf['Paths'].get("prepared_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation_training"
+    image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation"
 
     #analyze_timegraph(source, features, y, conf, image_save_directory)
     print("WARNING: If a singular matrix occurs in a calculation, probably the outcome is "
@@ -538,7 +538,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(args.config_path)
 
 
     print("=== Program end ===")

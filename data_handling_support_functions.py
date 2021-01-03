@@ -257,7 +257,7 @@ def load_features(conf):
 
     '''
 
-    training_data_directory = conf['Paths'].get("training_data_directory")
+    training_data_directory = conf['Paths'].get("prepared_data_directory")
     dataset_name = conf['Common'].get("dataset_name")
     class_name = conf['Common'].get("class_name")
 

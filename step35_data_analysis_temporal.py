@@ -179,14 +179,14 @@ def analyze_timegraph(source, features, y, conf, image_save_directory):
     vis.plot_temporal_correlation_feature(X_scaled, conf['Common'].get('dataset_name'), image_save_directory, source, y_scaled)
 
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = conf['Paths'].get("training_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
+    source_filename = conf['Paths'].get("prepared_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['Paths'].get('result_directory') + "/analysis_data_analysis"
+    image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation"
 
     analyze_timegraph(source, features, y, conf, image_save_directory)
     #analyse_features(features, y, class_labels, source, conf, image_save_directory)
@@ -194,6 +194,6 @@ def main():
 
 if __name__ == "__main__":
 
-    main()
+    main(args.config_path)
 
     print("=== Program end ===")

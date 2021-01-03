@@ -211,7 +211,7 @@ def extract_categorical_visualize_graphs(paths_path = "config/paths.pickle", top
     print("The top {}% of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
     results_subset = results_run1.iloc[0:number_results,:]
 
-    ## %% Plot graphs
+    ## Plot graphs
 
     # Prepare the inputs: Replace the lists with strings
     result_subset_copy = results_subset.copy()

@@ -306,13 +306,13 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
     return selected_feature_list
 
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
     image_save_directory = conf['Paths'].get('result_directory') + "/model_images"
 
-    selected_feature_columns_filename = conf['Paths'].get('training_data_directory') + "/" + conf['Common'].get('dataset_name') + "_" + \
+    selected_feature_columns_filename = conf['Paths'].get('prepared_data_directory') + "/" + conf['Common'].get('dataset_name') + "_" + \
                                         conf['Common'].get('class_name') + "_selected_feature_columns.csv"
 
     selected_feature_list = perform_feature_selection_algorithms(features, y, conf, image_save_directory)
@@ -325,6 +325,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(args.config_path)
 
     print("=== Program end ===")

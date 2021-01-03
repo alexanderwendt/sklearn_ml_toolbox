@@ -179,8 +179,8 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
 
     return features, y, class_labels
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
 
     data_preparation_dump_file_path = os.path.join("tmp", "step31out.pickle")
     (features_cleaned1, outcomes_cleaned1, class_labels,
@@ -217,6 +217,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(args.config_path)
 
     print("=== Program end ===")

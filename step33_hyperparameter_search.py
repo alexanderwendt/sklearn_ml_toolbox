@@ -107,14 +107,14 @@ def find_tsne_parmeters(X_scaled_subset, y_subset, class_labels, conf, image_sav
     plt.show(block = False)
 
 
-def main():
-    conf = sup.load_config(args.config_path)
+def main(config_path):
+    conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = conf['Paths'].get("training_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
+    source_filename = conf['Paths'].get("prepared_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['Paths'].get('result_directory') + "/analysis_data_analysis"
+    image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation"
 
     scaler = StandardScaler()  # Because normal distribution. Don't use minmax scaler for PCA or unsupervised learning
     # as the axis shall be centered and not shifted.
@@ -140,10 +140,8 @@ def main():
 
 
 if __name__ == "__main__":
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
-    main()
+    main(args.config_path)
 
 
     print("=== Program end ===")
