@@ -1,5 +1,6 @@
 import configparser
 import json
+import os
 import random
 import numpy as np
 import pandas as pd
@@ -210,7 +211,6 @@ def load_config(config_file_path):
 
     return config
 
-
 def load_data_source(source_filename):
     '''
 
@@ -258,12 +258,12 @@ def load_features(conf):
     '''
 
     training_data_directory = conf['Paths'].get("prepared_data_directory")
-    dataset_name = conf['Common'].get("dataset_name")
-    class_name = conf['Common'].get("class_name")
+    #dataset_name = conf['Common'].get("dataset_name")
+    #class_name = conf['Common'].get("class_name")
 
-    model_features_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_features_for_model" + ".csv"
-    model_outcomes_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_outcomes_for_model" + ".csv"
-    model_labels_filename = training_data_directory + "/" + dataset_name + "_" + class_name + "_labels_for_model" + ".csv"
+    model_features_filename = os.path.join(training_data_directory, conf['Preparation'].get('features_out'))
+    model_outcomes_filename = os.path.join(training_data_directory, conf['Preparation'].get('outcomes_out'))
+    model_labels_filename = os.path.join(training_data_directory, conf['Preparation'].get('labels_out'))
 
     # === Load Features ===#
     features = pd.read_csv(model_features_filename, sep=';').set_index('id')  # Set ID to be the data id
@@ -279,3 +279,53 @@ def load_features(conf):
     print("Loaded files to analyse")
 
     return features, y, df_y, class_labels
+
+def create_feature_dict(df_feature_columns, df_X):
+    '''
+    Create a dictionary of feature selection names and the column numbers.
+
+    :args:
+        df_feature_columns: column numbers for a feature selection method as dataframe
+        df_X: features as dataframe
+    :return:
+        feature_dict: feature selection method name assigned to a list of column numbers as dictionary
+
+    '''
+
+    # Create a list of column indices for the selection of features
+    selected_features = [getListFromColumn(df_feature_columns, df_X, i) for i in range(0, df_feature_columns.shape[1])]
+    feature_dict = dict(zip(df_feature_columns.columns, selected_features))
+
+    return feature_dict
+
+def get_class_information(y, y_classes_source):
+    '''
+    Get class information and remove unused classes.
+
+    :args:
+        y: y values for each feature x
+        y_classes_source: class labels
+    :return:
+        y_classes: class to number assignment as dictionary
+
+    '''
+
+    a, b = np.unique(y, return_counts=True)
+    vfunc = np.vectorize(lambda x: y_classes_source[x])  # Vectorize a function to process a whole array
+    print("For the classes with int {} and names {} are the counts {}".format(a, vfunc(a), b))
+    y_classes = {}
+    for i in a:
+        y_classes[i] = y_classes_source[i]
+    print("The following classes remain", y_classes)
+
+    # Check if y is binarized
+    if len(y_classes) == 2 and np.max(list(y_classes.keys())) == 1:
+        is_multiclass = False
+        print("Classes are binarized, 2 classes.")
+    else:
+        is_multiclass = True
+        print(
+            "Classes are not binarized, {} classes with values {}. For a binarized class, the values should be [0, 1].".
+            format(len(y_classes), list(y_classes.keys())))
+
+    return y_classes

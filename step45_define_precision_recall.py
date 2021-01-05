@@ -47,7 +47,7 @@ import numpy as np
 # Own modules
 import data_visualization_functions as vis
 import data_handling_support_functions as sup
-import execution_utils as step40
+import execution_utils as exe
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -66,78 +66,11 @@ np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
-parser = argparse.ArgumentParser(description='Step 4.5 - Define precision/recall')
-parser.add_argument("-d", '--data_path', default="config/paths.pickle",
-                    help='Prepared data', required=False)
+parser = argparse.ArgumentParser(description='Step 4 - Define precision/recall')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
+                    help='Configuration file path', required=False)
 
 args = parser.parse_args()
-
-
-def define_precision_recall_threshold(paths_path = "config/paths.pickle"):
-    '''
-    Load model data and training data. Check if the problem is a multiclass or single class,
-    the precision/recall threshold and save it to a file.
-
-    args:
-        data_input_path: Path for pickle file with data. Optional
-
-    return:
-        optimal_threshold: Optimal precision/recall threshold
-    '''
-
-    # Get data
-    # Load file paths
-    paths, model, train, test = step40.load_training_files(paths_path)
-    #f = open(data_input_path, "rb")
-    #prepared_data = pickle.load(f)
-    #print("Loaded data: ", prepared_data)
-
-    X_train = train['X']
-    y_train = train['y']
-    #X_test = test['X']
-    #y_test = test['y']
-
-    y_classes = train['label_map']
-    #scorers = model['scorers']
-    #refit_scorer_name = model['refit_scorer_name']
-    #selected_features = prepared_data['selected_features']
-    #results_run2_file_path = prepared_data['paths']['svm_run2_result_filename']
-    #svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
-    svm_pipe_final_selection = paths['svm_pipe_final_selection']
-    svm_external_parameters_filename = paths['svm_external_parameters_filename']
-    model_directory = paths['model_directory']
-    result_directory = paths['result_directory']
-    model_name = paths['dataset_name']
-
-    figure_path_prefix = result_directory + '/model_images/' + model_name
-    if not os.path.isdir(result_directory + '/model_images'):
-        os.makedirs(result_directory + '/model_images')
-        print("Created folder: ", result_directory + '/model_images')
-
-    # Check if precision recall can be applied, i.e. it is a binary problem
-    if len(y_classes) > 2:
-        print("The problem is a multi class problem. No precision/recall optimization will be done.")
-        optimal_threshold = 0
-    else:
-        print("The problem is a binary class problem. Perform precision/recall analysis.")
-
-        # Load model
-        # Load saved results
-        r = open(svm_pipe_final_selection, "rb")
-        model_pipe = pickle.load(r)
-        model_pipe['svm'].probability = True
-
-        optimal_threshold = get_optimal_precision_recall_threshold(X_train, y_train, y_classes, model_pipe, figure_path_prefix)
-
-    #Store optimal threshold
-    # save the optimal precision/recall value to disk
-    print("Save external parameters, precision recall threshold to disk")
-    extern_param = {}
-    extern_param['pr_threshold'] = optimal_threshold
-    with open(svm_external_parameters_filename, 'w') as fp:
-        json.dump(extern_param, fp)
-
-    return optimal_threshold
 
 def get_optimal_precision_recall_threshold(X_train_full, y_train_full, y_classes, model_pipe, figure_path_prefix):
     '''
@@ -228,9 +161,84 @@ def get_optimal_precision_recall_threshold(X_train_full, y_train_full, y_classes
 
     return optimal_threshold
 
+def define_precision_recall_threshold(config_path):
+    '''
+    Load model data and training data. Check if the problem is a multiclass or single class,
+    the precision/recall threshold and save it to a file.
+
+    args:
+        data_input_path: Path for pickle file with data. Optional
+
+    return:
+        optimal_threshold: Optimal precision/recall threshold
+    '''
+
+    # Get data
+    # Load file paths
+    #paths, model, train, test = step40.load_training_files(paths_path)
+    config = sup.load_config(config_path)
+    # Load file paths
+    # paths, model, train, test = step40.load_training_files(paths_path)
+    # Load complete training input
+    X_train, y_train, X_val, y_val, y_classes, selected_features, \
+    feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
+    #f = open(data_input_path, "rb")
+    #prepared_data = pickle.load(f)
+    #print("Loaded data: ", prepared_data)
+
+    #X_train = train['X']
+    #y_train = train['y']
+    #X_test = test['X']
+    #y_test = test['y']
+
+    #y_classes = train['label_map']
+    #scorers = model['scorers']
+    #refit_scorer_name = model['refit_scorer_name']
+    #selected_features = prepared_data['selected_features']
+    #results_run2_file_path = prepared_data['paths']['svm_run2_result_filename']
+    #svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
+    svm_pipe_final_selection = os.path.join(config['Paths'].get('model_directory'), config['Training'].get('pipeline_out')) #paths['svm_pipe_final_selection']
+    #svm_external_parameters_filename = paths['svm_external_parameters_filename']
+    #Use config parameters
+    svm_external_parameters_filename = os.path.join(config['Paths'].get('model_directory'), config['Training'].get('ext_param_out'))
+    model_directory = paths['model_directory']
+    result_directory = paths['result_directory']
+    model_name = paths['dataset_name']
+
+    figure_path_prefix = result_directory + '/model_images/' + model_name
+    if not os.path.isdir(result_directory + '/model_images'):
+        os.makedirs(result_directory + '/model_images')
+        print("Created folder: ", result_directory + '/model_images')
+
+    # Check if precision recall can be applied, i.e. it is a binary problem
+    if len(y_classes) > 2:
+        print("The problem is a multi class problem. No precision/recall optimization will be done.")
+        optimal_threshold = 0
+    else:
+        print("The problem is a binary class problem. Perform precision/recall analysis.")
+
+        # Load model
+        # Load saved results
+        r = open(svm_pipe_final_selection, "rb")
+        model_pipe = pickle.load(r)
+        model_pipe['svm'].probability = True
+
+        optimal_threshold = get_optimal_precision_recall_threshold(X_train, y_train, y_classes, model_pipe, figure_path_prefix)
+
+    #Store optimal threshold
+    # save the optimal precision/recall value to disk
+    print("Save external parameters, precision recall threshold to disk")
+    extern_param = {}
+    extern_param['pr_threshold'] = optimal_threshold
+    with open(svm_external_parameters_filename, 'w') as fp:
+        json.dump(extern_param, fp)
+
+    return optimal_threshold
+
+
 if __name__ == "__main__":
 
     # Define precision/recall
-    define_precision_recall_threshold(paths_path=args.data_path)
+    define_precision_recall_threshold(args.config_path)
 
     print("=== Program end ===")

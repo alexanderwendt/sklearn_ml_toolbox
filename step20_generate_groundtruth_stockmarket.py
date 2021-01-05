@@ -484,13 +484,11 @@ def generate_features_outcomes(conf, source):
 def main(config_path):
     conf = sup.load_config(config_path)
     # Load annotations file
-    annotations_filename = conf["Paths"].get("annotations_file")
-    annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
+    y_labels = pd.read_csv(conf["Paths"].get("labels_path"), sep=';', header=None).set_index(0).to_dict()[1]
 
     # Generating filenames for saving the files
     image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_generation")
-    outcomes_filename_raw = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Common'].get('dataset_name') + "_outcomes_uncut" + ".csv")
-    labels_filename = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Common'].get('dataset_name') + "_labels" + ".csv")
+    outcomes_filename_raw = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp_outcomes_uncut" + ".csv")
 
     if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
         os.makedirs(conf['Paths'].get('prepared_data_directory'))
@@ -502,13 +500,14 @@ def main(config_path):
 
     #Load only a subset of the whole raw data to create a debug dataset
     source = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
+
     #Plot source
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(source['Date'], source['Close'])
     plt.title(conf['Paths'].get('source_path'))
     plt.show(block = False)
 
-    y_labels = annotations #generate_custom_class_labels()
+    #y_labels = annotations #generate_custom_class_labels()
     outcomes = generate_features_outcomes(conf, source)
 
     # Drop the 50 last values as they cannot be used for prediction as +50 days ahead is predicted
@@ -542,55 +541,39 @@ def main(config_path):
     def binarize(outcomes, class_number):
         return (outcomes == class_number).astype(np.int)
 
-    vis.plot_two_class_graph(binarize(outcomes_cut['1dTrend'], conf['Classes'].getint('class_number')),
+    vis.plot_two_class_graph(binarize(outcomes_cut['1dTrend'], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
                              save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(binarize(outcomes_cut['5dTrend'], conf['Classes'].getint('class_number')),
+    vis.plot_two_class_graph(binarize(outcomes_cut['5dTrend'], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
                              save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(binarize(outcomes_cut['20dTrend'], conf['Classes'].getint('class_number')),
+    vis.plot_two_class_graph(binarize(outcomes_cut['20dTrend'], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
                              save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(binarize(outcomes_cut['LongTrend'], conf['Classes'].getint('class_number')),
+    vis.plot_two_class_graph(binarize(outcomes_cut['LongTrend'], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_LongTrend',
                              save_fig_prefix=image_save_directory)
-    #fig = plt.figure(num=None, figsize=(10, 7), dpi=80, facecolor='w', edgecolor='k')
-    #plt.plot(source['Date'], source['Close'])
-    #plt.plot(source['Date'], outcomes["LongTrend"], 'r-', linewidth=3)
-    #plt.plot(source['Date'], filtered[:, 1] * pos_trend, 'g-', linewidth=3)
-    #plt.title("Long term ")
-    #plt.show()
-
-    #ma50Future = MA(close, 50, -50)
 
     # Save file
     # Save outcomes to a csv file
     print("Outcomes shape {}".format(outcomes_cut.shape))
     outcomes_cut.to_csv(outcomes_filename_raw, sep=';', index=True, header=True)
     print("Saved outcomes to " + outcomes_filename_raw)
-
-    # Save y labels to a csv file as a dict
-    #print("Class labels length {}".format(len(y_labels)))
-    #with open(labels_filename, 'w') as f:
-    #    for key in y_labels.keys():
-    #        f.write("%s;%s\n" % (key, y_labels[key]))
-    #print("Saved class names and id to " + labels_filename)
-    print("Annotations are not saved. They are always loaded from the source.")
 
 
 if __name__ == "__main__":

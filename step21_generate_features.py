@@ -568,13 +568,19 @@ def main(config_path):
     conf = sup.load_config(config_path)
 
     image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_generation")
-    #outcomes_filename = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_outcomes" + ".csv"
-    features_filename_uncut = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Common'].get('dataset_name') + "_features_uncut" + ".csv")
-    #features_filename_uncut = conf['training_data_directory'] + "/" + conf['dataset_name'] + "_features_uncut" + ".csv"
+    features_filename_uncut = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp_features_uncut" + ".csv")
 
+    if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
+        os.makedirs(conf['Paths'].get('prepared_data_directory'))
+        print("Created directory ", conf['Paths'].get('training_data_directory'))
+
+    if os.path.isdir(conf['Paths'].get('result_directory'))==False:
+        os.makedirs(conf['Paths'].get('result_directory'))
+        print("Created directory ", conf['Paths'].get('result_directory'))
 
     #Load only a subset of the whole raw data to create a debug dataset
-    source = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
+    source = custom.load_source(conf['Paths'].get('source_path'))
+
     #Plot source
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(source['Date'], source['Close'])

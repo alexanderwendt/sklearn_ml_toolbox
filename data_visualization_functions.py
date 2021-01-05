@@ -704,6 +704,7 @@ def visualize_parameter_grid_search(param_name, search_cv_parameters, search_cv_
 
     # Significance matrix for distributions
     significance_matrix, fig2 = calculate_significance_matrix(param_name, unique_list, search_cv_results, refit_scorer_name)
+    plt.tight_layout()
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_' + param_name + '_significance_matrix', dpi=300)
     #plt.ion()
