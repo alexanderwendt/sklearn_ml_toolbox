@@ -1,93 +1,93 @@
-,mean_test_f1_score,std_test_f1_score,param_scaler,param_sampling,param_feat__cols,param_svm__kernel,param_svm__C,param_svm__gamma
-52,0.9761603469672241,0.017039707432340512,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,1
-71,0.9761603469672241,0.017039707432340512,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,10
-70,0.9761467291252317,0.017026089590348015,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,1
-41,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,10
-68,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,10
-40,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,1
-67,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,1
-66,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,0.1
-49,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,1
-50,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,10
-39,0.9760306513409963,0.0033979200875752236,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,0.1
-42,0.9727470930232558,0.013626453488372103,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,0.1
-69,0.9727470930232558,0.013626453488372103,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,0.1
-51,0.9727470930232558,0.013626453488372103,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,0.1
-53,0.9727470930232558,0.013626453488372103,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,10
-43,0.9727470930232558,0.013626453488372103,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,1
-44,0.9727470930232558,0.013626453488372103,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,10
-48,0.9726463325032348,0.006782238925336581,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,0.1
-35,0.9557827255219808,0.010081368055917361,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,10
-33,0.9524428648024095,0.01342122877548868,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,0.1
-34,0.9456542021197193,0.013294894760411959,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,1
-17,0.9456542021197193,0.013294894760411959,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,10
-16,0.9453825497246371,0.020481543853261064,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,1
-15,0.9452654625068417,0.013683634373289566,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,0.1
-8,0.9452654625068417,0.013683634373289566,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,10
-7,0.9452654625068417,0.013683634373289566,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,1
-6,0.9452654625068417,0.013683634373289566,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,0.1
-30,0.942330790842479,0.016618306037652464,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,0.1
-32,0.9421796536796537,0.009820346320346285,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,10
-14,0.942074847637672,0.016874249242459283,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,10
-47,0.9417909140667761,0.010209085933223838,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,10
-13,0.9386002991976063,0.01339970080239361,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,1
-12,0.9386002991976063,0.01339970080239361,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,0.1
-46,0.938450502935688,0.013549497064311966,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,1
-57,0.9289849149781237,0.036879178599774465,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,0.1
-31,0.9283076849754703,0.01670697778112784,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,1
-5,0.9281072796934865,0.0238927203065134,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,10
-4,0.9281072796934865,0.0238927203065134,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,1
-3,0.9281072796934865,0.0238927203065134,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,0.1
-65,0.9213624377076413,0.010505294850498337,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,10
-72,0.919023582359606,0.00391322582310366,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",rbf,1,1
-64,0.9180288706261778,0.0071717277690349635,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,1
-26,0.9170052417007658,0.035395139096187966,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,10
-61,0.9149835856807101,0.016284742765037608,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,1
-63,0.9145492109634552,0.003692068106312285,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,0.1
-9,0.9139844749098757,0.0031273320527326898,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,0.1
-24,0.9083053362239843,0.00993594284578303,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,0.1
-45,0.9065367852486497,0.004320357608493197,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,0.1
-11,0.9015451078656791,0.016353085894583674,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,10
-37,0.8988315023553454,0.01869049177955212,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,1
-38,0.8988315023553454,0.01869049177955212,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,10
-36,0.8988315023553454,0.01869049177955212,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,0.1
-21,0.8957434619717194,0.029457136423493402,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,0.1
-28,0.8947380481413927,0.016119094715750015,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,1
-27,0.8947380481413927,0.016119094715750015,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,0.1
-29,0.8947380481413927,0.016119094715750015,"StandardScaler(copy=True, with_mean=True, with_std=True)","ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,10
-60,0.892470448269148,0.059739282739909416,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,0.1
-62,0.8919142604772852,0.04607664485549695,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,10,10
-0,0.8917613388309484,0.019095804026194485,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,0.1
-1,0.8917613388309484,0.019095804026194485,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,1
-2,0.8917613388309484,0.019095804026194485,"StandardScaler(copy=True, with_mean=True, with_std=True)",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,10
-59,0.8904055251385617,0.054609137618036374,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,10
-58,0.8899779834183085,0.04769226913259417,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,1,1
-10,0.8884485479268088,0.02240859493033398,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto')","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,1
-23,0.882211326463465,0.022766049102145747,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,10
-54,0.8757850052436137,0.03507213761352912,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,0.1
-20,0.8749441660554731,0.028831493768573746,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,10
-19,0.8687612499901748,0.009066804308467846,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,1
-55,0.866428479296705,0.01839016653192327,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,1
-25,0.8622290165122788,0.01343869393163355,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,10,1
-18,0.8599256964515871,0.030605228562096354,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,0.1,0.1
-22,0.8597538067695664,0.03689770211840382,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",linear,1,1
-56,0.8571038826118098,0.04003897453104738,"StandardScaler(copy=True, with_mean=True, with_std=True)","SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
-         smote=None)","[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]",linear,0.1,10
-73,0.3657476936279768,0.0013409139669598447,"Normalizer(copy=True, norm='l2')",Nosampler(),"[2, 5, 23, 27, 42, 46, 47, 48, 49, 51, 52]",rbf,1,1
+;mean_test_f1_score;std_test_f1_score;param_scaler;param_sampling;param_feat__cols;param_svm__kernel;param_svm__C;param_svm__gamma
+66;0.9794745484400657;0.006841817186644783;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;1;0.1
+67;0.9794745484400657;0.006841817186644783;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;1;1
+71;0.9761467291252317;0.017026089590348015;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;10;10
+68;0.9760755937000799;0.0034428624466589786;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;1;10
+41;0.9760306513409963;0.0033979200875752236;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;1;10
+40;0.9760306513409963;0.0033979200875752236;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;1;1
+39;0.9760306513409963;0.0033979200875752236;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;1;0.1
+48;0.9760306513409963;0.0033979200875752236;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;1;0.1
+49;0.9760306513409963;0.0033979200875752236;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;1;1
+50;0.9760306513409963;0.0033979200875752236;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;1;10
+53;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;10;10
+69;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;10;0.1
+43;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;10;1
+42;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;10;0.1
+51;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;10;0.1
+44;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;10;10
+70;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;10;1
+52;0.9727470930232558;0.013626453488372103;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;10;1
+16;0.966000271997824;0.013599891200870406;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;10;1
+17;0.9555909956661233;0.024009167532571096;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;10;10
+34;0.9525532001912818;0.020193892831974203;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;10;1
+35;0.952500982534653;0.006448114345478373;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;10;10
+33;0.9491117004686028;0.016752393109295383;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;10;0.1
+32;0.9488747932381074;0.010074303642023996;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;1;10
+8;0.9452654625068417;0.013683634373289566;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;10;10
+6;0.9452654625068417;0.013683634373289566;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;10;0.1
+7;0.9452654625068417;0.013683634373289566;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;10;1
+30;0.9422957640061156;0.01682487552876799;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;1;0.1
+12;0.942074847637672;0.016874249242459283;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;1;0.1
+15;0.942074847637672;0.016874249242459283;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;10;0.1
+13;0.9352749020372368;0.023674194842894403;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;1;1
+31;0.9350978700913334;0.02385122678879803;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;1;1
+14;0.9350539623846601;0.017155768624397327;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;1;10
+5;0.9281072796934865;0.0238927203065134;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;1;10
+4;0.9281072796934865;0.0238927203065134;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;1;1
+3;0.9281072796934865;0.0238927203065134;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;1;0.1
+59;0.9250982845965158;0.012892620736266402;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;1;10
+65;0.9215711424705717;0.0033298634008043226;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;0.1;10
+64;0.9213624377076413;0.010505294850498337;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;0.1;1
+63;0.9213624377076413;0.010505294850498337;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Tree;linear;0.1;0.1
+72;0.919023582359606;0.00391322582310366;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;rbf;1;1
+45;0.9180697364150151;0.00017154265475233244;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;0.1;0.1
+46;0.9099074176057175;0.014993588265658608;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;0.1;1
+58;0.9074592227695676;0.06517350848385328;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;1;1
+47;0.9064060115501608;0.011492182210101953;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Tree;linear;0.1;10
+37;0.8988315023553454;0.01869049177955212;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;0.1;1
+38;0.8988315023553454;0.01869049177955212;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;0.1;10
+36;0.8988315023553454;0.01869049177955212;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Tree;linear;0.1;0.1
+9;0.8980245824141192;0.012832560443023722;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;0.1;0.1
+25;0.895895928184392;0.02900507768698407;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;10;1
+62;0.895593665709801;0.029307340161574994;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;10;10
+29;0.8947380481413927;0.016119094715750015;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;0.1;10
+28;0.8947380481413927;0.016119094715750015;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;0.1;1
+27;0.8947380481413927;0.016119094715750015;StandardScaler(copy=True, with_mean=True, with_std=True);ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto');Lasso;linear;0.1;0.1
+0;0.8917613388309484;0.019095804026194485;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;0.1;0.1
+2;0.8917613388309484;0.019095804026194485;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;0.1;10
+1;0.8917613388309484;0.019095804026194485;StandardScaler(copy=True, with_mean=True, with_std=True);Nosampler();Lasso;linear;0.1;1
+55;0.8917102868148491;0.013882232516206516;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;0.1;1
+20;0.8916199727691663;0.012155687054880626;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;0.1;10
+11;0.8890577876032913;0.015557037978103929;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;0.1;10
+60;0.8885211309502159;0.0024672411428072194;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;10;0.1
+24;0.8866808755760369;0.037890552995391735;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;10;0.1
+21;0.8833442581704539;0.03455393558980874;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;1;0.1
+23;0.8833442581704539;0.03455393558980874;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;1;10
+56;0.8830846276501506;0.0277725152069922;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;0.1;10
+26;0.8810423901024613;0.05751297833775543;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;10;10
+10;0.8788618133479338;0.03903638041232882;StandardScaler(copy=True, with_mean=True, with_std=True);SMOTE(k_neighbors=5, n_jobs=None, random_state=None, sampling_strategy='auto');Lasso;linear;0.1;1
+18;0.8758069005093606;0.02289194240631187;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;0.1;0.1
+61;0.8740167635472748;0.025226440966629682;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;10;1
+22;0.8734502699335548;0.031164555647840486;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;1;1
+57;0.8661929144883023;0.0006979360091056708;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;1;0.1
+54;0.8604202839524048;0.04335537587164229;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Tree;linear;0.1;0.1
+19;0.8496631057114928;0.042111786063398875;StandardScaler(copy=True, with_mean=True, with_std=True);"SMOTEENN(enn=None, n_jobs=None, random_state=None, sampling_strategy='auto',
+         smote=None)";Lasso;linear;0.1;1
+73;0.3657476936279768;0.0013409139669598447;Normalizer(copy=True, norm='l2');Nosampler();Lasso;rbf;1;1

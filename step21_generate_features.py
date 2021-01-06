@@ -140,7 +140,7 @@ def price_normalizer(source):
     # 5d, 20d, 100d, and 200d norm value from [0,1]
 
     # list of normed days that are interesting
-    normed_days = [50, 200]
+    normed_days = [5, 20, 50, 100, 200]
 
     normed_days_features = pd.DataFrame(index=source.index)
     close = source['Close']
@@ -186,7 +186,7 @@ def impulse_count(source):
     # In the last 10days, the price increased x% of the time. 1=all days, 0=no days
 
     # list of normed days that are interesting
-    number_days = [50, 200]
+    number_days = [50, 100, 200]
 
     #number_days_features = pd.DataFrame(index=features.index)
 
@@ -220,10 +220,10 @@ def calculate_moving_average(source):
 
     '''
 
-    # meanList = [2, 5, 8, 10, 13, 15, 18, 20, 22, 34, 40, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400];
+    meanList = [2, 5, 8, 10, 13, 15, 18, 20, 22, 34, 40, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400];
     # meanList = [5 10 20 50 100 1 50 200]';
     # meanList = [5, 10, 20, 50, 100, 200];
-    meanList = [50, 200]
+    # meanList = [50, 200]
 
     close = source['Close']
     meanfeatures = pd.DataFrame(index=source.index)
@@ -278,8 +278,8 @@ def get_rsi(source):
     '''
 
 
-    # rsiList = [2, 3, 5, 9, 10, 14, 20, 25];
-    rsiList = [9, 14];
+    rsiList = [2, 3, 5, 9, 10, 14, 20, 25];
+    # rsiList = [9, 14];
 
     close = source['Close']
     rsi_features = pd.DataFrame(index=source.index)
@@ -301,8 +301,8 @@ def get_rsi_difference(source):
     ### Generate RSI difference
 
     '''
-
-    rsiList = [9, 14];
+    rsiList = [2, 3, 5, 9, 10, 14, 20, 25]
+    #rsiList = [9, 14]
 
     rsi_values = rsiList
     close = source['Close']

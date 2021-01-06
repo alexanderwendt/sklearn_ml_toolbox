@@ -1,0 +1,25 @@
+=== Best results of run1 ===
+Best scaler:  StandardScaler(copy=True, with_mean=True, with_std=True)
+Best sampler:  ADASYN(n_jobs=None, n_neighbors=5, random_state=None, sampling_strategy='auto')
+Best kernel:  linear
+Best feature selection:  Tree
+Best column indices:  [0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 46, 47, 48, 49, 51, 52, 53]
+Best column names:  ['NormKurs50', 'NormKurs200', 'NumberRise50', 'NumberRise200', 'MA50Norm', 'MA200Norm', 'RSI_14', 'Stoch_Sk211414', 'Stoch_Sd211414', 'Stoch_Sk31414', 'Stoch_Sd31414', 'MACD_12_26_9', 'MACDS_12_26_9', 'MACD_5_35_5', 'MACDS_5_35_5', 'MACDS_12_26_9Diff', 'week_of_year', 'day_of_year', 'month_year__1', 'month_year__5', 'month_year__6', 'month_year__7', 'month_year__8', 'month_year__10', 'month_year__11', 'month_year__12']
+=== Best pipe after discrete parameters have been fixed ===
+Pipeline(memory=None,
+         steps=[('scaler',
+                 StandardScaler(copy=True, with_mean=True, with_std=True)),
+                ('sampling',
+                 ADASYN(n_jobs=None, n_neighbors=5, random_state=None,
+                        sampling_strategy='auto')),
+                ('feat',
+                 ColumnExtractor(cols=[0, 1, 2, 3, 4, 5, 9, 18, 19, 20, 21, 22,
+                                       23, 24, 25, 27, 34, 35, 42, 46, 47, 48,
+                                       49, 51, 52, 53])),
+                ('svm',
+                 SVC(C=1.0, break_ties=False, cache_size=200, class_weight=None,
+                     coef0=0.0, decision_function_shape='ovr', degree=3,
+                     gamma='scale', kernel='linear', max_iter=-1,
+                     probability=False, random_state=None, shrinking=True,
+                     tol=0.001, verbose=False))],
+         verbose=False)

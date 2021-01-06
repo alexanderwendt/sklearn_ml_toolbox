@@ -234,6 +234,15 @@ def execute_narrow_search(config_path):
     dump(results_run2, open(results_run2_file_path, 'wb'))
     print("Stored results ", results_run2_file_path)
 
+    result_save = results_run2.copy()
+    #sup.list_to_name(selected_features, list(feature_dict.keys()), result_save['param_feat__cols'])
+    results_run2.round(4).to_csv(results_run2_file_path + "_results.csv", sep=";")
+
+    #result['pipe'].to_json(results_file_path + ".csv", sep=";")
+
+    with open(results_run2_file_path + "_pipe.txt", 'w') as f:
+        print(pipe_run_best_first_selection, file=f)
+
     print("Method end")
 
 

@@ -132,6 +132,8 @@ def execute_wide_search(config, use_debug_parameters=False):
         Nothing
     '''
 
+    subset_share = float(config['Training'].get('subset_share')) #0.1
+
     # Load complete training input
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
@@ -169,7 +171,7 @@ def execute_wide_search(config, use_debug_parameters=False):
 
         grid_search_run1, params_run1, pipe_run1, results_run1 = exe.run_basic_svm(X_train, y_train, selected_features,
                                                                               scorers, refit_scorer_name,
-                                                                              subset_share=0.10, n_splits=3,
+                                                                              subset_share=subset_share, n_splits=3,
                                                                               )
 
     print('Final score is: ', grid_search_run1.score(X_val, y_val))
@@ -194,7 +196,7 @@ def execute_wide_search(config, use_debug_parameters=False):
 
     # Save results
     dump(result, open(results_file_path, 'wb'))
-    result['result'].to_csv(results_file_path + ".csv")
+
     print("Stored results of run 1 to ", results_file_path)
 
 
@@ -242,8 +244,6 @@ def extract_categorical_visualize_graphs(config, top_percentage = 0.2):
     number_results = np.int(results_run1.shape[0] * top_percentage)
     print("The top {}% of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
     results_subset = results_run1.iloc[0:number_results,:]
-
-    ## Plot graphs
 
     # Prepare the inputs: Replace the lists with strings
     result_subset_copy = results_subset.copy()
@@ -302,6 +302,23 @@ def extract_categorical_visualize_graphs(config, top_percentage = 0.2):
     # Save best pipe
     dump(pipe_run_best_first_selection, open(svm_pipe_first_selection, 'wb'))
     print("Stored pipe_run_best_first_selection at ", svm_pipe_first_selection)
+
+    result_save = results_run1.copy()
+    sup.list_to_name(selected_features, list(feature_dict.keys()), result_save['param_feat__cols'])
+    result_save.to_csv(results_file_path + ".csv", sep=";")
+
+    #result['pipe'].to_json(results_file_path + ".csv", sep=";")
+
+    with open(results_file_path + "_pipe.txt", 'w') as f:
+        print("=== Best results of run1 ===", file=f)
+        print("Best scaler: ", best_scaler, file=f)
+        print("Best sampler: ", best_sampler, file=f)
+        print("Best kernel: ", best_kernel, file=f)
+        print("Best feature selection: ", best_feat_cols, file=f)
+        print("Best column indices: ", best_columns, file=f)
+        print("Best column names: ", list(X_train.columns[best_columns]), file=f)
+        print("=== Best pipe after discrete parameters have been fixed ===", file=f)
+        print(pipe_run_best_first_selection, file=f)
 
     print("Method end")
 

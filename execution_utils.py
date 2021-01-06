@@ -356,7 +356,7 @@ def get_top_median_method(method_name, model_results, refit_scorer_name, top_sha
     return median_values, source
 
 
-def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_name, subset_share=0.1, n_splits=10,
+def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_name, subset_share=0.1, n_splits=5,
                   parameters=None):
     '''Run an extensive grid search over all parameters to find the best parameters for SVM Classifier.
     The search shall be done only with a subset of the data. Default subset is 0.1. Input is training and test data.
@@ -384,12 +384,19 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
         # https://www.kaggle.com/evanmiller/pipelines-gridsearch-awesome-ml-pipelines
         # Main set of parameters for the grid search run 1: Select scaler, sampler and kernel for the problem
         test_scaler = [StandardScaler(), RobustScaler(), QuantileTransformer(), Normalizer()]
-        test_sampling = [modelutil.Nosampler(), ClusterCentroids(), RandomUnderSampler(), NearMiss(version=1),
-                         EditedNearestNeighbours(),
-                         AllKNN(), CondensedNearestNeighbour(random_state=0),
-                         InstanceHardnessThreshold(random_state=0,
-                                                   estimator=LogisticRegression(solver='lbfgs', multi_class='auto')),
-                         SMOTE(), SMOTEENN(), SMOTETomek(), ADASYN()]
+        test_sampling = [modelutil.Nosampler(),
+                         ClusterCentroids(),
+                         RandomUnderSampler(),
+                         #NearMiss(version=1),
+                         #EditedNearestNeighbours(),
+                         AllKNN(),
+                         #CondensedNearestNeighbour(random_state=0),
+                         #InstanceHardnessThreshold(random_state=0,
+                         #                          estimator=LogisticRegression(solver='lbfgs', multi_class='auto')),
+                         SMOTE(),
+                         SMOTEENN(),
+                         SMOTETomek(),
+                         ADASYN()]
         test_C = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
 
         # gamma default parameters
