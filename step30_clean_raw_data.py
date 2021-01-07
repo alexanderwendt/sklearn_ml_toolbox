@@ -218,6 +218,7 @@ def print_characteristics(features_raw, image_save_directory, dataset_name, save
                 image_save_directory + '/' + dataset_name + '_{}-{}'.format(i, features_raw.columns[i]),
                 dpi=300)
         plt.show(block = False)
+        plt.close()
 
 
 def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_name, no_images=False, on_inference_data=False):

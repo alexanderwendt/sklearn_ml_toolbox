@@ -111,7 +111,7 @@ def main(config_path):
     conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = conf['Paths'].get("prepared_data_directory") + "/" + conf['Common'].get('dataset_name') + "_source" + ".csv"
+    source_filename = conf['Paths'].get("prepared_data_directory") + "/" + "source" + ".csv"
     source = sup.load_data_source(source_filename)
 
     image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation"

@@ -128,7 +128,7 @@ def load_data(X_path, y_path):
     print("X. Shape={}".format(df_X.shape))
 
     # === Load y values ===#
-    if y_path is not None:
+    if y_path is not None and y_path!="":
         df_y = pd.read_csv(y_path, delimiter=';').set_index('id')
         y = df_y.values.flatten()
         print("Indexes of X={}".format(df_X.index.shape))

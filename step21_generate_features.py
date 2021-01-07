@@ -64,6 +64,7 @@ parser = argparse.ArgumentParser(description='Step 2.1 - Generate features from 
 #                    help='Set flag if retraining with all available data shall be performed after ev')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
                     help='Configuration file path', required=False)
+parser.add_argument("-debug", '--debug_param', default=False, action='store_true', help='Use debug parameters')
 # parser.add_argument("-i", "--on_inference_data", action='store_true',
 #                    help="Set inference if only inference and no training")
 
@@ -131,7 +132,7 @@ def generate_smoothed_trigger(values, alpha=0.5, tailclip=0.1):
 #     vadf = df.ta(kind=kind, close=volumedf, length=length).tail(last)
 #     vadf.plot(figsize=figsize, lw=1.4, color='black', title=title, rot=45, grid=True)
 
-def price_normalizer(source):
+def price_normalizer(source, debug_param=False):
     '''
     Max and Min Price Values
     Normalize the price compared to e.g.the last 200 days to find new highs and lows.
@@ -140,7 +141,10 @@ def price_normalizer(source):
     # 5d, 20d, 100d, and 200d norm value from [0,1]
 
     # list of normed days that are interesting
-    normed_days = [5, 20, 50, 100, 200]
+    if debug_param:
+        normed_days = [5, 200]
+    else:
+        normed_days = [5, 20, 50, 100, 200]
 
     normed_days_features = pd.DataFrame(index=source.index)
     close = source['Close']
@@ -171,7 +175,7 @@ def price_normalizer(source):
 
     return normed_days_features
 
-def impulse_count(source):
+def impulse_count(source, debug_param=False):
     '''
     Number of last days increase/decrease
 
@@ -186,7 +190,10 @@ def impulse_count(source):
     # In the last 10days, the price increased x% of the time. 1=all days, 0=no days
 
     # list of normed days that are interesting
-    number_days = [50, 100, 200]
+    if not debug_param:
+        number_days = [50, 100, 200]
+    else:
+        number_days = [200]
 
     #number_days_features = pd.DataFrame(index=features.index)
 
@@ -213,17 +220,19 @@ def impulse_count(source):
 
     return number_days_features
 
-def calculate_moving_average(source):
+def calculate_moving_average(source, debug_param=False):
     '''
     ### Generate mean values
     # Generate features - Mean value
 
     '''
 
-    meanList = [2, 5, 8, 10, 13, 15, 18, 20, 22, 34, 40, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400];
+    if not debug_param:
+        meanList = [2, 5, 8, 10, 13, 15, 18, 20, 22, 34, 40, 50, 75, 100, 125, 150, 175, 200];
     # meanList = [5 10 20 50 100 1 50 200]';
     # meanList = [5, 10, 20, 50, 100, 200];
-    # meanList = [50, 200]
+    else:
+        meanList = [50, 200]
 
     close = source['Close']
     meanfeatures = pd.DataFrame(index=source.index)
@@ -267,7 +276,7 @@ def calculate_moving_average_direction(source, meanfeatures):
 
     return madiff_features
 
-def get_rsi(source):
+def get_rsi(source, debug_param=False):
     '''
     ### Generate RSI
 
@@ -277,9 +286,10 @@ def get_rsi(source):
     #import pandas_ta as ta  # https://github.com/twopirllc/pandas-ta
     '''
 
-
-    rsiList = [2, 3, 5, 9, 10, 14, 20, 25];
-    # rsiList = [9, 14];
+    if not debug_param:
+        rsiList = [2, 3, 5, 9, 10, 14, 20, 25]
+    else:
+        rsiList = [9, 14]
 
     close = source['Close']
     rsi_features = pd.DataFrame(index=source.index)
@@ -564,7 +574,7 @@ def get_periodical_indicators(source):
 #     i = CDL3INSIDE(close, high, low, close)
 #     display(np.sum(pattern1))
 
-def main(config_path):
+def main(config_path, debug_param):
     conf = sup.load_config(config_path)
 
     image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_generation")
@@ -592,19 +602,19 @@ def main(config_path):
 
     # Generate Price Based Values
 
-    normed_days_features = price_normalizer(source)
+    normed_days_features = price_normalizer(source, debug_param=debug_param)
     features = features.join(normed_days_features)
 
-    number_days_features = impulse_count(source)
+    number_days_features = impulse_count(source, debug_param=debug_param)
     features = features.join(number_days_features)
 
-    mean_features = calculate_moving_average(source)
+    mean_features = calculate_moving_average(source, debug_param=debug_param)
     features = features.join(mean_features)
 
     madiff_features = calculate_moving_average_direction(source, mean_features)
     features = features.join(madiff_features)
 
-    rsi_features = get_rsi(source)
+    rsi_features = get_rsi(source, debug_param=debug_param)
     features = features.join(rsi_features)
 
     rsi_change_features = get_rsi_difference(source)
@@ -671,7 +681,7 @@ def main(config_path):
 
 
 if __name__ == "__main__":
-    main(args.config_path)
+    main(args.config_path, args.debug_param)
 
 
     print("=== Program end ===")
