@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from IPython.core.display import display
+#from IPython.core.display import display
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
@@ -340,7 +340,7 @@ def get_top_median_method(method_name, model_results, refit_scorer_name, top_sha
                      model_results['param_' + method_name] == model_results['param_' + method_name].unique()[i]].iloc[0,
                  :].name for i in range(0, len(merged_params_of_model_results[method_name]))]
     print("Plot best {} values".format(method_name))
-    display(model_results.loc[indexList].round(3))
+    print(model_results.loc[indexList].round(3))
 
     # number of results to consider
     number_results = np.int(model_results.shape[0] * top_share)
@@ -456,7 +456,10 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
     pipe_run1 = pipe_run1
     params_run1 = parameters  # params_debug #params_run1
     grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=1, cv=skf, scoring=scorers, refit=refit_scorer_name,
-                                    return_train_score=True, iid=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
+                                    return_train_score=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
+
+    #grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=1, cv=skf, scoring=scorers, refit=refit_scorer_name,
+    #                                return_train_score=True, iid=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
 
     results_run1 = modelutil.generate_result_table(grid_search_run1, params_run1, refit_scorer_name)
     print("Result size=", results_run1.shape)
@@ -479,7 +482,7 @@ def get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_s
     '''
     best_kernel = str(pipe_run_best_first_selection['svm'].get_params()['kernel']).strip()
     print("Best kernel", best_kernel)
-    display(pipe_run_best_first_selection)
+    print(pipe_run_best_first_selection)
     # Define pipeline, which is constant for all tests
     pipe_run_random = pipe_run_best_first_selection  # Use the best pipe from the best run
     # Main set of parameters for the grid search run 2: Select solver parameter
@@ -516,7 +519,7 @@ def get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_s
         name='param_svm__gamma')
     parameter_svm = pd.DataFrame([param_svm_C_minmax, param_svm_gamma_minmax])
     print("The initial parameters are in this area")
-    display(parameter_svm)
+    print(parameter_svm)
 
     return parameter_svm
 
@@ -588,7 +591,12 @@ def run_random_cv_for_SVM(X_train, y_train, parameter_svm, pipe_run, scorers, re
     random_search_run = RandomizedSearchCV(pipe_run, param_distributions=params_run, n_jobs=-1,
                                            n_iter=n_iter_search, cv=skf, scoring=scorers,
                                            refit=refit_scorer_name, return_train_score=True,
-                                           iid=True, verbose=5).fit(X_train_subset, y_train_subset)
+                                           verbose=5).fit(X_train_subset, y_train_subset)
+
+   # random_search_run = RandomizedSearchCV(pipe_run, param_distributions=params_run, n_jobs=-1,
+   #                                        n_iter=n_iter_search, cv=skf, scoring=scorers,
+   #                                        refit=refit_scorer_name, return_train_score=True,
+   #                                        iid=True, verbose=5).fit(X_train_subset, y_train_subset)
 
     print("Best parameters: ", random_search_run.best_params_)
     print("Best score: {:.3f}".format(random_search_run.best_score_))
@@ -601,7 +609,7 @@ def run_random_cv_for_SVM(X_train, y_train, parameter_svm, pipe_run, scorers, re
     # display(parameter_svm)
 
     # Display results
-    display(results.round(3).head(5))
-    display(parameter_svm)
+    print(results.round(3).head(5))
+    print(parameter_svm)
 
     return parameter_svm, results, random_search_run

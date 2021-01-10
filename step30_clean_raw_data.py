@@ -33,7 +33,7 @@ from pickle import dump
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from IPython.core.display import display
+#from IPython.core.display import display
 #from matplotlib.ticker import FuncFormatter, MaxNLocator
 from pandas.core.dtypes.common import is_string_dtype
 from pandas.plotting import register_matplotlib_converters
@@ -94,7 +94,7 @@ def clean_features_first_pass(features_raw, class_name):
     features.columns = [x.replace("/", "-") for x in features.columns]
 
     print("Features size : ", features.shape)
-    display(features.head(5))
+    print(features.head(5))
     # print("Outcomes size : ", outcomes.shape)
     # display(outcomes.head(5))
 
@@ -215,7 +215,7 @@ def print_characteristics(features_raw, image_save_directory, dataset_name, save
         plt.figure(fig.number)
         if save_graphs == True:
             plt.savefig(
-                image_save_directory + '/' + dataset_name + '_{}-{}'.format(i, features_raw.columns[i]),
+                image_save_directory + '/' + 'feature_{}-{}'.format(i, features_raw.columns[i]),
                 dpi=300)
         plt.show(block = False)
         plt.close()

@@ -968,7 +968,7 @@ def plot_temporal_correlation_feature(X_scaled, dataset_name, image_save_directo
         if image_save_directory:
             if not os.path.isdir(image_save_directory):
                 os.makedirs(image_save_directory)
-            plt.savefig(os.path.join(image_save_directory, dataset_name + '_Temp_corr_{}_to_Outcome_{}'.format(col, tmp.columns[-1])), dpi=300)
+            plt.savefig(os.path.join(image_save_directory, 'corr_{}_outcome_{}'.format(col, tmp.columns[-1])), dpi=300)
 
         plt.show(block=False)
         plt.pause(0.1)

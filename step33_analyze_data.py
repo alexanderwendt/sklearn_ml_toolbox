@@ -37,6 +37,8 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
+import umap.umap_ as umap  # Work around from https://github.com/lmcinnes/umap/issues/24
+
 import matplotlib.pyplot as plt
 
 from scipy.cluster import hierarchy
@@ -187,7 +189,7 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Variance_Coverage'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'PCA_Variance_Coverage'), dpi=300)
 
     plt.show(block = False)
 
@@ -199,7 +201,7 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Heatmap'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'PCA_Heatmap'), dpi=300)
 
 
     plt.figure(figsize=(10, 10))
@@ -214,7 +216,7 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_PCA_Plot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'PCA_Plot'), dpi=300)
 
     plt.show(block = False)
 
@@ -224,7 +226,6 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
 
     sns.set(style='white', context='poster')
     # import umap
-    import umap.umap_ as umap  # Work around from https://github.com/lmcinnes/umap/issues/24
     # %time #Time of the whole cell
     embeddingUnsupervised = umap.UMAP(n_neighbors=5).fit_transform(X_scaled)
     # %time #Time of the whole cell
@@ -235,7 +236,7 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_UMAP_Unsupervised'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'UMAP_Unsupervised'), dpi=300)
 
     plt.show(block = False)
 
@@ -243,7 +244,7 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_UMAP_Supervised'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'UMAP_Supervised'), dpi=300)
 
     plt.show(block = False)
 
@@ -311,7 +312,7 @@ def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_T-SNE_Plot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'T-SNE_Plot'), dpi=300)
 
     plt.show(block = False)
 
@@ -381,7 +382,7 @@ def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_sa
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Parallel_Coordinates'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'Parallel_Coordinates'), dpi=300)
 
     plt.show(block = False)
 
@@ -403,7 +404,7 @@ def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Hierarchical_Linkage'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'Hierarchical_Linkage'), dpi=300)
 
     plt.show(block = False)
 
@@ -437,7 +438,7 @@ def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Spearman_Correlation_Plot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'Spearman_Correlation_Plot'), dpi=300)
 
     plt.show(block = False)
 
@@ -460,7 +461,7 @@ def plot_correlation_matrix2(conf, image_save_directory, total_values):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Pairplot'), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, 'Pairplot'), dpi=300)
 
     plt.show(block = False)
 
@@ -491,7 +492,7 @@ def plot_correlation_matrix(conf, features, image_save_directory, total_values):
     if image_save_directory:
         if not os.path.isdir(image_save_directory):
             os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get("dataset_name") + "_Scatter-Matrix"), dpi=300)
+        plt.savefig(os.path.join(image_save_directory, "Scatter-Matrix"), dpi=300)
     plt.show(block = False)
 
 

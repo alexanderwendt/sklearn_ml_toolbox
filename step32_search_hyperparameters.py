@@ -32,7 +32,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from IPython.core.display import display
+#from IPython.core.display import display
 #from matplotlib.ticker import FuncFormatter, MaxNLocator
 #from pandas.core.dtypes.common import is_string_dtype
 from pandas.plotting import register_matplotlib_converters

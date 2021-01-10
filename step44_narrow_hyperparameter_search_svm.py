@@ -48,19 +48,19 @@ import matplotlib.pyplot as plt
 # Minimal set of parameter to test different grid searches
 from pickle import dump
 
-import sklearn_utils as modelutil
+#import sklearn_utils as modelutil
 import numpy as np
-import copy
+#import copy
 
-from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
-from imblearn.over_sampling import SMOTE
-from imblearn.over_sampling import ADASYN
-from imblearn.over_sampling import RandomOverSampler
-from imblearn.combine import SMOTEENN
-from imblearn.combine import SMOTETomek
+#from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
+#from imblearn.over_sampling import SMOTE
+#from imblearn.over_sampling import ADASYN
+#from imblearn.over_sampling import RandomOverSampler
+#from imblearn.combine import SMOTEENN
+#from imblearn.combine import SMOTETomek
 
 # Own modules
-import data_visualization_functions as vis
+#import data_visualization_functions as vis
 import data_handling_support_functions as sup
 import execution_utils as exe
 

@@ -361,27 +361,27 @@ def get_stochastics(source):
     # Recommended stochastics: [fk, sk, sd], [5,3,3], [21,7,7], [21,14,14]
     '''
 
-    fastk_parameter = [13, 5, 21, 21, 3]
-    slowk_parameter = [3, 3, 7, 14, 14]
-    slowd_parameter = [8, 3, 7, 14, 14]
+    fastk_parameter = [14, 13, 5, 21, 21, 3]
+    slowk_parameter = [3, 3, 3, 7, 14, 14]
+    slowd_parameter = [3, 8, 3, 7, 14, 14]
 
     close = source['Close']
     high = source['High']
     low = source['Low']
     stoch_features = pd.DataFrame(index=source.index)
 
-    for fk, sd, sk in zip(fastk_parameter, slowk_parameter, slowd_parameter):
+    for fk, sk, sd in zip(fastk_parameter, slowk_parameter, slowd_parameter):
         print("Parameter: fastk={}, slowk={}, slowd={}".format(fk, sk, sd))
 
-        df = ta.stoch(high, low, close, fast_k=fk, slow_k=sk, slow_d=sd)
+        df = ta.stoch(high, low, close, k=fk, d=sk, smooth_k=sd)
         # print(df.columns)
 
         # print(pd.Series(df['STOCH_' + str(sk)], name='Stoch_Sk' + str(fk)+str(sk)+str(sd)))
 
         stoch_features = stoch_features.join(
-            pd.Series(df['STOCH_' + str(sk)], name='Stoch_Sk' + str(fk) + str(sk) + str(sd)))
+            pd.Series(df['STOCHk_' + str(fk) + "_" + str(sk) + "_" + str(sd)], name='Stoch_Sk' + str(fk) + str(sk) + str(sd)))
         stoch_features = stoch_features.join(
-            pd.Series(df['STOCH_' + str(sd)], name='Stoch_Sd' + str(fk) + str(sk) + str(sd)))
+            pd.Series(df['STOCHd_' + str(fk) + "_" + str(sk) + "_" + str(sd)], name='Stoch_Sd' + str(fk) + str(sk) + str(sd)))
 
     print("Number of features: {}".format(stoch_features.shape))
     print(stoch_features.head(5))

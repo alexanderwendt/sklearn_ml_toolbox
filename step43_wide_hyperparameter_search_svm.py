@@ -33,7 +33,7 @@ from pandas.plotting import register_matplotlib_converters
 import pickle
 from pickle import dump
 
-from IPython.core.display import display
+#from IPython.core.display import display
 from imblearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
