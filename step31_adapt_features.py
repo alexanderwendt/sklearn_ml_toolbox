@@ -69,7 +69,7 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 args = parser.parse_args()
 
 
-def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, conf):
+def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, class_labels, conf):
 
 
     ## Prepare the Feature Columns
@@ -198,7 +198,8 @@ def main(config_path):
     model_outcomes_filename = os.path.join(data_directory, conf['Preparation'].get('outcomes_out'))
     model_labels_filename = os.path.join(data_directory, conf['Preparation'].get('labels_out'))
 
-    features, y, class_labels = adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_directory, conf)
+    features, y, class_labels = adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_directory,
+                                                         class_labels, conf)
 
     # === Save features to a csv file ===#
     print("Features shape {}".format(features.shape))

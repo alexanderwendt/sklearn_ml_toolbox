@@ -33,6 +33,7 @@ import matplotlib.pyplot as plt
 from statsmodels.nonparametric.smoothers_lowess import lowess
 import numpy as np
 from scipy.ndimage.interpolation import shift
+import matplotlib.dates as mdates
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
@@ -433,18 +434,7 @@ def clean_bad_signals_3(y1day, y5day, y20day, ylong, close, latestBottoms, lates
 
     return y1day, y5day, y20day, ylong
 
-def define_tops_bottoms(bottoms, tops):
-    '''
-    Merge tops and bottoms
-
-    '''
-
-    print("Merge tops and bottoms. Tops=1, Bottoms=2")
-    col = (bottoms > 0) * 2 + (tops > 0) * 1
-    return col
-
-
-def generate_features_outcomes(conf, source):
+def generate_features_outcomes(outcomes_source, outcome_col, source, rename_outcome_col):
     '''
 
 
@@ -467,30 +457,32 @@ def generate_features_outcomes(conf, source):
     #plt.title(conf['source_path'])
     #plt.show()
 
-    bottoms, tops, latestTops, latestBottoms = find_tops_bottoms(source)
-    topsBottoms = define_tops_bottoms(bottoms, tops)
+    #bottoms, tops, latestTops, latestBottoms = find_tops_bottoms(source)
 
+    #pos_trend_long, fig_long = calculate_lowess(source, 300)
+    #plt.gca()
+    #plt.show(block = False)
 
-    pos_trend_long, fig_long = calculate_lowess(source, 300)
-    plt.gca()
-    plt.show(block = False)
+    #pos_trend_short, fig_short = calculate_lowess(source, 10)
+    #plt.gca()
+    #plt.show(block = False)
 
-    pos_trend_short, fig_short = calculate_lowess(source, 10)
-    plt.gca()
-    plt.show(block = False)
+    #y1day, y5day, y20day, ylong = calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_trend_long, pos_trend_short)
+    #y1day, y5day, y20day, ylong = clean_bad_signals_1(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
+    #y1day, y5day, y20day, ylong = clean_bad_signals_2(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
+    #y1day, y5day, y20day, ylong = clean_bad_signals_3(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
 
-    y1day, y5day, y20day, ylong = calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_trend_long, pos_trend_short)
-    y1day, y5day, y20day, ylong = clean_bad_signals_1(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
-    y1day, y5day, y20day, ylong = clean_bad_signals_2(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
-    y1day, y5day, y20day, ylong = clean_bad_signals_3(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
+    #Load outcome file
+    outcome_raw = pd.read_csv(outcomes_source, sep=';')
+    outcome_raw.index.name = "id"
+    outcome_raw.columns = ['Date', outcome_col]
+    outcome_raw['Date'] = pd.to_datetime(outcome_raw['Date'])
+    outcome_raw['Date'].apply(mdates.date2num)
+    outcome_raw.rename(columns={outcome_col : rename_outcome_col}, inplace=True)
 
     # Merge all y values to the series start
     outcomes = pd.DataFrame(index=source.index).join(
-        pd.Series(y1day, name="1dTrend").astype('int64')).join(
-        pd.Series(y5day, name="5dTrend").astype('int64')).join(
-        pd.Series(y20day, name="20dTrend").astype('int64')).join(
-        pd.Series(ylong, name="LongTrend").astype('int64')).join(
-        pd.Series(topsBottoms, name="TopsBottoms").astype('int64'))
+        outcome_raw[rename_outcome_col])
 
     return outcomes
 
@@ -514,6 +506,9 @@ def main(config_path):
 
     #Load only a subset of the whole raw data to create a debug dataset
     source = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
+    outcomes_source = conf['Paths'].get('outcomes_source')
+    outcome_col = conf['Generation'].get('outcome_col')
+    rename_outcome_col = conf['Common'].get('class_name')
 
     #Plot source
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
@@ -522,72 +517,67 @@ def main(config_path):
     plt.show(block = False)
 
     #y_labels = annotations #generate_custom_class_labels()
-    outcomes = generate_features_outcomes(conf, source)
+    outcomes = generate_features_outcomes(outcomes_source, outcome_col, source, rename_outcome_col)
 
     # Drop the 50 last values as they cannot be used for prediction as +50 days ahead is predicted
-    source_cut = source.drop(source.tail(50).index, inplace=False)
-    outcomes_cut = outcomes.drop(outcomes.tail(50).index, inplace=False)
+    #No drop as the annotations were loaded
+    source_cut = source #source.drop(source.tail(50).index, inplace=False)
+    outcomes_cut = outcomes #outcomes.drop(outcomes.tail(50).index, inplace=False)
 
-    vis.plot_three_class_graph(outcomes_cut['1dTrend'].values,
-                               source_cut['Close'], source_cut['Date'],
-                               0,0,0, ('close', 'neutral', 'positive', 'negative'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
-                               save_fig_prefix=image_save_directory + "/1d")
+    # vis.plot_three_class_graph(outcomes_cut['1dTrend'].values,
+    #                            source_cut['Close'], source_cut['Date'],
+    #                            0,0,0, ('close', 'neutral', 'positive', 'negative'),
+    #                            title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
+    #                            save_fig_prefix=image_save_directory)
+    #
+    # vis.plot_three_class_graph(outcomes_cut['5dTrend'].values,
+    #                            source_cut['Close'], source_cut['Date'],
+    #                            0,0,0, ('close', 'neutral', 'positive', 'negative'),
+    #                            title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
+    #                            save_fig_prefix=image_save_directory)
+    #
+    # vis.plot_three_class_graph(outcomes_cut['20dTrend'].values,
+    #                            source_cut['Close'], source_cut['Date'],
+    #                            0,0,0, ('close', 'neutral', 'positive', 'negative'),
+    #                            title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
+    #                            save_fig_prefix=image_save_directory)
 
-    vis.plot_three_class_graph(outcomes_cut['5dTrend'].values,
-                               source_cut['Close'], source_cut['Date'],
-                               0,0,0, ('close', 'neutral', 'positive', 'negative'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
-                               save_fig_prefix=image_save_directory + "/5d")
-
-    vis.plot_three_class_graph(outcomes_cut['20dTrend'].values,
-                               source_cut['Close'], source_cut['Date'],
-                               0,0,0, ('close', 'neutral', 'positive', 'negative'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
-                               save_fig_prefix=image_save_directory + "/20d")
-
-    vis.plot_three_class_graph(outcomes_cut['LongTrend'].values,
+    vis.plot_three_class_graph(outcomes_cut[rename_outcome_col].values,
                                source_cut['Close'], source_cut['Date'],
                                0,0,0, ('close', 'neutral', 'positive', 'negative'),
                                title=conf['Common'].get('dataset_name') + '_Groud_Truth_LongTrend',
-                               save_fig_prefix=image_save_directory + "/LongTrend")
-
-    vis.plot_three_class_graph(outcomes_cut['TopsBottoms'].values,
-                               source_cut['Close'], source_cut['Date'],
-                               0,0,0, ('close', 'neutral', 'top', 'bottom'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_TopsBottoms',
-                               save_fig_prefix=image_save_directory + "/TopsBottoms")
+                               save_fig_prefix=image_save_directory)
 
     def binarize(outcomes, class_number):
         return (outcomes == class_number).astype(np.int)
 
-    vis.plot_two_class_graph(binarize(outcomes_cut['1dTrend'], conf['Common'].getint('class_number')),
-                             source_cut['Close'], source_cut['Date'],
-                             0,
-                             ('close', 'Positive Trend'),
-                             title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
-                             save_fig_prefix=image_save_directory + "/1d")
+    # vis.plot_two_class_graph(binarize(outcomes_cut['1dTrend'], conf['Common'].getint('class_number')),
+    #                          source_cut['Close'], source_cut['Date'],
+    #                          0,
+    #                          ('close', 'Positive Trend'),
+    #                          title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
+    #                          save_fig_prefix=image_save_directory)
+    #
+    # vis.plot_two_class_graph(binarize(outcomes_cut['5dTrend'], conf['Common'].getint('class_number')),
+    #                          source_cut['Close'], source_cut['Date'],
+    #                          0,
+    #                          ('close', 'Positive Trend'),
+    #                          title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
+    #                          save_fig_prefix=image_save_directory)
+    #
+    # vis.plot_two_class_graph(binarize(outcomes_cut['20dTrend'], conf['Common'].getint('class_number')),
+    #                          source_cut['Close'], source_cut['Date'],
+    #                          0,
+    #                          ('close', 'Positive Trend'),
+    #                          title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
+    #                          save_fig_prefix=image_save_directory)
 
-    vis.plot_two_class_graph(binarize(outcomes_cut['5dTrend'], conf['Common'].getint('class_number')),
-                             source_cut['Close'], source_cut['Date'],
-                             0,
-                             ('close', 'Positive Trend'),
-                             title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
-                             save_fig_prefix=image_save_directory + "/5d")
-
-    vis.plot_two_class_graph(binarize(outcomes_cut['20dTrend'], conf['Common'].getint('class_number')),
-                             source_cut['Close'], source_cut['Date'],
-                             0,
-                             ('close', 'Positive Trend'),
-                             title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
-                             save_fig_prefix=image_save_directory + "/20d")
-
-    vis.plot_two_class_graph(binarize(outcomes_cut['LongTrend'], conf['Common'].getint('class_number')),
+    vis.plot_two_class_graph(binarize(outcomes_cut[rename_outcome_col], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
                              title=conf['Common'].get('dataset_name') + '_Groud_Truth_LongTrend',
-                             save_fig_prefix=image_save_directory + "/LongTrend")
+                             save_fig_prefix=image_save_directory)
 
     # Save file
     # Save outcomes to a csv file

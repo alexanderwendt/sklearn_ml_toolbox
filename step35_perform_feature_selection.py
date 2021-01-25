@@ -100,7 +100,7 @@ def execute_lasso_feature_selection(X_scaled, y, conf, image_save_directory):
     print("Lasso coefficient list\n:", coefList)
 
     # plt.figure()
-    m.rcParams['figure.figsize'] = (8.0, 10.0)
+    m.rcParams['figure.figsize'] = (8.0, 20.0)
     imp_coef.plot(kind="barh")
     plt.title("Feature importance using Lasso Model")
     plt.tight_layout()
@@ -140,7 +140,7 @@ def execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory)
     print("Tree based coefficent list:\n", treecoefList)
 
     plt.figure()
-    m.rcParams['figure.figsize'] = (8.0, 10.0)
+    m.rcParams['figure.figsize'] = (8.0, 20.0)
     imp_treecoef.plot(kind="barh")
     plt.title("Feature importance using Tree Search Model")
     plt.vlines(threshold, 0, len(X_scaled.columns), color='red')
