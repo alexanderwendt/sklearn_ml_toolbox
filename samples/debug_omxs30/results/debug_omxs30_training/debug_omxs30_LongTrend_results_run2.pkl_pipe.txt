@@ -1,0 +1,8 @@
+Pipeline(steps=[('scaler', StandardScaler()), ('sampling', Nosampler()),
+                ('feat',
+                 ColumnExtractor(cols=[1, 2, 3, 4, 8, 20, 23, 24, 25, 26, 28,
+                                       29, 30, 31, 32, 34, 41, 42, 49, 53, 54,
+                                       55, 56, 57, 58, 59])),
+                ('svm',
+                 SVC(C=10.74013091788963, gamma=1.0054867987087446,
+                     kernel='linear'))])

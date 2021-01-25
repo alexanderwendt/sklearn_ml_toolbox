@@ -1,0 +1,14 @@
+=== Best results of run1 ===
+Best scaler:  StandardScaler()
+Best sampler:  Nosampler()
+Best kernel:  linear
+Best feature selection:  Tree
+Best column indices:  [1, 2, 3, 4, 8, 20, 23, 24, 25, 26, 28, 29, 30, 31, 32, 34, 41, 42, 49, 53, 54, 55, 56, 57, 58, 59]
+Best column names:  ['NormKurs200', 'NumberRise200', 'MA50Norm', 'MA200Norm', 'RSI_14', 'Stoch_Sd1338', 'Stoch_Sk2177', 'Stoch_Sd2177', 'Stoch_Sk211414', 'Stoch_Sd211414', 'Stoch_Sd31414', 'MACD_12_26_9', 'MACDS_12_26_9', 'MACD_5_35_5', 'MACDS_5_35_5', 'MACDS_12_26_9Diff', 'week_of_year', 'day_of_year', 'month_year__1', 'month_year__5', 'month_year__6', 'month_year__7', 'month_year__8', 'month_year__9', 'month_year__10', 'month_year__11']
+=== Best pipe after discrete parameters have been fixed ===
+Pipeline(steps=[('scaler', StandardScaler()), ('sampling', Nosampler()),
+                ('feat',
+                 ColumnExtractor(cols=[1, 2, 3, 4, 8, 20, 23, 24, 25, 26, 28,
+                                       29, 30, 31, 32, 34, 41, 42, 49, 53, 54,
+                                       55, 56, 57, 58, 59])),
+                ('svm', SVC(kernel='linear'))])
