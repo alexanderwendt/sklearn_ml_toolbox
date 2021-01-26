@@ -531,32 +531,32 @@ def main(config_path):
     vis.plot_three_class_graph(outcomes_cut['1dTrend'].values,
                                source_cut['Close'], source_cut['Date'],
                                0,0,0, ('close', 'neutral', 'positive', 'negative'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
-                               save_fig_prefix=image_save_directory + "/1d")
+                               title=conf['Common'].get('dataset_name') + '_GT_1dTrend',
+                               save_fig_prefix=image_save_directory)
 
     vis.plot_three_class_graph(outcomes_cut['5dTrend'].values,
                                source_cut['Close'], source_cut['Date'],
                                0,0,0, ('close', 'neutral', 'positive', 'negative'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
-                               save_fig_prefix=image_save_directory + "/5d")
+                               title=conf['Common'].get('dataset_name') + '_GT_5dTrend',
+                               save_fig_prefix=image_save_directory)
 
     vis.plot_three_class_graph(outcomes_cut['20dTrend'].values,
                                source_cut['Close'], source_cut['Date'],
                                0,0,0, ('close', 'neutral', 'positive', 'negative'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
-                               save_fig_prefix=image_save_directory + "/20d")
+                               title=conf['Common'].get('dataset_name') + '_GT_20dTrend',
+                               save_fig_prefix=image_save_directory)
 
     vis.plot_three_class_graph(outcomes_cut['LongTrend'].values,
                                source_cut['Close'], source_cut['Date'],
                                0,0,0, ('close', 'neutral', 'positive', 'negative'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_LongTrend',
-                               save_fig_prefix=image_save_directory + "/LongTrend")
+                               title=conf['Common'].get('dataset_name') + '_GT_LongTrend',
+                               save_fig_prefix=image_save_directory)
 
     vis.plot_three_class_graph(outcomes_cut['TopsBottoms'].values,
                                source_cut['Close'], source_cut['Date'],
                                0,0,0, ('close', 'neutral', 'top', 'bottom'),
-                               title=conf['Common'].get('dataset_name') + '_Groud_Truth_TopsBottoms',
-                               save_fig_prefix=image_save_directory + "/TopsBottoms")
+                               title=conf['Common'].get('dataset_name') + '_GT_TopsBottoms',
+                               save_fig_prefix=image_save_directory)
 
     def binarize(outcomes, class_number):
         return (outcomes == class_number).astype(np.int)
@@ -565,29 +565,29 @@ def main(config_path):
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
-                             title=conf['Common'].get('dataset_name') + '_Groud_Truth_1dTrend',
-                             save_fig_prefix=image_save_directory + "/1d")
+                             title=conf['Common'].get('dataset_name') + '_GT_1dTrend',
+                             save_fig_prefix=image_save_directory)
 
     vis.plot_two_class_graph(binarize(outcomes_cut['5dTrend'], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
-                             title=conf['Common'].get('dataset_name') + '_Groud_Truth_5dTrend',
-                             save_fig_prefix=image_save_directory + "/5d")
+                             title=conf['Common'].get('dataset_name') + '_GT_5dTrend',
+                             save_fig_prefix=image_save_directory)
 
     vis.plot_two_class_graph(binarize(outcomes_cut['20dTrend'], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
-                             title=conf['Common'].get('dataset_name') + '_Groud_Truth_20dTrend',
-                             save_fig_prefix=image_save_directory + "/20d")
+                             title=conf['Common'].get('dataset_name') + '_GT_20dTrend',
+                             save_fig_prefix=image_save_directory)
 
     vis.plot_two_class_graph(binarize(outcomes_cut['LongTrend'], conf['Common'].getint('class_number')),
                              source_cut['Close'], source_cut['Date'],
                              0,
                              ('close', 'Positive Trend'),
-                             title=conf['Common'].get('dataset_name') + '_Groud_Truth_LongTrend',
-                             save_fig_prefix=image_save_directory + "/LongTrend")
+                             title=conf['Common'].get('dataset_name') + '_GT_LongTrend',
+                             save_fig_prefix=image_save_directory)
 
     # Save file
     # Save outcomes to a csv file

@@ -310,7 +310,7 @@ def main(config_path):
     conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    image_save_directory = conf['Paths'].get('result_directory') + "/model_images"
+    image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation"
 
     selected_feature_columns_filename = os.path.join(conf['Paths'].get('prepared_data_directory'),
                                                      conf['Preparation'].get("selected_feature_columns_out"))

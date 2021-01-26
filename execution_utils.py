@@ -386,7 +386,7 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
         test_scaler = [StandardScaler(), RobustScaler(), QuantileTransformer(), Normalizer()]
         test_sampling = [modelutil.Nosampler(),
                          ClusterCentroids(),
-                         RandomUnderSampler(),
+                         #RandomUnderSampler(),
                          #NearMiss(version=1),
                          #EditedNearestNeighbours(),
                          AllKNN(),

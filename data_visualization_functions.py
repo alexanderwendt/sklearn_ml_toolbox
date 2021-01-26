@@ -359,7 +359,7 @@ def plot_three_class_graph(y_class, y_ref, y_time, offset1, offset2, offset3, le
     if save_fig_prefix:
         if not os.path.isdir(save_fig_prefix):
             os.makedirs(save_fig_prefix)
-        plt.savefig(os.path.join(save_fig_prefix, title + '_three_class_graph'), dpi=300)
+        plt.savefig(os.path.join(save_fig_prefix, title + '_3class'), dpi=300)
 
     plt.show(block=False)
     plt.pause(0.1)
@@ -380,7 +380,7 @@ def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend, title
     if save_fig_prefix:
         if not os.path.isdir(save_fig_prefix):
             os.makedirs(save_fig_prefix)
-        plt.savefig(os.path.join(save_fig_prefix, title + '_two_class_graph'), dpi=300)
+        plt.savefig(os.path.join(save_fig_prefix, title + '_3class'), dpi=300)
 
     plt.show(block=False)
     plt.pause(0.1)
