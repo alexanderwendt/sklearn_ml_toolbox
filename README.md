@@ -1,21 +1,43 @@
 # The Machine Learning Toolbox
-Complete process of data preparation, data analysis, model training and prediction of unknown data. The machine learning toolbox is supposed to be used for primary small and middle structured datasets. In this toolbox, a stock index prediction example is provided to show how to use the tools. The tools contains several methods collected from different sources like stack overflow. The purpose is to have a comprehensive set of tools to handle many types of data. Methods that have been copied are referenced by the url. 
+The Machine Learning Toolbox represents a complete tool-chain of data preparation, data analysis, model training and prediction of unknown data. 
+The machine learning toolbox is supposed to be used for primary small and middle sized, structured datasets. 
 
-## Learning Algorithms
-SKlearn is the main library used.
+In this toolbox, a stock index prediction example is provided to show how to use the tools. The tools contains several methods collected from 
+different sources like stack overflow. The purpose is to have a comprehensive set of tools to handle many types of data. Methods that have been 
+copied are referenced by the url. 
 
-## System setup
-Create the environment in sub folder 81_Setup/environment.yml to setup the environment.
+Machine Learning algorithms from the Scikit Learn library are used in the implementations.
 
-## File Structure
-The file structure is used as a template to adapt to an arbitrary dataset
+## Setup
+In a python 3.6+ environment, run 
+```shell
+pip install -r requirements.txt
+```
 
-Directories:
-- 01_Source: Raw data
-- 02_Training_Data: Prepared training data with all features and handled NaNs
-- 03_Test_Prepared_Data: Prepared test data with all features and handled NaNs
-- 04_Model: Stored, trained model
-- 05_Results: Results of training results and prediction
+In case all libraries cannot be setup correctly, they can be installed manually based on the requirements.txt
+
+## Setup a Project
+The toolbox contains several python scripts that are divided into steps, e.g. "step20_". In the following, each step will be described. The file structure 
+with scripts is supposed to be used as a template to adapt to an arbitrary dataset, as scripts almost always have to be adapted to their specific use case.  
+
+Toolbox default directories:
+- (root): all python scripts used in the process
+- samples: Debug and test projects, on which the scripts have been tested.
+- doc: documentation
+
+For individual projects, it is recommended to use the directory structure in the sample/debug_omxs30 project. These directories are defined in the project
+configuration file and the naming can be changed. Project specifix directories:
+- annotations: Place to put the class labels
+- data_raw: Put your raw data here, i.e. tables with training and test data as well as inference data
+- data_prepared: Prepared training, validation and inference data with all features and handled NaNs. The scripts process the raw data and then puts new 
+tables into the prepared data folder. 
+- models: Stored, trained models
+- results: Results of training and prediction
+- config: This is the location, where the configuration files are located. In the script arguments, this path is provided.
+- (root): Shell or bat scripts that are used to run the pipeline. They refer to the location of the scripts.
+
+
+
 
 Files:
 - OMX_S20_Class_y_Feature_X_Construction: S20 is used to create labels if necessary and to generate new features from raw data for training
@@ -26,17 +48,30 @@ Files:
 - OMX_S50_Prediction: A saved model is loaded together with prepared test data and a class prediction is made
 - ...py: Functions used in the notebooks
 
-## Data for the Template
-To demonstrate the machine learning toolbox, the problem of classifying the trend of the swedish OMXS30 stock index was selected. From the raw data, future samples were used to detemine the current trend. The challenge is to recognize the correct trend, which is simple when looking backward, but hard in advance or in the current moment. The trend is classified in positive and negative trend.
+## Machine Learning Toolbox Process
+The process and the scripts will be described with a example. To demonstrate the machine learning toolbox, the problem of classifying the 
+trend of the swedish OMXS30 stock index was selected. From the raw data, future samples were used to detemine the current trend. The challenge is 
+to recognize the correct trend, which is simple when looking backward, but hard in advance or in the current moment. The trend is classified 
+in a positive and a negative trend.
 
-## Content
-
-### Data Preparation (S20, S21)
-In the data preparation, the y values are generated if applicable. In the OMXS30 example, the positive trend is illustrated as orange and the negative trend is blue.
+### Feature and Outcomes Generation Step 2X
+For raw data, sometimes, it is necessary to generate features or outcomes. In step 2X, Feature generation as well as outcome generation is applied.
+In the data preparation, the y values are generated if applicable. In the OMXS30 example, the positive trend is illustrated as orange and the negative 
+trend is blue. The long-term trend has been defined automatically by combining a top-bottom recognition algorithm with Lowess.
 
 <img src="doc/saved_images/OMXS30_Trend_Definition.png" width="700">
 
 Features are generated based on the raw X data. In the example, technical indicators like MA, RSI and Stochastics are used to generate features.
+
+#### step20_generate_groundtruth_stockmarket_from_annotation.py
+
+
+#### step20_generate_groundtruth_stockmarket.py
+
+
+#### step21_generate_features.py
+
+#### step22_adapt_dimensions.py
 
 ### Analysis and Feature Selection (S30, S31)
 In this process step, the following processing is done:
@@ -207,6 +242,10 @@ In the prediction, the model from the training phase is loaded and used for pred
 <img src="doc/saved_images/S50_OMXS30_Prediction.png" width="700">
 
 The Machine Learning Toolbox offers multiple tools for preparing, analyzing and training data on an SVM algorithm. 
+
+# Issues
+If there are any issues or suggestions for improvements, please add an issue to github's bug tracking system or please send a mail 
+to [Alexander Wendt](mailto:alexander.wendt@tuwien.ac.at)
 
 
 
