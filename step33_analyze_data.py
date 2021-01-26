@@ -102,20 +102,17 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     total_values_scaled = X_scaled.join(y_scaled)
 
     ### Feature and Outcomes Correlation Matrix
-
-    #plot_correlation_matrix(conf, features, image_save_directory, total_values_scaled)
+    plot_correlation_matrix(conf, features, image_save_directory, total_values_scaled)
 
     #fixme: Class names not correct shown
-    #plot_correlation_matrix2(conf, image_save_directory, total_values_scaled)
+    plot_correlation_matrix2(conf, image_save_directory, total_values_scaled)
 
-    #plot_spearman_correlation_matrix(conf, image_save_directory, total_values_scaled)
+    plot_spearman_correlation_matrix(conf, image_save_directory, total_values_scaled)
 
-    #plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled)
+    plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled)
 
     #from tabulate import tabulate
     #print(tabulate(X_scaled, headers='keys', tablefmt='psql'))
-
-
 
     plot_hierarchical_linkage(X_scaled, conf, image_save_directory)
 
@@ -165,7 +162,6 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     plot_umap(X_scaled, class_labels, conf, image_save_directory, y)
 
     ### PCA Analysis
-
     plot_pca(X_scaled, class_labels, conf, image_save_directory, y)
 
 
@@ -192,6 +188,8 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
         plt.savefig(os.path.join(image_save_directory, 'PCA_Variance_Coverage'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
     fig = plt.figure()
@@ -219,6 +217,8 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
         plt.savefig(os.path.join(image_save_directory, 'PCA_Plot'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
@@ -247,6 +247,8 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
         plt.savefig(os.path.join(image_save_directory, 'UMAP_Supervised'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
@@ -280,6 +282,8 @@ def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
 
     plt.gcf()
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_directory):
@@ -315,6 +319,8 @@ def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_
         plt.savefig(os.path.join(image_save_directory, 'T-SNE_Plot'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_save_directory):
@@ -385,6 +391,8 @@ def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_sa
         plt.savefig(os.path.join(image_save_directory, 'Parallel_Coordinates'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
@@ -407,6 +415,8 @@ def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
         plt.savefig(os.path.join(image_save_directory, 'Hierarchical_Linkage'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
@@ -422,6 +432,8 @@ def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
         plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Correlation_Strength'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
@@ -441,6 +453,8 @@ def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
         plt.savefig(os.path.join(image_save_directory, 'Spearman_Correlation_Plot'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def plot_correlation_matrix2(conf, image_save_directory, total_values):
@@ -464,6 +478,8 @@ def plot_correlation_matrix2(conf, image_save_directory, total_values):
         plt.savefig(os.path.join(image_save_directory, 'Pairplot'), dpi=300)
 
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 def plot_correlation_matrix(conf, features, image_save_directory, total_values):
     # Select column values to use in the correlation plot
@@ -494,6 +510,8 @@ def plot_correlation_matrix(conf, features, image_save_directory, total_values):
             os.makedirs(image_save_directory)
         plt.savefig(os.path.join(image_save_directory, "Scatter-Matrix"), dpi=300)
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 
 def rescale(conf, features, y):

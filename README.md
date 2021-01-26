@@ -116,50 +116,73 @@ are search for T-SNE. The result of the hyperparameter search for T-SNE looks li
 
 <img src="doc/saved_images/omxs30_lt_TSNE_Calibration_Plot.png" width="700">
 
+In this case, probably the standard parameters can be used.
 
-#### Individual X value analysis
-Several tools and graphs analyze and visualize different charactersics of the data to create an understanding of its structure and values. The following analyses are made:
-- histograms for robust and normal average and standard deviations 
-  
-<img src="doc/saved_images/MA2Norm.png" width="300">
-- Pearson and Spearman rang Correlation matrices 
-  
-<img src="doc/saved_images/Correlation_Spearman.png" width="500">
-- Autocorrelation and partial autocorrelation of time dependent variables 
+#### step33_analyze_data.py
+Several tools and graphs analyze and visualize different charactersics of the data to create an understanding of its structure.
 
-<img src="doc/saved_images/Partial_Autocorrelation_OMXS30.png" width="300">
-- Parallel Coordinates 
+Spearman Correlation
+<img src="doc/saved_images/Spearman_Correlation_Plot.png" width="600">
 
-<img src="doc/saved_images/Partial_Coordinates_OMXS30.png" width="600">
-- Visualization of missing data
-- t-SNE Visualization 
+Scatterplot Matrix
+<img src="doc/saved_images/Scatter-Matrix.png" width="600">
 
-<img src="doc/saved_images/t-SNE_OMXS30.png" width="500">
-- UMAP unsupervised and supervised 2D projection 
+Pairplot
+<img src="doc/saved_images/Pairplot.png" width="600">
 
-<img src="doc/saved_images/UMAP_Supervised_OMXS30.png" width="500">
-- PCA Analysis 
+Correlation strength between features and outcome
+<img src="doc/saved_images/omxs30_lt_Correlation_Strength.png" width="600">
 
-<img src="doc/saved_images/PCA_Accumulated_Variance_OMXS30.png" width="500">
+Hierarchical Linkage
+<img src="doc/saved_images/omxs30_lt_Hierarchical_Linkage.png" width="600">
 
-#### Feature Selection
+Parallel coordinates of selected features
+<img src="doc/saved_images/omxs30_lt_Parallel_Coordinates.png" width="600">
+
+T-SNE unsupervised grouping of data
+<img src="doc/saved_images/omxs30_lt_T-SNE_Plot.png" width="600">
+
+UMAP unsupervised clustering
+<img src="doc/saved_images/omxs30_lt_UMAP_Unsupervised.png" width="600">
+
+UMAP supervised clustering
+<img src="doc/saved_images/omxs30_lt_UMAP_Supervised.png" width="600">
+
+PCA Plot
+<img src="doc/saved_images/omxs30_lt_PCA_Plot.png" width="600">
+
+PCA Variance Coverage. Plots the number of composed features that are necessary to cover 95% of the variance of the data. 
+It shows that it is possible to reduce the number of features from ~120 to 20.
+<img src="doc/saved_images/omxs30_lt_PCA_Variance_Coverage.png" width="600">
+
+#### step34_analyze_temporal_data.py
+For time series, chart tools are available for plotting auto correlations of the source data 
+
+
+#### step35_perform_feature_selection.py
 Feature selection is done by using several different methods to get the most significant features and adding them to a list of features. This list is then tested in the model optimization step. The following feature selection methods are used:
 - Logistic regression with lasso (L1) regulaization 
-<img src="doc/saved_images/Lasso_FS_OMXS30.png" width="500">
+<img src="doc/saved_images/omxs30_lt_Lasso_Model_Weights.png" width="500">
 - Tree based feature selection 
-<img src="doc/saved_images/Tree_based_FS_OMXS30.png" width="500">
+<img src="doc/saved_images/omxs30_lt_Tree_Based_Importance.png" width="500">
 - Backward Elimination
 - Recursive Elimination with Logistic Regression
 
-All extracted features are merged into a data frame.
+All extracted features are merged into a data frame, similar to the following image.
 <img src="doc/saved_images/Significant_Features_OMXS30.jpg" width="600">
 
 Finally, the prepared dataset and the extracted features are stored.
 
-### Model Optimization (S40)
-The model used is a Support Vector Machine. In the model optimization the following process steps are done:
+#### step36_split_training_validation.py
+The training data is then split into a training and a validation set. Often, the split is 80% for training data and 20% for validation data.
 
-#### Preparation of the Optimization
+### Model Training 4X
+The model used is a Support Vector Machine. In the model optimization the following process steps are done.
+
+#### step42_analyze_training_time_svm.py
+With this script, it is possible to make estimations of dummy classifiers, i.e. the majority classifier to have as a baseline for the best guess. Further,
+it is analyzed how the training duration and F1 score increases with increasing number of samples.
+
 - Load X, y, class labels and columns
 - Split the training data into training and test data, default 80% training data. If timedependent X values, data is not shuffled at the split
 - Baseline prediction based on majority class and stratified class prediction to detemine, whether the classifier provides signifiant results
@@ -168,10 +191,16 @@ The model used is a Support Vector Machine. In the model optimization the follow
 - Test training results as a function of the number of samples to determine the minimum training size
 <img src="doc/saved_images/S40_OMXS30_Result_Samples.png" width="300">
 
-#### Runs
+#### step43_wide_hyperparameter_search_svm.py
+A hyperparameter search is performed for the machine learning algorithm. For the Support Vector Machine, it is possible to narrow the search space with less
+data and then make a fine grained search with more data. In the first search, discrete values are selected. In the narrow search, continuous values are 
+selected. 
+
 To focus the search on hyper parameters with a wide range, i.e. C and gamma, the optimization is divided into several runs with different focus.
 
-Run 1: Selection of Scaler, Sampler Feature Subset and Kernel. In the first run, the goal is to select the best scaler, sampler, kernel and feature subset. The hyper parameters C and gamma are used in a small range around the default value. Only a subset of the data is used, e.g. 30/6000 samples. In a grid search, the best parameter of the following is determined and fixed.
+Run 1: Selection of Scaler, Sampler Feature Subset and Kernel. In the first run, the goal is to select the best scaler, sampler, kernel and feature subset. 
+The hyper parameters C and gamma are used in a small range around the default value. Only a subset of the data is used, e.g. 30/6000 samples. 
+In a grid search, the best parameter of the following is determined and fixed.
 
 Scalers:
 - StandardScaler()
@@ -214,7 +243,9 @@ Feature Selection
 - Manual feature selection
 - All features
 
-Run 2: Exhaustive Parameter Selection Through Wide Grid Search. The basic parameters have been set. Now make an exhaustive parameter search for tuning parameters. Only a few samples are used and low kfold just to find the parameter limits. The parameters of C and gamma are selected wide.
+#### step44_narrow_hyperparameter_search_svm.py
+Run 2: Exhaustive Parameter Selection Through Wide Grid Search. The basic parameters have been set. Now make an exhaustive parameter search 
+for tuning parameters. Only a few samples are used and low kfold just to find the parameter limits. The parameters of C and gamma are selected wide.
 
 The results of C and gamma are visible in the following:
 
@@ -255,13 +286,24 @@ The result of run 4 is the best parameter combination.
 
 TODO: Implement bayesian optimization.
 
-#### Optimize Model for Precision/Recall
+#### step45_define_precision_recall.py
 The training data is split in a new training set and a cross validation set (shuffled and stratified). The training set is trained with the optimal parameters. On the cross validation data, the precision/recall curve is optimized as seen below. The decision threshold is moved in the optimal direction.
 
 <img src="doc/saved_images/S40_OMXS30_Precision_Recall.png" width="500">
 
-#### Validation
-The model is trained with the complete training data and the optimal parameters. Then it is evaluated on the test data from the split at the beginning of the notebook. The results are shown in a confusion matrix
+### Train model 5X
+As all hyperparameters have been set, the next step is to train a model with complete pipline.
+
+#### step50_train_model_from_pipe.py
+The script takes a pipe from the hyperparameter optimization and trains it on the data. For the complete process, two models will be needed: the first model is
+trained on the training data only. It will be used for validation with the validation data that was split in step 3. The second model will be used for inference
+and is trained on all available data. It is to expect that the more data is used for training, the better the model gets.
+
+### Validation and Evaluation 6X
+The model is trained with the complete training data and the optimal parameters.
+
+#### step60_evaluate_model.py
+Then it is evaluated on the validation data. The results are shown in a confusion matrix.
 
 <img src="doc/saved_images/S40_OMXS30_Eval_Conf_Matrix.png" width="300">
 
@@ -269,17 +311,20 @@ The prediction for the OMXS30 example is visualized together with the correct va
 
 <img src="doc/saved_images/S40_OMXS30_Results.png" width="700">
 
-#### Final Training of the complete model
-To use the most of the data, finally all available data is used to train the final model. This model is saved in 04/Model
+#### step61_evaluate_model_temporal_data.py
+For temporal data like stock market data, this script offers the possibility to validate the predictions on the chart.
 
-### Prediction (S50, S51)
+
+### Prediction 7X
 In the prediction, the model from the training phase is loaded and used for prediction of the unknown data. 
+
+#### step70_predict_temporal_data.py
 
 <img src="doc/saved_images/S50_OMXS30_Prediction.png" width="700">
 
-The Machine Learning Toolbox offers multiple tools for preparing, analyzing and training data on an SVM algorithm. 
+ 
 
-# Issues
+## Issues
 If there are any issues or suggestions for improvements, please add an issue to github's bug tracking system or please send a mail 
 to [Alexander Wendt](mailto:alexander.wendt@tuwien.ac.at)
 

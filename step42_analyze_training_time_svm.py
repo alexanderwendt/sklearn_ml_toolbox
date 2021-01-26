@@ -108,7 +108,7 @@ args = parser.parse_args()
 #     return X_train, y_train, X_val, y_val, y_classes, scorer
 
 
-def run_training_estimation(X_train, y_train, X_test, y_test, scorer, save_fig_prefix=None):
+def run_training_estimation(X_train, y_train, X_test, y_test, scorer, image_save_directory=None):
     '''
     Run estimation of scorer (default f1) and duration dependent of subset size of input data
 
@@ -142,14 +142,30 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, save_fig_p
     plt.xlabel('Number of training examples')
     plt.ylabel('Duration [s]')
     plt.title("Training Duration")
+
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, 'SVM_Duration_Samples'), dpi=300)
+
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
     plt.figure()
     plt.plot(xaxis, scores)
     plt.xlabel('Number of training examples')
     plt.ylabel('F1-Score on cross validation set (=the rest). Size={}'.format(X_test.shape[0]))
     plt.title("F1 Score Improvement With More Data")
+
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, 'SVM_F1_Samples'), dpi=300)
+
     plt.show(block = False)
+    plt.pause(0.1)
+    plt.close()
 
 def run_training_predictors(data_input_path):
     '''
@@ -171,7 +187,7 @@ def run_training_predictors(data_input_path):
     baseline_results = exe.execute_baseline_classifier(X_train, y_train, X_val, y_val, y_classes, scorer)
     print("Baseline results=", baseline_results)
 
-    run_training_estimation(X_train, y_train, X_val, y_val, scorer)
+    run_training_estimation(X_train, y_train, X_val, y_val, scorer, save_fig_prefix)
 
 
 if __name__ == "__main__":
