@@ -37,17 +37,6 @@ tables into the prepared data folder.
 - (root): Shell or bat scripts that are used to run the pipeline. They refer to the location of the scripts.
 
 
-
-
-Files:
-- OMX_S20_Class_y_Feature_X_Construction: S20 is used to create labels if necessary and to generate new features from raw data for training
-- OMX_S21_Class_y_Feature_X_Construction: S21 is used only to generate new features for the test data. Generated labels are ignored.
-- OMX_S30_Analysis_Feature_Selection: Feature analysis of the X data as well as methods for feature selection, e.g. lasso regression for training data
-- OMX_S31_Analysis: Feature analysis of the X test data
-- OMX_S40_Model_[Type]: Model optimization for the model [Type]. Only SVM has been optimized so far
-- OMX_S50_Prediction: A saved model is loaded together with prepared test data and a class prediction is made
-- ...py: Functions used in the notebooks
-
 ## Machine Learning Toolbox Process
 The process and the scripts will be described with a example. To demonstrate the machine learning toolbox, the problem of classifying the 
 trend of the swedish OMXS30 stock index was selected. From the raw data, future samples were used to detemine the current trend. The challenge is 
@@ -56,30 +45,77 @@ in a positive and a negative trend.
 
 ### Feature and Outcomes Generation Step 2X
 For raw data, sometimes, it is necessary to generate features or outcomes. In step 2X, Feature generation as well as outcome generation is applied.
-In the data preparation, the y values are generated if applicable. In the OMXS30 example, the positive trend is illustrated as orange and the negative 
-trend is blue. The long-term trend has been defined automatically by combining a top-bottom recognition algorithm with Lowess.
-
-<img src="doc/saved_images/OMXS30_Trend_Definition.png" width="700">
-
-Features are generated based on the raw X data. In the example, technical indicators like MA, RSI and Stochastics are used to generate features.
-
-#### step20_generate_groundtruth_stockmarket_from_annotation.py
+In the data preparation, the y values are generated if applicable. 
 
 
 #### step20_generate_groundtruth_stockmarket.py
+In the OMXS30 example, the positive trend is illustrated as orange and the negative 
+trend is blue. The long-term trend has been defined automatically by combining a top-bottom recognition algorithm with Lowess.
 
+<img src="doc/saved_images/S20_omxs30_tb_Groud_Truth_LongTrend_two_class_graph.png" width="700">
+
+#### step20_generate_groundtruth_stockmarket_from_annotation.py
+If the outcomes are not automatically generated, they can be loaded from a csv file instead.
 
 #### step21_generate_features.py
+Features are generated based on the raw X data. In the example, technical indicators like moving average, RSI and Stochastics are used to generate features. 
+Any technical indicators can be added here.
 
 #### step22_adapt_dimensions.py
+In the generation of outcomes, different averering methods are used, which use future data. To get correct labeling, future data is removed at the end of the generation, e.g. last 50 values.
+In the generation of features, moving averages 200 are used. Therefore, the 200 first values are cut off to get a correct feature representation. Both 
+features and outcomes have to have the same dimensions. This adaption is automatically done in with this script.
 
-### Analysis and Feature Selection (S30, S31)
+This step is very individual for each problem. Only step22_adapt_dimensions.py could remain the same in another project.
+
+### Data Preparation, Analysis and Feature Selection 3X
 In this process step, the following processing is done:
-#### Dataset loading
-Prepared features and labels are loaded from files. The default format is to load a csv file with features in the columns and with the last column as the class. In the parameters, the class name is defined.
+- Dataset loading
+- Dataset cleaning
+- Dataset analysis
+- Feature selection for the machine learning algorithms
 
-#### Dataset cleaning
-The dataset is prepared to be used as an input to a model. Feature can be renamed, inconsitent used of NaN are replaced.
+#### step30_clean_raw_data.py
+Prepared features and labels are loaded from files. The following cleaning steps are applied:
+- Column names are stripped 
+- " " are replaced by "_" to get unified naming
+- "/" are replaxed by "-"
+- All string values "?" or empty values are replaced by numpy "NaN"
+
+In this module, each feature is plotted and visualized with median and means like below.
+
+<img src="doc/saved_images/omxs30_lt_25-MA200Norm.png" width="300">
+<img src="doc/saved_images/omxs30_lt_3-LongTrend.png" width="300">
+
+The outcome in this example is "LongTrend". From the graph, it is visible that the classes are skewed. There are twice as many values of "positive trend" as 
+"negative trend".
+
+Usually, this script has to adapted to an input dataset. However, if several similar datasets are analyzed or inference data is continually used, this script
+can remain unchanged.
+
+#### step31_adapt_features.py
+After the raw data has been processed in a first pass, features may have to be adapted for a machine learning algorithm. An example is the one-hot-encoding,
+where nominal values are replaced by binary values for each value type.
+
+This script does the following:
+- one-hot encoding
+- Making all columns numeric values to int or float
+- Outcomes as int for classification problems
+- Binarize labels: For some problems, only one class might be interesting. This is set in the configuration file. In this step, the selected class gets
+the number 1 and all other classes get the number 0. In that way, a class is binarized. In our example, we are only interested in the positive trend. 
+
+Finally, the share of missing values are shown in the following graph.
+
+<img src="doc/saved_images/_missing_numbers_matrix.png" width="700">
+
+In our example, there are no missing values (NaN).
+
+#### step32_search_hyperparameters.py
+In the next step, the data will be analyzed to get an overview of the distribution and possibilites to group it. Before that, some hyperparameters 
+are search for T-SNE. The result of the hyperparameter search for T-SNE looks like this
+
+<img src="doc/saved_images/omxs30_lt_TSNE_Calibration_Plot.png" width="700">
+
 
 #### Individual X value analysis
 Several tools and graphs analyze and visualize different charactersics of the data to create an understanding of its structure and values. The following analyses are made:
