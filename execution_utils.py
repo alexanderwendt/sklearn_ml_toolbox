@@ -385,11 +385,11 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
         # Main set of parameters for the grid search run 1: Select scaler, sampler and kernel for the problem
         test_scaler = [StandardScaler(), RobustScaler(), QuantileTransformer(), Normalizer()]
         test_sampling = [modelutil.Nosampler(),
-                         ClusterCentroids(),
+                         #ClusterCentroids(),
                          #RandomUnderSampler(),
                          #NearMiss(version=1),
                          #EditedNearestNeighbours(),
-                         AllKNN(),
+                         #AllKNN(),
                          #CondensedNearestNeighbour(random_state=0),
                          #InstanceHardnessThreshold(random_state=0,
                          #                          estimator=LogisticRegression(solver='lbfgs', multi_class='auto')),
@@ -451,11 +451,12 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
     print("Pipeline: ", pipe_run1)
 
     print("Stratified KFold={} used.".format(n_splits))
-    skf = StratifiedKFold(n_splits=n_splits)
+    #INFO: KFold Splitter with shuffle=True to get random values
+    skf = StratifiedKFold(n_splits=n_splits, random_state=3, shuffle=True)
 
     pipe_run1 = pipe_run1
     params_run1 = parameters  # params_debug #params_run1
-    grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=1, cv=skf, scoring=scorers, refit=refit_scorer_name,
+    grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=2, cv=skf, scoring=scorers, refit=refit_scorer_name,
                                     return_train_score=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
 
     #grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=1, cv=skf, scoring=scorers, refit=refit_scorer_name,

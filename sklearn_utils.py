@@ -66,6 +66,8 @@ def extract_data_subset(X_train, y_train, number_of_samples, shuffled=True):
 
     a, b = np.unique(y_train_subset, return_counts=True)
     print("Classes {}, counts {}".format(a, b))
+    if len(a)<2:
+        raise Exception("Only one class")
 
 
     return X_train_subset, y_train_subset
