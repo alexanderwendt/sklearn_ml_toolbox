@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #from __future__ import print_function
 
 # Built-in/Generic Imports
+import json
 import os
 
 # Libs
@@ -89,7 +90,7 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 args = parser.parse_args()
 
 def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter_svm, pipe_run_random, scorers,
-                                                refit_scorer_name, save_fig_prefix):
+                                                refit_scorer_name, iter_setup, save_fig_prefix=None):
     '''
     Iterated search for parameters. Set sample size, kfolds, number of iterations and top result selection. Execute
     random search cv for the number of entries and extract the best parameters from that search. As a result the
@@ -109,10 +110,13 @@ def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter
     '''
 
     # Iterated pipeline with increasing number of tries
-    sample_size = [200, 400, 600]
-    kfolds = [2, 3, 3]
-    number_of_interations = [100, 100, 20]
-    select_from_best = [10, 10, 10]
+
+
+
+    sample_size = list((np.array(iter_setup['samples'])*X_train.shape[0]).astype(int))
+    kfolds = iter_setup['kfolds']
+    number_of_interations = iter_setup['iter']
+    select_from_best = iter_setup['selection']
 
     combined_parameters = zip(sample_size, kfolds, number_of_interations, select_from_best)
 
@@ -180,6 +184,19 @@ def execute_narrow_search(config_path):
     # Load complete training input
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
+
+    #Load narrow training parameters
+    samples = json.loads(config.get("Training", "narrow_samples"))
+    kfolds = json.loads(config['Training'].get('narrow_kfolds'))
+    iterations = json.loads(config['Training'].get('narrow_iterations'))
+    selection = json.loads(config['Training'].get('narrow_selection'))
+
+    iter_setup=dict()
+    iter_setup['samples'] = samples
+    iter_setup['kfolds'] = kfolds
+    iter_setup['iter'] = iterations
+    iter_setup['selection'] = selection
+
     #f = open(data_input_path, "rb")
     #prepared_data = pickle.load(f)
     #print("Loaded data: ", prepared_data)
@@ -215,9 +232,13 @@ def execute_narrow_search(config_path):
     parameter_svm = exe.get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_selection)
 
     # Execute iterated random search where parameters are even more limited
-    param_final, results_run2 = execute_search_iterations_random_search_SVM(X_train, y_train, parameter_svm, pipe_run_best_first_selection, scorers,
-                                                refit_scorer_name,
-                                                save_fig_prefix=save_fig_prefix + '/' + model_name)
+    param_final, results_run2 = execute_search_iterations_random_search_SVM(X_train, y_train,
+                                                                            parameter_svm,
+                                                                            pipe_run_best_first_selection,
+                                                                            scorers,
+                                                                            refit_scorer_name,
+                                                                            iter_setup,
+                                                                            save_fig_prefix=save_fig_prefix + '/')
 
     # Enhance kernel with found parameters
     pipe_run_best_first_selection['svm'].C = param_final['C']

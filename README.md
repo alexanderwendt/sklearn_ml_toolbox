@@ -131,75 +131,86 @@ Pairplot
 <img src="doc/saved_images/Pairplot.png" width="600">
 
 Correlation strength between features and outcome
-<img src="doc/saved_images/omxs30_lt_Correlation_Strength.png" width="600">
+<img src="doc/saved_images/omxs30_ltred_Correlation_Strength.png" width="600">
 
 Hierarchical Linkage
-<img src="doc/saved_images/omxs30_lt_Hierarchical_Linkage.png" width="600">
+<img src="doc/saved_images/Hierarchical_Linkage.png" width="600">
 
 Parallel coordinates of selected features
-<img src="doc/saved_images/omxs30_lt_Parallel_Coordinates.png" width="600">
+<img src="doc/saved_images/Parallel_Coordinates.png" width="600">
 
 T-SNE unsupervised grouping of data
-<img src="doc/saved_images/omxs30_lt_T-SNE_Plot.png" width="600">
+<img src="doc/saved_images/T-SNE_Plot.png" width="600">
 
 UMAP unsupervised clustering
-<img src="doc/saved_images/omxs30_lt_UMAP_Unsupervised.png" width="600">
+<img src="doc/saved_images/UMAP_Unsupervised.png" width="600">
 
 UMAP supervised clustering
-<img src="doc/saved_images/omxs30_lt_UMAP_Supervised.png" width="600">
+<img src="doc/saved_images/UMAP_Supervised.png" width="600">
 
 PCA Plot
-<img src="doc/saved_images/omxs30_lt_PCA_Plot.png" width="600">
+<img src="doc/saved_images/PCA_Plot.png" width="600">
 
 PCA Variance Coverage. Plots the number of composed features that are necessary to cover 95% of the variance of the data. 
-It shows that it is possible to reduce the number of features from ~120 to 20.
-<img src="doc/saved_images/omxs30_lt_PCA_Variance_Coverage.png" width="600">
+It shows that it is possible to reduce the number of features from 36 to 9.
+<img src="doc/saved_images/PCA_Variance_Coverage.png" width="600">
 
 #### step34_analyze_temporal_data.py
-For time series, chart tools are available for plotting auto correlations of the source data 
+For time series, chart tools are available for plotting auto correlations of the source data.
 
 
 #### step35_perform_feature_selection.py
 Feature selection is done by using several different methods to get the most significant features and adding them to a list of features. This list is then tested in the model optimization step. The following feature selection methods are used:
 - Logistic regression with lasso (L1) regulaization 
-<img src="doc/saved_images/omxs30_lt_Lasso_Model_Weights.png" width="500">
+<img src="doc/saved_images/omxs30_ltred_Lasso_Model_Weights.png" width="500">
 - Tree based feature selection 
-<img src="doc/saved_images/omxs30_lt_Tree_Based_Importance.png" width="500">
+<img src="doc/saved_images/omxs30_ltred_Tree_Based_Importance.png" width="500">
 - Backward Elimination
 - Recursive Elimination with Logistic Regression
 
-All extracted features are merged into a data frame, similar to the following image.
+All extracted features are merged into a data frame, similar to the following image for each feature extraction method.
 <img src="doc/saved_images/Significant_Features_OMXS30.jpg" width="600">
 
 Finally, the prepared dataset and the extracted features are stored.
 
 #### step36_split_training_validation.py
-The training data is then split into a training and a validation set. Often, the split is 80% for training data and 20% for validation data.
+The training data is then split into a training and a validation set. Often, the split is 80% for training data and 20% for validation data. The share of validation data
+is defined in the configuration file. Also if data shall be shuffled is set in the configuration file.
 
 ### Model Training 4X
 The model used is a Support Vector Machine. In the model optimization the following process steps are done.
+
+Training is done in the following steps:
+- Estimation of baseline that the classifier should beat
+- Wide hyperparameter search to determine discrete values like scaler, features to use and sampler.
+- Narrow hyperparameter search to determine the continuous values
+- For multiclass problems, determine the precision/recall coefficient
+- Train a model with the hyperparameters
+
 
 #### step42_analyze_training_time_svm.py
 With this script, it is possible to make estimations of dummy classifiers, i.e. the majority classifier to have as a baseline for the best guess. Further,
 it is analyzed how the training duration and F1 score increases with increasing number of samples.
 
-- Load X, y, class labels and columns
-- Split the training data into training and test data, default 80% training data. If timedependent X values, data is not shuffled at the split
-- Baseline prediction based on majority class and stratified class prediction to detemine, whether the classifier provides signifiant results
-- Test training durations, i.e. training time of the classifier as a function of number of samples to be able to estimate the effort of training
-<img src="doc/saved_images/S40_OMXS30_Duration_Samples.png" width="300">
-- Test training results as a function of the number of samples to determine the minimum training size
-<img src="doc/saved_images/S40_OMXS30_Result_Samples.png" width="300">
+Baseline prediction based on majority class and stratified class prediction to detemine, whether the classifier provides signifiant results. In this case, as 2/3 of the trend
+is positive, the accuracy of the majority classifier would be around 0.66.
+
+
+Test training durations are tested to get an overview how the algorithm scales, i.e. training time of the classifier as a function of number of samples to be able 
+to estimate the effort of training. In the case of an Support Vector Machine, it scales with O(n^2)
+
+<img src="doc/saved_images/SVM_Duration_Samples.png" width="300">
+
+Test training results as a function of the number of samples to determine the minimum training size. The question to be answer is how much data is needed to flatten the
+learning curve.
+<img src="doc/saved_images/SVM_F1_Samples.png" width="300">
 
 #### step43_wide_hyperparameter_search_svm.py
 A hyperparameter search is performed for the machine learning algorithm. For the Support Vector Machine, it is possible to narrow the search space with less
-data and then make a fine grained search with more data. In the first search, discrete values are selected. In the narrow search, continuous values are 
-selected. 
+data and then make a fine grained search with more data. In the first search, discrete values are selected. 
 
-To focus the search on hyper parameters with a wide range, i.e. C and gamma, the optimization is divided into several runs with different focus.
-
-Run 1: Selection of Scaler, Sampler Feature Subset and Kernel. In the first run, the goal is to select the best scaler, sampler, kernel and feature subset. 
-The hyper parameters C and gamma are used in a small range around the default value. Only a subset of the data is used, e.g. 30/6000 samples. 
+Selection of Scaler, Sampler Feature Subset and Kernel. In the first run, the goal is to select the best scaler, sampler, kernel and feature subset. 
+The hyper parameters C and gamma are used in a small range around the default value. Only a subset of the data is used, e.g. 20% of the samples. 
 In a grid search, the best parameter of the following is determined and fixed.
 
 Scalers:
@@ -210,15 +221,15 @@ Scalers:
 
 Proportion of the different scalers in the top 10% of the results
 
-<img src="doc/saved_images/S40_OMXS30_Scaler_Selection_Top10p.png" width="400">
+<img src="doc/saved_images/_scaler_categorical_bar.png" width="400">
 
 Statistical difference significance matrix (0 for the same distribution, 1 for different distribution)
 
-<img src="doc/saved_images/S40_OMXS30_Scaler_Selection_Significance.png" width="500">
+<img src="doc/saved_images/_scaler_significance_matrix.png" width="500">
 
 Distributions of the scalers for the result range (f1) 
 
-<img src="doc/saved_images/S40_OMXS30_Scaler_Selection.png" width="500">
+<img src="doc/saved_images/_scaler_overlayed_histograms.png" width="500">
 
 Samples:
 - Nosampler()
@@ -227,11 +238,35 @@ Samples:
 - SMOTETomek()
 - ADASYN()
 
+Proportion of the different scalers in the top 10% of the results
+
+<img src="doc/saved_images/_sampling_categorical_bar.png" width="400">
+
+Statistical difference significance matrix (0 for the same distribution, 1 for different distribution)
+
+<img src="doc/saved_images/_sampling_significance_matrix.png" width="500">
+
+Distributions of the scalers for the result range (f1) 
+
+<img src="doc/saved_images/_sampling_overlayed_histograms.png" width="500">
+
 Kernels:
 - linear
 - polynomial with degree 2, 3 or 4
 - rbf
 - sigmoid
+
+Proportion of the different scalers in the top 10% of the results
+
+<img src="doc/saved_images/_svm__kernel_categorical_bar.png" width="400">
+
+Statistical difference significance matrix (0 for the same distribution, 1 for different distribution)
+
+<img src="doc/saved_images/_svm__kernel_significance_matrix.png" width="500">
+
+Distributions of the scalers for the result range (f1) 
+
+<img src="doc/saved_images/_svm__kernel_overlayed_histograms.png" width="500">
 
 Feature Selection
 - Lasso	
@@ -243,14 +278,41 @@ Feature Selection
 - Manual feature selection
 - All features
 
+Proportion of the different scalers in the top 10% of the results
+
+<img src="doc/saved_images/_feat__cols_categorical_bar.png" width="400">
+
+Statistical difference significance matrix (0 for the same distribution, 1 for different distribution)
+
+<img src="doc/saved_images/_feat__significance_matrix.png" width="500">
+
+Distributions of the scalers for the result range (f1) 
+
+<img src="doc/saved_images/_feat__overlayed_histograms.png" width="500">
+
+In out case, the algorithm selected the following pipline:
+- Best scaler:  QuantileTransformer()
+- Best sampler:  ADASYN()
+- Best feature selection:  Tree
+- Best kernel:  rbf
+
 #### step44_narrow_hyperparameter_search_svm.py
-Run 2: Exhaustive Parameter Selection Through Wide Grid Search. The basic parameters have been set. Now make an exhaustive parameter search 
-for tuning parameters. Only a few samples are used and low kfold just to find the parameter limits. The parameters of C and gamma are selected wide.
+Exhaustive parameter selection through narrow grid search. Only continuous parameters are optimized here. The basic parameters have been set. Now make an exhaustive parameter 
+search for tuning parameters. Only a few samples are used and low kfold just to find the parameter limits. The parameters of C and gamma are selected wide.
 
-The results of C and gamma are visible in the following:
 
-<img src="doc/saved_images/S40_OMXS30_run2_validation_C.png" width="300">
-<img src="doc/saved_images/S40_OMXS30_run2_validation_gamma.png" width="300">
+To focus the search on hyper parameters C and gamma with a wide range. The optimization is divided into several runs where the top 10% are selected after each run with
+more data.
+
+For gamma and C the range was selected [1e-5, 1e5]. In the first run less samples were run 100 iterations and 2 folds with the random search. The results show the top 10% 
+of the runs. The range is reduced significantly.
+
+<img src="doc/saved_images/omxs30_ltred_run2_subrun_0_samples200_fold2_iter100_sel10.png" width="400">
+
+The second run
+
+<img src="doc/saved_images/omxs30_ltred_run2_subrun_1_samples400_fold3_iter100_sel10" width="400">
+
 
 The optimal range has been found (white)
 

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #Generate Scatter plot with results
-def visualize_random_search_results(random_search, refit_scorer_name):
+def visualize_random_search_results(random_search, refit_scorer_name, xlim=None, ylim=None):
     '''
     Generate a 2D scatter plot with results for SVM
 
@@ -26,8 +26,16 @@ def visualize_random_search_results(random_search, refit_scorer_name):
 
     ax.set_yscale('log')
     ax.set_xscale('log')
-    ax.set_xlim([np.min(x), np.max(x)])
-    ax.set_ylim([np.min(y), np.max(y)])
+
+    if xlim:
+        ax.set_xlim([np.min(x), np.max(x)])
+    else:
+        ax.set_xlim(xlim)
+
+    if ylim:
+        ax.set_ylim([np.min(y), np.max(y)])
+    else:
+        ax.set_ylim(ylim)
     plt.grid(True)
     plt.colorbar(sc)
 
