@@ -171,7 +171,7 @@ PCA Plot
 <img src="doc/saved_images/PCA_Plot.png" width="600">
 
 PCA Variance Coverage. Plots the number of composed features that are necessary to cover 95% of the variance of the data. 
-It shows that it is possible to reduce the number of features from 36 to 9.
+It shows that it is possible to reduce the number of features from 37 to 9.
 
 <img src="doc/saved_images/PCA_Variance_Coverage.png" width="600">
 
@@ -272,7 +272,7 @@ Statistical difference significance matrix (0 for the same distribution, 1 for d
 
 <img src="doc/saved_images/_sampling_significance_matrix.png" width="500">
 
-Distributions of the scalers for the result range (f1) 
+Distributions of the samplers for the result range (f1) 
 
 <img src="doc/saved_images/_sampling_overlayed_histograms.png" width="500">
 
@@ -290,7 +290,7 @@ Statistical difference significance matrix (0 for the same distribution, 1 for d
 
 <img src="doc/saved_images/_svm__kernel_significance_matrix.png" width="500">
 
-Distributions of the scalers for the result range (f1) 
+Distributions of the kernels for the result range (f1) 
 
 <img src="doc/saved_images/_svm__kernel_overlayed_histograms.png" width="500">
 
@@ -312,9 +312,9 @@ Statistical difference significance matrix (0 for the same distribution, 1 for d
 
 <img src="doc/saved_images/_feat__cols_significance_matrix.png" width="500">
 
-Distributions of the scalers for the result range (f1) 
+Distributions of the feature selections for the result range (f1) 
 
-<img src="doc/saved_images/_feat__cols_overlayed_histograms" width="500">
+<img src="doc/saved_images/_feat__cols_overlayed_histograms.png" width="500">
 
 In out case, the algorithm selected the following pipline:
 - Best scaler:  QuantileTransformer()
@@ -388,11 +388,11 @@ The model is trained with the complete training data and the optimal parameters.
 Then, the model is evaluated on the training and validation data. The results are shown in a confusion matrix. The folloing image shows the comfusion matrix. 
 The model almost perfectly fits the data.
 
-<img src="doc/saved_images/Train__confusion_matrix.png" width="300">
+<img src="doc/saved_images/Train__confusion_matrix.png" width="400">
 
 The confusion matrix for the test data.
 
-<img src="doc/saved_images/Val__confusion_matrix.png" width="300">
+<img src="doc/saved_images/Val__confusion_matrix.png" width="400">
 
 From the confusion matrices, it is visible that the classifier overfits the data
 
@@ -421,7 +421,9 @@ The prediction on the validation data confirms the overfitting shown in the conf
 
 <img src="doc/saved_images/Val_Pred_omxs30_ltred_3class.png" width="700">
 
-With th system trained, like this, is it possible to make money with this system?
+With the system trained like this, is it possible to make money with this system? A filter that removes single outlier signals could help to get smoother
+trends. It is expected that in a negative trend up to 26% values are predicted positive, where they should be negative. In the other way, 11% of the 
+values are predicted negative, where the long trend is positive.
 
 ### Prediction 7X
 In the prediction, the model from the training phase is loaded and used for prediction of the unknown data. 
@@ -432,6 +434,11 @@ to be positive.
 
 <img src="doc/saved_images/InferenceInference_omxs30_ltred_3class.png" width="700">
 
+
+## Future Work
+The following items will be implemented to complete the tool chain
+- Random Forest Class Classifier, KNN and multi layer perceptons
+- Metrics and visualations for regression problems
  
 
 ## Issues
