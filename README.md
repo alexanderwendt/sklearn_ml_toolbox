@@ -43,6 +43,15 @@ trend of the swedish OMXS30 stock index was selected. From the raw data, future 
 to recognize the correct trend, which is simple when looking backward, but hard in advance or in the current moment. The trend is classified 
 in a positive and a negative trend.
 
+The raw input data has the following format
+Date | Open | High | Low | Close 
+--- | --- | --- | --- |--- |
+1986-09-30 | 125 | 125 | 125 | 125
+1986-10-01 | 125 | 125.93 | 125.93 | 125.93
+1986-10-02 | 125.93 | 126.25 | 126.25 | 126.25
+1986-10-03 | 126.25 | 126.68 | 126.68 | 126.68
+
+
 ### Feature and Outcomes Generation Step 2X
 For raw data, sometimes, it is necessary to generate features or outcomes. In step 2X, Feature generation as well as outcome generation is applied.
 In the data preparation, the y values are generated if applicable. 
@@ -52,7 +61,7 @@ In the data preparation, the y values are generated if applicable.
 In the OMXS30 example, the positive trend is illustrated as orange and the negative 
 trend is blue. The long-term trend has been defined automatically by combining a top-bottom recognition algorithm with Lowess.
 
-<img src="doc/saved_images/S20_omxs30_tb_Groud_Truth_LongTrend_two_class_graph.png" width="700">
+<img src="doc/saved_images/S20_omxs30_tb_Groud_Truth_LongTrend_two_class_graph.png" width="900">
 
 #### step20_generate_groundtruth_stockmarket_from_annotation.py
 If the outcomes are not automatically generated, they can be loaded from a csv file instead.
@@ -84,8 +93,8 @@ Prepared features and labels are loaded from files. The following cleaning steps
 
 In this module, each feature is plotted and visualized with median and means like below.
 
-<img src="doc/saved_images/omxs30_lt_25-MA200Norm.png" width="300">
-<img src="doc/saved_images/omxs30_lt_3-LongTrend.png" width="300">
+<img src="doc/saved_images/omxs30_lt_25-MA200Norm.png" width="400">
+<img src="doc/saved_images/omxs30_lt_3-LongTrend.png" width="400">
 
 The outcome in this example is "LongTrend". From the graph, it is visible that the classes are skewed. There are twice as many values of "positive trend" as 
 "negative trend".
@@ -122,37 +131,48 @@ In this case, probably the standard parameters can be used.
 Several tools and graphs analyze and visualize different charactersics of the data to create an understanding of its structure.
 
 Spearman Correlation
-<img src="doc/saved_images/Spearman_Correlation_Plot.png" width="600">
+
+<img src="doc/saved_images/Spearman_Correlation_Plot.png" width="700">
 
 Scatterplot Matrix
-<img src="doc/saved_images/Scatter-Matrix.png" width="600">
+
+<img src="doc/saved_images/Scatter-Matrix.png" width="700">
 
 Pairplot
-<img src="doc/saved_images/Pairplot.png" width="600">
+
+<img src="doc/saved_images/Pairplot.png" width="700">
 
 Correlation strength between features and outcome
-<img src="doc/saved_images/omxs30_ltred_Correlation_Strength.png" width="600">
+
+<img src="doc/saved_images/omxs30_ltred_Correlation_Strength.png" width="400">
 
 Hierarchical Linkage
+
 <img src="doc/saved_images/Hierarchical_Linkage.png" width="600">
 
 Parallel coordinates of selected features
-<img src="doc/saved_images/Parallel_Coordinates.png" width="600">
+
+<img src="doc/saved_images/Parallel_Coordinates.png" width="700">
 
 T-SNE unsupervised grouping of data
+
 <img src="doc/saved_images/T-SNE_Plot.png" width="600">
 
 UMAP unsupervised clustering
+
 <img src="doc/saved_images/UMAP_Unsupervised.png" width="600">
 
 UMAP supervised clustering
+
 <img src="doc/saved_images/UMAP_Supervised.png" width="600">
 
 PCA Plot
+
 <img src="doc/saved_images/PCA_Plot.png" width="600">
 
 PCA Variance Coverage. Plots the number of composed features that are necessary to cover 95% of the variance of the data. 
 It shows that it is possible to reduce the number of features from 36 to 9.
+
 <img src="doc/saved_images/PCA_Variance_Coverage.png" width="600">
 
 #### step34_analyze_temporal_data.py
@@ -162,13 +182,18 @@ For time series, chart tools are available for plotting auto correlations of the
 #### step35_perform_feature_selection.py
 Feature selection is done by using several different methods to get the most significant features and adding them to a list of features. This list is then tested in the model optimization step. The following feature selection methods are used:
 - Logistic regression with lasso (L1) regulaization 
-<img src="doc/saved_images/omxs30_ltred_Lasso_Model_Weights.png" width="500">
+
+<img src="doc/saved_images/omxs30_ltred_Lasso_Model_Weights.png" width="400">
+
 - Tree based feature selection 
-<img src="doc/saved_images/omxs30_ltred_Tree_Based_Importance.png" width="500">
+
+<img src="doc/saved_images/omxs30_ltred_Tree_Based_Importance.png" width="400">
+
 - Backward Elimination
 - Recursive Elimination with Logistic Regression
 
 All extracted features are merged into a data frame, similar to the following image for each feature extraction method.
+
 <img src="doc/saved_images/Significant_Features_OMXS30.jpg" width="600">
 
 Finally, the prepared dataset and the extracted features are stored.
@@ -402,8 +427,10 @@ With th system trained, like this, is it possible to make money with this system
 In the prediction, the model from the training phase is loaded and used for prediction of the unknown data. 
 
 #### step70_predict_temporal_data.py
+This function is similar to the evaluation function and provides the inference for a chart. Looking at the last date 2021-01-26, the trend is predicted
+to be positive.
 
-<img src="doc/saved_images/S50_OMXS30_Prediction.png" width="700">
+<img src="doc/saved_images/InferenceInference_omxs30_ltred_3class.png" width="700">
 
  
 
