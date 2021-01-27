@@ -64,11 +64,13 @@ np.set_printoptions(suppress=True)
 parser = argparse.ArgumentParser(description='Step 7 - Predict Temporal Data')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
+parser.add_argument("-sec", '--config_section', default="Evaluation",
+                    help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
 
 
-def visualize_temporal_data(config_path):
+def visualize_temporal_data(config_path, config_section):
     # Load intermediate model, which has only been trained on training data
     # Get data
     # Load file paths
@@ -76,7 +78,7 @@ def visualize_temporal_data(config_path):
     config = sup.load_config(config_path)
     #paths, model, train, test = step40.load_training_files(paths_path)
 
-    X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config)
+    X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
 
     y_classes = labels #train['label_map']
 
@@ -84,7 +86,7 @@ def visualize_temporal_data(config_path):
     source_path = config['Evaluation'].get('source_in') #paths['source_path']
     result_directory = config['Paths'].get('result_directory')
 
-    figure_path_prefix = result_directory + '/evaluation/' + model_name
+    figure_path_prefix = result_directory + '/evaluation/' + title + "_"
     if not os.path.isdir(result_directory + '/evaluation'):
         os.makedirs(result_directory + '/evaluation')
         print("Created folder: ", result_directory + '/evaluation')
@@ -123,6 +125,6 @@ def visualize_temporal_data(config_path):
 
 
 if __name__ == "__main__":
-    visualize_temporal_data(args.config_path)
+    visualize_temporal_data(args.config_path, args.config_section)
 
     print("=== Program end ===")

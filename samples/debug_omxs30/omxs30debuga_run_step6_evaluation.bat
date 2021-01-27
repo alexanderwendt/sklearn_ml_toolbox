@@ -33,6 +33,9 @@ echo #=================================================#
 echo #=================================================#
 echo # Model Evaluation for Temporal Datasets #
 echo #=================================================#
+python %script_prefix%\step60_evaluate_model.py --config_path=%config_file% --config_section="EvaluationTraining"
+python %script_prefix%\step61_evaluate_model_temporal_data.py --config_path=%config_file% --config_section="EvaluationTraining"
+
 python %script_prefix%\step60_evaluate_model.py --config_path=%config_file%
 python %script_prefix%\step61_evaluate_model_temporal_data.py --config_path=%config_file%
 

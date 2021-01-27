@@ -64,11 +64,13 @@ np.set_printoptions(suppress=True)
 parser = argparse.ArgumentParser(description='Step 5.0 - Evaluate Model for Temporal Data')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
+parser.add_argument("-sec", '--config_section', default="Evaluation",
+                    help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
 
 
-def visualize_temporal_data(config_path):
+def visualize_temporal_data(config_path, config_section):
     # Load intermediate model, which has only been trained on training data
     # Get data
     # Load file paths
@@ -76,23 +78,16 @@ def visualize_temporal_data(config_path):
     config = sup.load_config(config_path)
     #paths, model, train, test = step40.load_training_files(paths_path)
 
-    X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config)
-
-    #X_train = train['X']
-    #y_train = train['y']
-    #X_test = test['X']
-    #y_test = test['y']
+    X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
     y_classes = labels #train['label_map']
 
-    #svm_pipe_final_selection = prepared_data['paths']['svm_pipe_final_selection']
-    #svm_evaluation_model_filepath = paths['svm_evaluated_model_filename']
-    #svm_external_parameters_filename = paths['svm_external_parameters_filename']
-    #model_directory = paths['model_directory']
+    title = config.get(config_section, 'title')
+
     model_name = config['Common'].get('dataset_name')
     source_path = config['Evaluation'].get('source_in') #paths['source_path']
     result_directory = config['Paths'].get('result_directory')
 
-    figure_path_prefix = result_directory + '/evaluation/' + model_name
+    figure_path_prefix = result_directory + '/evaluation/' + title + "_"
     if not os.path.isdir(result_directory + '/evaluation'):
         os.makedirs(result_directory + '/evaluation')
         print("Created folder: ", result_directory + '/evaluation')
@@ -138,33 +133,25 @@ def visualize_temporal_data(config_path):
 
 
     #Visualize the results
-    print("Plot fpr training data")
-    #vis.plot_three_class_graph(y_order_train_pred['y'].values,
-    #                           df_time_graph['Close'][y_order_train.index],
-    #                           df_time_graph['Date'][y_order_train.index], 0, 0, 0,
-    #                           ('close', 'neutral', 'positive', 'negative'),
-    #                           save_fig_prefix=figure_path_prefix + "_train_")
-    #vis.plot_two_class_graph(y_order_train, y_order_train_pred,
-    #                         save_fig_prefix=figure_path_prefix + "_train_")
-
-
     print("Plot for test data")
     vis.plot_three_class_graph(y_order_test['y'].values,
                                df_time_graph['Close'][y_order_test.index],
                                df_time_graph['Date'][y_order_test.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
-                               save_fig_prefix=figure_path_prefix + "_test_gt")
+                               title=title + "_GT_" + model_name,
+                               save_fig_prefix=figure_path_prefix)
 
     vis.plot_three_class_graph(y_order_test_pred['y'].values,
                                df_time_graph['Close'][y_order_test.index],
                                df_time_graph['Date'][y_order_test.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
-                               save_fig_prefix=figure_path_prefix + "_test_")
+                               title=title + "_Pred_" + model_name,
+                               save_fig_prefix=figure_path_prefix)
     #vis.plot_two_class_graph(y_order_test, y_order_test_pred,
     #                         save_fig_prefix=figure_path_prefix + "_test_")
 
 
 if __name__ == "__main__":
-    visualize_temporal_data(args.config_path)
+    visualize_temporal_data(args.config_path, args.config_section)
 
     print("=== Program end ===")

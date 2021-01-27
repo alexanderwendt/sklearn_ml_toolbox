@@ -40,10 +40,15 @@ echo #=================================================#
 echo # Training Model for Temporal Datasets #
 echo #=================================================#
 python %script_prefix%\step50_train_model_from_pipe.py --config_path=%config_file%
+rem train the final model
+python %script_prefix%\step50_train_model_from_pipe.py --config_path=%config_file% --config_section="ModelFinal"
 
 echo #=================================================#
 echo # Model Evaluation for Temporal Datasets #
 echo #=================================================#
+python %script_prefix%\step60_evaluate_model.py --config_path=%config_file% --config_section="EvaluationTraining"
+python %script_prefix%\step61_evaluate_model_temporal_data.py --config_path=%config_file% --config_section="EvaluationTraining"
+
 python %script_prefix%\step60_evaluate_model.py --config_path=%config_file%
 python %script_prefix%\step61_evaluate_model_temporal_data.py --config_path=%config_file%
 

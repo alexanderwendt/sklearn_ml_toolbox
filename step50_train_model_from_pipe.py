@@ -63,20 +63,22 @@ np.set_printoptions(suppress=True)
 parser = argparse.ArgumentParser(description='Step 4.7 - Train evaluation model for final testing')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
+parser.add_argument("-sec", '--config_section', default="Model",
+                    help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
 
-def load_data(conf):
+def load_data(conf, config_section="Model"):
     '''
 
 
     '''
 
-    X_train_path = conf['Model'].get('features_in')
-    y_train_path = conf['Model'].get('outcomes_in')
-    labels_path = conf['Model'].get('labels_in')
-    pipeline_in = conf['Model'].get('pipeline_in')
-    ext_param_in = conf['Model'].get('ext_param_in')
+    X_train_path = conf[config_section].get('features_in')
+    y_train_path = conf[config_section].get('outcomes_in')
+    labels_path = conf[config_section].get('labels_in')
+    pipeline_in = conf[config_section].get('pipeline_in')
+    ext_param_in = conf[config_section].get('ext_param_in')
 
     # Load X and y
     X_train, _, y_train = exe.load_data(X_train_path, y_train_path)
@@ -90,7 +92,7 @@ def load_data(conf):
 
     return X_train, y_train, pipe
 
-def train_final_model(config_path):
+def train_final_model(config_path, config_section="Evaluation"):
     # Get data
     config = sup.load_config(config_path)
     #paths, model, train, test = step40.load_training_files(paths_path)
@@ -108,7 +110,7 @@ def train_final_model(config_path):
     #y_classes = train['label_map']
 
     #svm_pipe_final_selection = paths['svm_pipe_final_selection']
-    svm_final_model_filepath = config['Model'].get('model_out') #paths['svm_final_model_filename']
+    svm_final_model_filepath = config[config_section].get('model_out') #paths['svm_final_model_filename']
     #model_directory = paths['model_directory']
     #model_name = paths['dataset_name']
 
@@ -154,7 +156,7 @@ def train_final_model(config_path):
 
 if __name__ == "__main__":
 
-    train_final_model(args.config_path)
+    train_final_model(args.config_path, args.config_section)
 
 
     print("=== Program end ===")

@@ -25,17 +25,17 @@ class Metrics:
 
         return scorers
 
-def load_evaluation_data(conf):
+def load_evaluation_data(conf, config_section="Evaluation"):
     '''
 
 
     '''
 
-    X_path = conf['Evaluation'].get('features_in')
-    y_path = conf['Evaluation'].get('outcomes_in')
-    labels_path = conf['Evaluation'].get('labels_in')
-    model_in = conf['Evaluation'].get('model_in')
-    ext_param_in = conf['Evaluation'].get('ext_param_in')
+    X_path = conf[config_section].get('features_in')
+    y_path = conf[config_section].get('outcomes_in')
+    labels_path = conf[config_section].get('labels_in')
+    model_in = conf[config_section].get('model_in')
+    ext_param_in = conf[config_section].get('ext_param_in')
 
     # Load X and y
     X_val, _, y_val = exe.load_data(X_path, y_path)

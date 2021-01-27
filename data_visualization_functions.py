@@ -781,7 +781,7 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
 
 
 
-def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, save_fig_prefix=None):
+def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, title_prefix="", save_fig_prefix=None):
     """
     plots the precision recall curve and shows the current value for each
     by identifying the classifier's threshold (t).
@@ -796,7 +796,7 @@ def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, 
 
     # plot the curve
     plt.figure(figsize=(8, 8))
-    plt.title("Precision and Recall curve ^ = current threshold")
+    plt.title(title_prefix + "Precision and Recall curve ^ = current threshold")
     plt.step(r, p, color='b', alpha=0.2, where='post')
     plt.fill_between(r, p, step='post', alpha=0.2, color='b')
     plt.ylim([0.5, 1.01]);
@@ -814,7 +814,7 @@ def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, 
     plt.pause(0.1)
     plt.close()
 
-def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_threshold, save_fig_prefix=None):
+def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_threshold, title_prefix="", save_fig_prefix=None):
     """
     Modified from:
     Hands-On Machine learning with Scikit-Learn
@@ -823,7 +823,7 @@ def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_
     #https://towardsdatascience.com/fine-tuning-a-classifier-in-scikit-learn-66e048c21e65
     """
     plt.figure(figsize=(8, 8))
-    plt.title("Precision and Recall Scores as a function of the decision threshold")
+    plt.title(title_prefix + "Precision and Recall Scores as a function of the decision threshold")
     plt.plot(thresholds, precisions[:-1], "b--", label="Precision")
     plt.plot(thresholds, recalls[:-1], "g-", label="Recall")
     close_default_clf = np.argmin(np.abs(thresholds - optimal_threshold))
@@ -840,14 +840,14 @@ def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_
     plt.pause(0.1)
     plt.close()
 
-def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
+def plot_roc_curve(fpr, tpr, label=None, title_prefix="", save_fig_prefix=None):
     """
     The ROC curve, modified from
     Hands-On Machine learning with Scikit-Learn and TensorFlow; p.91
     #https://towardsdatascience.com/fine-tuning-a-classifier-in-scikit-learn-66e048c21e65
     """
     plt.figure(figsize=(8,8))
-    plt.title('ROC Curve')
+    plt.title(title_prefix + 'ROC Curve')
     plt.plot(fpr, tpr, linewidth=2, label=label)
     plt.plot([0, 1], [0, 1], 'k--')
     #plt.plot(closest_zero_p, closest_zero_r, 'o', markersize = 12, fillstyle = 'none', c='r', mew=3)
@@ -864,7 +864,7 @@ def plot_roc_curve(fpr, tpr, label=None, save_fig_prefix=None):
     plt.pause(0.1)
     plt.close()
 
-def plot_decision_boundary(X, y, model, save_fig_prefix=None):
+def plot_decision_boundary(X, y, model, title_prefix="", save_fig_prefix=None):
     X_Train_embedded = TSNE(n_components=2).fit_transform(X)
     print(X_Train_embedded.shape)
     # model = LogisticRegression().fit(X,y)
@@ -887,7 +887,7 @@ def plot_decision_boundary(X, y, model, save_fig_prefix=None):
     plt.figure(figsize=(11.5, 7))
     plt.contourf(xx, yy, voronoiBackground)
     plt.scatter(X_Train_embedded[:, 0], X_Train_embedded[:, 1], c=y)
-    plt.title("Decision Boundary Plot Projected")
+    plt.title(title_prefix + "Decision Boundary Plot Projected")
 
     if save_fig_prefix != None:
         plt.savefig(save_fig_prefix + '_decision_boundary_plot')

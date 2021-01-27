@@ -65,6 +65,8 @@ np.set_printoptions(suppress=True)
 parser = argparse.ArgumentParser(description='Step 6.0 - Evaluation model')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
+parser.add_argument("-sec", '--config_section', default="Evaluation",
+                    help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
 
@@ -98,7 +100,7 @@ args = parser.parse_args()
 #     return X_val, y_val, labels, model, external_params
 
 
-def evaluate_model(config_path):
+def evaluate_model(config_path, config_section="Evaluation"):
     '''
 
 
@@ -106,14 +108,15 @@ def evaluate_model(config_path):
     # Get data
     config = sup.load_config(config_path)
 
-    X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config)
-
+    X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
     y_classes = labels #train['label_map']
 
     result_directory = config['Paths'].get('result_directory')
     model_name = config['Common'].get('dataset_name')
 
-    figure_path_prefix = result_directory + '/model_images/' + model_name
+    title = config.get(config_section, 'title')
+
+    figure_path_prefix = result_directory + '/model_images/' + title + "_"
     if not os.path.isdir(result_directory + '/model_images'):
         os.makedirs(result_directory + '/model_images')
         print("Created folder: ", result_directory + '/model_images')
@@ -123,12 +126,6 @@ def evaluate_model(config_path):
     print("Loaded precision/recall threshold: ", pr_threshold)
 
     # Load model
-
-    #print("Predict training data")
-    #y_train_pred = clf.predict(X_train.values)
-    #y_train_pred_scores = clf.decision_function(X_train.values)
-    #y_train_pred_proba = clf.predict_proba(X_train.values)
-
     print("Predict validation data")
     y_test_pred = model.predict(X_val.values)
     #If there is an error here, set model_pipe['svm'].probability = True
@@ -148,31 +145,29 @@ def evaluate_model(config_path):
         y_test_pred_adjust = y_test_pred
         print("This is a multi class problem. No precision/recall adjustment of scores are made.")
 
-    #print("Model training finished")
-
     #Plot graphs
     #If binary class plot precision/recall
     # Plot the precision and the recall together with the selected value for the test set
     if len(y_classes) == 2:
         print("Plot precision recall graphs")
         precision, recall, thresholds = precision_recall_curve(y_val, y_test_pred_scores)
-        vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold, save_fig_prefix=figure_path_prefix + "_step46_")
+        vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold, title_prefix=title + "_", save_fig_prefix=figure_path_prefix)
 
     #Plot evaluation
     #vis.plot_precision_recall_evaluation(y_train, y_train_pred_adjust, y_train_pred_proba, reduced_class_dict_train,
     #                                 save_fig_prefix=figure_path_prefix + "_step46_train_")
     vis.plot_precision_recall_evaluation(y_val, y_test_pred_adjust, y_test_pred_proba, reduced_class_dict_test,
-                                     save_fig_prefix=figure_path_prefix + "_step46_test_")
+                                         title_prefix=title + "_", save_fig_prefix=figure_path_prefix)
     #Plot decision boundary plot
     X_decision = X_val.values[0:1000, :]
     y_decision = y_val[0:1000]
-    vis.plot_decision_boundary(X_decision, y_decision, model, save_fig_prefix=figure_path_prefix + "_step60_test_")
+    vis.plot_decision_boundary(X_decision, y_decision, model, title_prefix=title + "_", save_fig_prefix=figure_path_prefix)
 
     print("Visualization complete")
 
 
 if __name__ == "__main__":
-    evaluate_model(args.config_path)
+    evaluate_model(args.config_path, args.config_section)
 
 
     print("=== Program end ===")

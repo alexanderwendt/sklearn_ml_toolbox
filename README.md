@@ -203,6 +203,7 @@ to estimate the effort of training. In the case of an Support Vector Machine, it
 
 Test training results as a function of the number of samples to determine the minimum training size. The question to be answer is how much data is needed to flatten the
 learning curve.
+
 <img src="doc/saved_images/SVM_F1_Samples.png" width="300">
 
 #### step43_wide_hyperparameter_search_svm.py
@@ -284,11 +285,11 @@ Proportion of the different scalers in the top 10% of the results
 
 Statistical difference significance matrix (0 for the same distribution, 1 for different distribution)
 
-<img src="doc/saved_images/_feat__significance_matrix.png" width="500">
+<img src="doc/saved_images/_feat__cols_significance_matrix.png" width="500">
 
 Distributions of the scalers for the result range (f1) 
 
-<img src="doc/saved_images/_feat__overlayed_histograms.png" width="500">
+<img src="doc/saved_images/_feat__cols_overlayed_histograms" width="500">
 
 In out case, the algorithm selected the following pipline:
 - Best scaler:  QuantileTransformer()
@@ -301,57 +302,51 @@ Exhaustive parameter selection through narrow grid search. Only continuous param
 search for tuning parameters. Only a few samples are used and low kfold just to find the parameter limits. The parameters of C and gamma are selected wide.
 
 
-To focus the search on hyper parameters C and gamma with a wide range. The optimization is divided into several runs where the top 10% are selected after each run with
+To focus the search on hyper parameters C and gamma with a wide range. The optimization is divided into several runs where the top results are selected after each run with
 more data.
 
 For gamma and C the range was selected [1e-5, 1e5]. In the first run less samples were run 100 iterations and 2 folds with the random search. The results show the top 10% 
-of the runs. The range is reduced significantly.
+of the runs. The x best results are selected for the next run. The range is reduced significantly.
 
 <img src="doc/saved_images/omxs30_ltred_run2_subrun_0_samples200_fold2_iter100_sel10.png" width="400">
 
-The second run
+The second run with x samples, y iterations and z folds. The x best results are selected for the next run. The range is further.
 
 <img src="doc/saved_images/omxs30_ltred_run2_subrun_1_samples400_fold3_iter100_sel10" width="400">
 
+The third run with x samples, y iterations and z folds. The x best results are selected for the next run. The range is further.
 
-The optimal range has been found (white)
+<img src="doc/saved_images/omxs30_ltred_run2_subrun_1_samples400_fold3_iter100_sel10" width="400">
 
-<img src="doc/saved_images/S40_OMXS30_run2_2D_graph.png" width="400">
+From the narrow search, the following pipeline produces the best results:
 
-As the optimal range is found, the limits of C and gamma are adjusted to cover the top 10 results.
+In out case, the algorithm selected the following pipline:
+- Best scaler:  QuantileTransformer()
+- Best sampler:  ADASYN()
+- Best feature selection:  Tree
+- Best kernel:  rbf
+- C=774.3554617473495
+- gamma=1.2555871653599182
 
-Run 3: Randomized space search to find optimal maximum. Within the best 10 results with a samples, many iterations with random search are performed. 
-
-First e.g. 2000 samples are tested and the 50 best are selected as boundary. 
-
-<img src="doc/saved_images/S40_OMXS30_run3_Random1.png" width="300">
-
-Then, in a second iteration another 6000 are tested within the new boundary. These values are the base for the deep search.
-
-<img src="doc/saved_images/S40_OMXS30_run3_Random2.png" width="300">
-
-Run 4: Run best parameters from the intense random search. In the final run, based on the random points with only less samples, more and more samples are tested, but less configurations to finally find the best parameter configuration. 
-
-1st iteration with 400 samples and the best 50 are selected
-
-<img src="doc/saved_images/S40_OMXS30_run4_Iter1.png" width="300">
-
-2nd iteration with 1000 samples and the best 10 are selected
-
-<img src="doc/saved_images/S40_OMXS30_run4_Iter2.png" width="300">
-
-3rd iteration with 6000 samples and the best 3 are selected
-
-<img src="doc/saved_images/S40_OMXS30_run4_Iter3.png" width="300">
-
-The result of run 4 is the best parameter combination.
-
-TODO: Implement bayesian optimization.
 
 #### step45_define_precision_recall.py
-The training data is split in a new training set and a cross validation set (shuffled and stratified). The training set is trained with the optimal parameters. On the cross validation data, the precision/recall curve is optimized as seen below. The decision threshold is moved in the optimal direction.
+The training data is split in a new training set and a cross validation set (shuffled and stratified). The training set is trained with the optimal 
+parameters. On the cross validation data, the precision/recall curve is optimized as seen below. The decision threshold is moved in the optimal 
+direction.
 
-<img src="doc/saved_images/S40_OMXS30_Precision_Recall.png" width="500">
+Precision/Recall curve
+
+<img src="doc/saved_images/omxs30_ltred_step46_test__pr_curve.png" width="500">
+
+ROC curve
+
+<img src="doc/saved_images/omxs30_ltred_step46_test__roc_curve.png" width="500">
+
+Precision/Recall threshold
+
+<img src="doc/saved_images/omxs30_ltred_step46__pr_scores_of_decision_threshold.png" width="500">
+
+In our example with binary classes, the precision/recall threshold was XXX
 
 ### Train model 5X
 As all hyperparameters have been set, the next step is to train a model with complete pipline.
@@ -365,13 +360,18 @@ and is trained on all available data. It is to expect that the more data is used
 The model is trained with the complete training data and the optimal parameters.
 
 #### step60_evaluate_model.py
-Then it is evaluated on the validation data. The results are shown in a confusion matrix.
+Then, it is evaluated on the validation data. The results are shown in a confusion matrix.
 
 <img src="doc/saved_images/S40_OMXS30_Eval_Conf_Matrix.png" width="300">
 
 The prediction for the OMXS30 example is visualized together with the correct values. The correct values are shown in green above the price, i.e. the positive trend and the predicted values in yellow.
 
 <img src="doc/saved_images/S40_OMXS30_Results.png" width="700">
+
+Decision boundary plot
+
+<img src="doc/saved_images/omxs30_ltred_step46__pr_scores_of_decision_threshold.png" width="700">
+
 
 #### step61_evaluate_model_temporal_data.py
 For temporal data like stock market data, this script offers the possibility to validate the predictions on the chart.
