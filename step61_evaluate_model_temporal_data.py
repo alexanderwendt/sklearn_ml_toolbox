@@ -87,7 +87,7 @@ def visualize_temporal_data(config_path, config_section):
     source_path = config['Evaluation'].get('source_in') #paths['source_path']
     result_directory = config['Paths'].get('result_directory')
 
-    figure_path_prefix = result_directory + '/evaluation/' + title + "_"
+    figure_path_prefix = result_directory + '/evaluation'
     if not os.path.isdir(result_directory + '/evaluation'):
         os.makedirs(result_directory + '/evaluation')
         print("Created folder: ", result_directory + '/evaluation')
@@ -99,9 +99,6 @@ def visualize_temporal_data(config_path, config_section):
     print("Loaded precision/recall threshold: {0:.2f}".format(pr_threshold))
 
     # Open evaluation model
-    #evalclf = joblib.load(svm_evaluation_model_filepath)
-    #print("Loaded trained evaluation model from ", svm_evaluation_model_filepath)
-    #print("Model", evalclf)
 
     # Make predictions
     #y_train_pred_scores = evalclf.decision_function(X_train.values)
@@ -147,8 +144,6 @@ def visualize_temporal_data(config_path, config_section):
                                ('close', 'neutral', 'positive', 'negative'),
                                title=title + "_Pred_" + model_name,
                                save_fig_prefix=figure_path_prefix)
-    #vis.plot_two_class_graph(y_order_test, y_order_test_pred,
-    #                         save_fig_prefix=figure_path_prefix + "_test_")
 
 
 if __name__ == "__main__":

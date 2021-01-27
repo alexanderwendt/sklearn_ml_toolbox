@@ -305,28 +305,28 @@ search for tuning parameters. Only a few samples are used and low kfold just to 
 To focus the search on hyper parameters C and gamma with a wide range. The optimization is divided into several runs where the top results are selected after each run with
 more data.
 
-For gamma and C the range was selected [1e-5, 1e5]. In the first run less samples were run 100 iterations and 2 folds with the random search. The results show the top 10% 
-of the runs. The x best results are selected for the next run. The range is reduced significantly.
+For gamma and C the range was selected [1e-5, 1e5]. In the first run 1337 (40%) samples were run 4000 iterations and 3 folds with the random search. The results show the top 10% 
+of the runs. The 100 best results are selected for the next run. The range is reduced significantly.
 
-<img src="doc/saved_images/omxs30_ltred_run2_subrun_0_samples200_fold2_iter100_sel10.png" width="400">
+<img src="doc/saved_images/_run2_subrun_0_samples1337_fold3_iter4000_sel100.png" width="400">
 
-The second run with x samples, y iterations and z folds. The x best results are selected for the next run. The range is further.
+The second run with 2674 samples, 2000 iterations and 5 folds. The 50 best results are selected for the next run. The range is further.
 
-<img src="doc/saved_images/omxs30_ltred_run2_subrun_1_samples400_fold3_iter100_sel10" width="400">
+<img src="doc/saved_images/_run2_subrun_1_samples2674_fold5_iter2000_sel50.png" width="400">
 
-The third run with x samples, y iterations and z folds. The x best results are selected for the next run. The range is further.
+The third run with 6685 samples, 100 iterations and 5 folds. The 20 best results are selected for the next run. The range is further.
 
-<img src="doc/saved_images/omxs30_ltred_run2_subrun_1_samples400_fold3_iter100_sel10" width="400">
+<img src="doc/saved_images/_run2_subrun_2_samples6685_fold5_iter100_sel20.png" width="400">
 
 From the narrow search, the following pipeline produces the best results:
 
 In out case, the algorithm selected the following pipline:
 - Best scaler:  QuantileTransformer()
 - Best sampler:  ADASYN()
-- Best feature selection:  Tree
+- Best feature selection: Tree
 - Best kernel:  rbf
-- C=774.3554617473495
-- gamma=1.2555871653599182
+- C=2786.3123139377217
+- gamma=0.6169115526350926
 
 
 #### step45_define_precision_recall.py
@@ -334,48 +334,69 @@ The training data is split in a new training set and a cross validation set (shu
 parameters. On the cross validation data, the precision/recall curve is optimized as seen below. The decision threshold is moved in the optimal 
 direction.
 
-Precision/Recall curve
+Precision/Recall curve for validation data
 
-<img src="doc/saved_images/omxs30_ltred_step46_test__pr_curve.png" width="500">
+<img src="doc/saved_images/Val__pr_curve.png" width="500">
 
 ROC curve
 
-<img src="doc/saved_images/omxs30_ltred_step46_test__roc_curve.png" width="500">
+<img src="doc/saved_images/Val__roc_curve.png" width="500">
 
-Precision/Recall threshold
+Precision/Recall threshold for validation data
 
-<img src="doc/saved_images/omxs30_ltred_step46__pr_scores_of_decision_threshold.png" width="500">
+<img src="doc/saved_images/Val__pr_scores_of_decision_threshold.png" width="500">
 
-In our example with binary classes, the precision/recall threshold was XXX
+In our example with binary classes, the precision/recall threshold was -0.14
 
 ### Train model 5X
 As all hyperparameters have been set, the next step is to train a model with complete pipline.
 
 #### step50_train_model_from_pipe.py
 The script takes a pipe from the hyperparameter optimization and trains it on the data. For the complete process, two models will be needed: the first model is
-trained on the training data only. It will be used for validation with the validation data that was split in step 3. The second model will be used for inference
+trained on the training data only. It will be used for validation with the validation data that was split in step 3X. The second model will be used for inference
 and is trained on all available data. It is to expect that the more data is used for training, the better the model gets.
 
 ### Validation and Evaluation 6X
 The model is trained with the complete training data and the optimal parameters.
 
 #### step60_evaluate_model.py
-Then, it is evaluated on the validation data. The results are shown in a confusion matrix.
+Then, the model is evaluated on the training and validation data. The results are shown in a confusion matrix. The folloing image shows the comfusion matrix. 
+The model almost perfectly fits the data.
 
-<img src="doc/saved_images/S40_OMXS30_Eval_Conf_Matrix.png" width="300">
+<img src="doc/saved_images/Train__confusion_matrix.png" width="300">
 
-The prediction for the OMXS30 example is visualized together with the correct values. The correct values are shown in green above the price, i.e. the positive trend and the predicted values in yellow.
+The confusion matrix for the test data.
 
-<img src="doc/saved_images/S40_OMXS30_Results.png" width="700">
+<img src="doc/saved_images/Val__confusion_matrix.png" width="300">
 
-Decision boundary plot
+From the confusion matrices, it is visible that the classifier overfits the data
 
-<img src="doc/saved_images/omxs30_ltred_step46__pr_scores_of_decision_threshold.png" width="700">
+Decision boundary plot to see how well the classifier fits the data.
+
+<img src="doc/saved_images/Val__decision_boundary_plot.png" width="700">
 
 
 #### step61_evaluate_model_temporal_data.py
 For temporal data like stock market data, this script offers the possibility to validate the predictions on the chart.
 
+This graph shows the ground thuth of the training data, followed by the prediction of the training data. The prediction almost perfectly fits the 
+training data.
+
+<img src="doc/saved_images/Train_GT_omxs30_ltred_3class.png" width="700">
+
+Prediction on training data.
+
+<img src="doc/saved_images/Train_Pred_omxs30_ltred_3class.png" width="700">
+
+The validation ground truth is shown here.
+
+<img src="doc/saved_images/Val_GT_omxs30_ltred_3class.png" width="700">
+
+The prediction on the validation data confirms the overfitting shown in the confusion matrix. 
+
+<img src="doc/saved_images/Val_Pred_omxs30_ltred_3class.png" width="700">
+
+With th system trained, like this, is it possible to make money with this system?
 
 ### Prediction 7X
 In the prediction, the model from the training phase is loaded and used for prediction of the unknown data. 

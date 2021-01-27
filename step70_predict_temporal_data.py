@@ -77,6 +77,7 @@ def visualize_temporal_data(config_path, config_section):
     #paths, model, train, test = step40.load_training_files(paths_path)
     config = sup.load_config(config_path)
     #paths, model, train, test = step40.load_training_files(paths_path)
+    title = config.get(config_section, 'title')
 
     X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
 
@@ -86,7 +87,7 @@ def visualize_temporal_data(config_path, config_section):
     source_path = config['Evaluation'].get('source_in') #paths['source_path']
     result_directory = config['Paths'].get('result_directory')
 
-    figure_path_prefix = result_directory + '/evaluation/' + title + "_"
+    figure_path_prefix = result_directory + '/evaluation'
     if not os.path.isdir(result_directory + '/evaluation'):
         os.makedirs(result_directory + '/evaluation')
         print("Created folder: ", result_directory + '/evaluation')
@@ -119,7 +120,8 @@ def visualize_temporal_data(config_path, config_section):
                                df_time_graph['Close'][y_order_test_pred.index],
                                df_time_graph['Date'][y_order_test_pred.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
-                               save_fig_prefix=figure_path_prefix + "_inference_")
+                               title=title + "Inference_" + model_name,
+                               save_fig_prefix=figure_path_prefix)
     #vis.plot_two_class_graph(y_order_test, y_order_test_pred,
     #                         save_fig_prefix=figure_path_prefix + "_test_")
 

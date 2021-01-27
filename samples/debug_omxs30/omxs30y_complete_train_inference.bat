@@ -11,13 +11,6 @@ call omxs30debugx_run_step100_complete_training.bat
 
 
 echo ##################################################################
-echo # Start Training of the Complete Model                           #
-echo ##################################################################
-
-call omxs30debugx_run_step100_train_final_model.bat
-
-
-echo ##################################################################
 echo # Inference                                                      #
 echo ##################################################################
 
