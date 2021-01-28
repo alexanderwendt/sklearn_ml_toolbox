@@ -1,4 +1,4 @@
-# The Machine Learning Toolbox
+# The SKLearn Machine Learning Toolbox
 The Machine Learning Toolbox represents a complete tool-chain of data preparation, data analysis, model training and prediction of unknown data. 
 The machine learning toolbox is supposed to be used for primary small and middle sized, structured datasets. 
 
