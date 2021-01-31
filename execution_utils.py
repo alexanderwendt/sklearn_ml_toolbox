@@ -398,6 +398,7 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
                          SMOTETomek(),
                          ADASYN()]
         test_C = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
+        test_C_linear = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]
 
         # gamma default parameters
         param_scale = 1 / (X_train.shape[1] * np.mean(X_train.var()))
@@ -408,7 +409,14 @@ def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_nam
                 'sampling': test_sampling,
                 'feat__cols': selected_features,
                 'svm__C': test_C,  # default C=1
-                'svm__kernel': ['linear', 'sigmoid']
+                'svm__kernel': ['sigmoid']
+            },
+            {
+                'scaler': test_scaler,
+                'sampling': test_sampling,
+                'feat__cols': selected_features,
+                'svm__C': test_C_linear,  # default C=1
+                'svm__kernel': ['linear']
             },
             {
                 'scaler': test_scaler,
