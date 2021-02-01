@@ -29,6 +29,8 @@ import os
 
 # Libs
 import argparse
+import warnings
+
 from pandas.plotting import register_matplotlib_converters
 import pickle
 from pickle import dump
@@ -133,10 +135,18 @@ def execute_wide_search(config, use_debug_parameters=False):
     '''
 
     subset_share = float(config['Training'].get('subset_share')) #0.1
+    max_features = int(config.get('Training', 'max_features'))
 
     # Load complete training input
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
+    
+    reduced_selected_features = []
+    for flist in selected_features:
+        if max_features >= len(flist):
+            reduced_selected_features.append(flist)
+        else:
+            warnings.warn("Too many features for the SVM. Remove this features list")
 
     results_file_path = paths['svm_run1_result_filename']
     if not os.path.isdir(os.path.dirname(results_file_path)):
