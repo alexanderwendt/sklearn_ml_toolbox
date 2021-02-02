@@ -146,7 +146,8 @@ def execute_wide_search(config, use_debug_parameters=False):
         if max_features >= len(flist):
             reduced_selected_features.append(flist)
         else:
-            warnings.warn("Too many features for the SVM. Remove this features list")
+            warnings.warn("Too many features for the SVM. Max features are " +
+                          str(max_features) + ". Remove this features list with length " + str(len(flist)))
 
     results_file_path = paths['svm_run1_result_filename']
     if not os.path.isdir(os.path.dirname(results_file_path)):
