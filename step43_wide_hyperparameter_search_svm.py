@@ -157,7 +157,7 @@ def execute_wide_search(config, use_debug_parameters=False):
     # Define parameters as an array of dicts in case different parameters are used for different optimizations
     params_debug = [{'scaler': [StandardScaler()],
                      'sampling': [modelutil.Nosampler(), SMOTE(), SMOTEENN(), ADASYN()],
-                     'feat__cols': selected_features[0:2],
+                     'feat__cols': reduced_selected_features[0:2],
                      'svm__kernel': ['linear'],
                      'svm__C': [0.1, 1, 10],
                      'svm__gamma': [0.1, 1, 10],
@@ -165,7 +165,7 @@ def execute_wide_search(config, use_debug_parameters=False):
                     {
                         'scaler': [StandardScaler(), Normalizer()],
                         'sampling': [modelutil.Nosampler()],
-                        'feat__cols': selected_features[0:1],
+                        'feat__cols': reduced_selected_features[0:1],
                         'svm__C': [1],  # default C=1
                         'svm__kernel': ['rbf'],
                         'svm__gamma': [1]
@@ -174,13 +174,13 @@ def execute_wide_search(config, use_debug_parameters=False):
 
     if use_debug_parameters:
         grid_search_run1, params_run1, pipe_run1, results_run1 = exe.run_basic_svm(X_train, y_train,
-                                                                                      selected_features,
+                                                                                      reduced_selected_features,
                                                                                       scorers, refit_scorer_name,
                                                                                       subset_share=0.01, n_splits=2,
                                                                                       parameters=params_debug)
     else:
 
-        grid_search_run1, params_run1, pipe_run1, results_run1 = exe.run_basic_svm(X_train, y_train, selected_features,
+        grid_search_run1, params_run1, pipe_run1, results_run1 = exe.run_basic_svm(X_train, y_train, reduced_selected_features,
                                                                               scorers, refit_scorer_name,
                                                                               subset_share=subset_share, n_splits=3,
                                                                               )
