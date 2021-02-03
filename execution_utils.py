@@ -315,8 +315,8 @@ def estimate_training_duration(model_clf, X_train, y_train, X_test, y_test, samp
         model_clf.fit(X_train_subset.values, y_train_subset)
         elapsed = time.time() - t
         durations.append(elapsed)
-        y_test_pred = model_clf.predict(X_test)
-        score = model_clf.score(X_test,
+        y_test_pred = model_clf.predict(X_test.values)
+        score = model_clf.score(X_test.values,
                                 y_test)  # f1_score(y_test, y_test_pred, average=f1_average_method)  # Micro, consider skewed data for the whole dataset
         scores.append(score)
         print("Training of {} examples; duration {}s; f1-score={}".format(i, np.round(elapsed, 3), np.round(score, 3)))

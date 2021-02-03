@@ -26,14 +26,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 # Built-in/Generic Imports
 #import os
+import sys
 
 # Libs
 import argparse
 import os
+import logging
 
 import numpy as np
 from pandas.plotting import register_matplotlib_converters
 from sklearn.svm import SVC
+from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
 
 # Own modules
@@ -60,11 +63,22 @@ np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(message)s',
+                    datefmt='%Y%m%d %H:%M:%S',
+                    handlers=[logging.FileHandler("logs/" + "test" + ".log"), logging.StreamHandler()])
+log = logging.getLogger(__name__)
+
+
 parser = argparse.ArgumentParser(description='Step 4 - Calculate predictions for training like estimated time')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
+parser.add_argument("-algo", '--algorithm', default="svm",
+                    help='Select algorithm to test: SVM (svm) or XGBoost (xgboost). Deafult: SVM.', required=False)
 
 args = parser.parse_args()
+
+
 
 
 # def load_input(conf):
@@ -108,7 +122,7 @@ args = parser.parse_args()
 #     return X_train, y_train, X_val, y_val, y_classes, scorer
 
 
-def run_training_estimation(X_train, y_train, X_test, y_test, scorer, image_save_directory=None):
+def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf, image_save_directory=None):
     '''
     Run estimation of scorer (default f1) and duration dependent of subset size of input data
 
@@ -133,7 +147,7 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, image_save
 
     # SVM model
     # Define the model
-    model_clf = SVC()
+
     xaxis, durations, scores = exe.estimate_training_duration(model_clf, X_train, y_train, X_test, y_test, test_range, scorer)
 
     # Paint figure
@@ -167,7 +181,7 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, image_save
     plt.pause(0.1)
     plt.close()
 
-def run_training_predictors(data_input_path):
+def run_training_predictors(data_input_path, algorithm):
     '''
 
 
@@ -187,7 +201,15 @@ def run_training_predictors(data_input_path):
     baseline_results = exe.execute_baseline_classifier(X_train, y_train, X_val, y_val, y_classes, scorer)
     print("Baseline results=", baseline_results)
 
-    run_training_estimation(X_train, y_train, X_val, y_val, scorer, save_fig_prefix)
+    #Set classifier and estimate performance
+    if algorithm=='xgboost':
+        model_clf = XGBClassifier(objective="binary:logistic", random_state=42)
+        log.info("XBoost Classifier selected.")
+    else:
+        model_clf = SVC()
+        log.info("SVM (deafult) classifier selected.")
+
+    run_training_estimation(X_train, y_train, X_val, y_val, scorer, model_clf, save_fig_prefix)
 
 
 if __name__ == "__main__":
@@ -196,6 +218,6 @@ if __name__ == "__main__":
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
     # Execute wide search
-    run_training_predictors(data_input_path=args.config_path)
+    run_training_predictors(args.config_path, args.algorithm)
 
     print("=== Program end ===")
