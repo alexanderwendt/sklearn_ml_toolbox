@@ -9,6 +9,12 @@ copied are referenced by the url.
 Machine Learning algorithms from the Scikit Learn library are used in the implementations.
 
 ## Setup
+create a conda virtual environment called sklearn
+```
+conda create -n sklearn python=3.8
+```
+
+
 In a python 3.6+ environment, run 
 ```shell
 pip install -r requirements.txt
