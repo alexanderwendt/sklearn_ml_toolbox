@@ -18,6 +18,9 @@ import sklearn_utils as modelutil
 from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
 # from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
+
+import xgboost as xgb
+
 from sklearn.model_selection import GridSearchCV
 import numpy as np
 import pandas as pd
@@ -354,6 +357,58 @@ def get_top_median_method(method_name, model_results, refit_scorer_name, top_sha
                                                              model_results, refit_scorer_name)
 
     return median_values, source
+
+
+def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, model,
+                    subset_share=0.1, n_splits=5):
+    '''
+    Run a SKLearn model
+
+
+    '''
+
+    # Create a subset to train on
+    print("[Step 1]: Create a data subset")
+    subset_min = 300  # Minimal subset is 100 samples.
+
+    if subset_share * X_train.shape[0] < subset_min:
+        number_of_samples = subset_min
+        print("minimal number of samples used: ", number_of_samples)
+    else:
+        number_of_samples = subset_share * X_train.shape[0]
+
+    X_train_subset, y_train_subset = modelutil.extract_data_subset(X_train, y_train, number_of_samples)
+    print("Got subset sizes X train: {} and y train: {}".format(X_train_subset.shape, y_train_subset.shape))
+
+    # Main pipeline for the grid search
+    pipe_run1 = Pipeline([
+        ('imputer', SimpleImputer(missing_values=np.nan, strategy='median')),
+        ('scaler', StandardScaler()),
+        ('sampling', modelutil.Nosampler()),
+        ('feat', modelutil.ColumnExtractor(cols=None)),
+        ('model', model)
+    ])
+
+    print("Pipeline: ", pipe_run1)
+
+    print("Stratified KFold={} used.".format(n_splits))
+    # INFO: KFold Splitter with shuffle=True to get random values
+    skf = StratifiedKFold(n_splits=n_splits, random_state=3, shuffle=True)
+
+    pipe_run1 = pipe_run1
+    params_run1 = parameters  # params_debug #params_run1
+    grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=2, cv=skf, scoring=scorers, refit=refit_scorer_name,
+                                    return_train_score=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
+
+    # grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=1, cv=skf, scoring=scorers, refit=refit_scorer_name,
+    #                                return_train_score=True, iid=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
+
+    results_run1 = modelutil.generate_result_table(grid_search_run1, params_run1, refit_scorer_name)
+    print("Result size=", results_run1.shape)
+    print("Number of NaN results: {}. Replace them with 0".format(
+        np.sum(results_run1['mean_test_' + refit_scorer_name].isna())))
+
+    return grid_search_run1, params_run1, pipe_run1, results_run1
 
 
 def run_basic_svm(X_train, y_train, selected_features, scorers, refit_scorer_name, subset_share=0.1, n_splits=5,

@@ -7,3 +7,6 @@
 /data_omxs30_longterm
 /logs
 /samples/debug_omxs30/logs
+/samples/debug_omxs30/data_prepared
+/samples/debug_omxs30/models
+/samples/debug_omxs30/results

@@ -5,7 +5,7 @@ echo #===========================================#
 rem define config file to use
 set config_file="config/debug_timedata_omxS30_inference.ini"
 set script_prefix="..\.."
-set env="scikit"
+set env="sklearn"
 
 echo setup environment %env%
 call conda activate %env%

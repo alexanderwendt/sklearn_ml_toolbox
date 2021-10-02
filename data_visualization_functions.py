@@ -18,7 +18,27 @@ from statsmodels.stats.diagnostic import acorr_ljungbox
 
 import data_handling_support_functions as sup
 
+def save_figure(figure, image_save_directory=None, filename="Image_file_name", show_image=False, dpi=300):
+    """
+    Save and show figure
+
+    """
+    if image_save_directory:
+        if not os.path.isdir(image_save_directory):
+            os.makedirs(image_save_directory)
+        plt.savefig(os.path.join(image_save_directory, filename), dpi=dpi)
+
+    if show_image:
+        plt.show(block = False)
+        plt.pause(0.1)
+        plt.close()
+
+
 def paintBarChartForMissingValues(xlabels, yvalues):
+    """
+
+
+    """
     # Create the figure
     fig = plt.figure(num=None, figsize=(8, 8), dpi=80, facecolor='w', edgecolor='k')
 
