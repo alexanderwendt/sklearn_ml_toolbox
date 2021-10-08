@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
 
-import data_visualization_functions as vis
+#import data_visualization_functions as vis
 
 
 def load_source(source_path):

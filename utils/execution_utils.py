@@ -13,7 +13,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import f1_score
 import time
 import random
-import sklearn_utils as modelutil
+import utils.sklearn_utils as modelutil
 
 from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
 # from sklearn.pipeline import Pipeline
@@ -56,8 +56,8 @@ from scipy.stats import reciprocal
 from scipy.stats import randint as sp_randint
 from sklearn.model_selection import RandomizedSearchCV
 
-import data_handling_support_functions as sup
-from evaluation_utils import Metrics
+import utils.data_handling_support_functions as sup
+from utils.metrics import Metrics
 from filepaths import Paths
 
 

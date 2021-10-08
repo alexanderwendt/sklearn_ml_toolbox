@@ -51,8 +51,8 @@ from sklearn import preprocessing
 from pandas.plotting import register_matplotlib_converters
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -182,24 +182,29 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     plt.hlines(0.95, 0, len(pca_trafo.explained_variance_ratio_.cumsum()), colors='red', linestyles='solid',
                label='95% variance covered')
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'PCA_Variance_Coverage'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='PCA_Variance_Coverage')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'PCA_Variance_Coverage'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
     fig = plt.figure()
     sns.heatmap(np.log(pca_trafo.inverse_transform(np.eye(X_scaled.shape[1]))), cmap="hot", cbar=True)
     necessary_components = pca_trafo.explained_variance_ratio_.cumsum()[pca_trafo.explained_variance_ratio_.cumsum() < 0.95]
     print("95% variance covered with the {} first components. Values={}".format(len(necessary_components), necessary_components))
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'PCA_Heatmap'), dpi=300)
+
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='PCA_Heatmap')
+
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'PCA_Heatmap'), dpi=300)
 
 
     plt.figure(figsize=(10, 10))
@@ -211,14 +216,16 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     plt.xlabel('Component 1')
     plt.ylabel('Component 2')
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'PCA_Plot'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='PCA_Plot')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'PCA_Plot'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
 def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
@@ -233,57 +240,65 @@ def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
     vis.plotUmap(embeddingUnsupervised, y, list(class_labels.values()), 'Dataset unsupervised clustering',
                  cmapString='RdYlGn')
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'UMAP_Unsupervised'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='UMAP_Unsupervised')
 
-    plt.show(block = False)
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'UMAP_Unsupervised'), dpi=300)
+
+    #plt.show(block = False)
 
     vis.plotUmap(embeddingSupervised, y, list(class_labels.values()), 'Dataset supervised clustering')
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'UMAP_Supervised'), dpi=300)
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='UMAP_Supervised')
+
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'UMAP_Supervised'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
-def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
-    # Optimize t-sne plot
-    #tne_gridsearch = False
-    # Create a TSNE grid search with two variables
-    perplex = [5, 10, 30, 50, 100]
-    exaggregation = [5, 12, 20, 50, 100]
-    # learning_rate = [10, 50, 200]
-    fig, axarr = plt.subplots(len(perplex), len(exaggregation), figsize=(15, 15))
-    #if tne_gridsearch == True:
-    # for m,l in enumerate(learning_rate):
-    for k, p in enumerate(perplex):
-        # print("i {}, p {}".format(i, p))
-        for j, e in enumerate(exaggregation):
-            # print("j {}, e {}".format(j, e))
-            X_embedded = TSNE(n_components=2, perplexity=p, early_exaggeration=e, n_iter=5000,
-                              n_iter_without_progress=1000, learning_rate=10).fit_transform(
-                X_scaled_subset)
-
-            for i, t in enumerate(set(y_scaled_subset)):
-                idx = y_scaled_subset == t
-                axarr[k, j].scatter(X_embedded[idx, 0], X_embedded[idx, 1], label=class_labels[t])
-
-            axarr[k, j].set_title("p={}, e={}".format(p, e))
-
-            # clear_output(wait=True)
-            print('perplex paramater={}/{}, exaggregation parameterj={}/{}'.format(k, len(perplex), j,
-                                                                                   len(exaggregation)))
-    fig.subplots_adjust(hspace=0.3)
-
-    plt.gcf()
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+# def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
+#     # Optimize t-sne plot
+#     #tne_gridsearch = False
+#     # Create a TSNE grid search with two variables
+#     perplex = [5, 10, 30, 50, 100]
+#     exaggregation = [5, 12, 20, 50, 100]
+#     # learning_rate = [10, 50, 200]
+#     fig, axarr = plt.subplots(len(perplex), len(exaggregation), figsize=(15, 15))
+#     #if tne_gridsearch == True:
+#     # for m,l in enumerate(learning_rate):
+#     for k, p in enumerate(perplex):
+#         # print("i {}, p {}".format(i, p))
+#         for j, e in enumerate(exaggregation):
+#             # print("j {}, e {}".format(j, e))
+#             X_embedded = TSNE(n_components=2, perplexity=p, early_exaggeration=e, n_iter=5000,
+#                               n_iter_without_progress=1000, learning_rate=10).fit_transform(
+#                 X_scaled_subset)
+#
+#             for i, t in enumerate(set(y_scaled_subset)):
+#                 idx = y_scaled_subset == t
+#                 axarr[k, j].scatter(X_embedded[idx, 0], X_embedded[idx, 1], label=class_labels[t])
+#
+#             axarr[k, j].set_title("p={}, e={}".format(p, e))
+#
+#             # clear_output(wait=True)
+#             print('perplex paramater={}/{}, exaggregation parameterj={}/{}'.format(k, len(perplex), j,
+#                                                                                    len(exaggregation)))
+#     fig.subplots_adjust(hspace=0.3)
+#
+#     plt.gcf()
+#
+#     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='UMAP_Supervised')
+#
+#     plt.show(block = False)
+#     plt.pause(0.1)
+#     plt.close()
 
 
 def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_directory):
@@ -313,14 +328,16 @@ def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_
     # adjust_text(texts, force_points=0.2, force_text=0.2, expand_points=(1,1), expand_text=(1,1), arrowprops=dict(arrowstyle="-", color='black', lw=0.5))
     plt.legend(bbox_to_anchor=(1, 1));
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'T-SNE_Plot'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='T-SNE_Plot')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'T-SNE_Plot'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
 def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_save_directory):
@@ -384,15 +401,16 @@ def plot_parallel_coordinates(df, cols, colours, comparison_name, conf, image_sa
         bbox_to_anchor=(1.2, 1), loc=2, borderaxespad=0.)
 
     plt.title("Values of attributes by category")
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='Parallel_Coordinates')
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'Parallel_Coordinates'), dpi=300)
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'Parallel_Coordinates'), dpi=300)
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
 def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
@@ -409,14 +427,16 @@ def plot_hierarchical_linkage(X_scaled, conf, image_save_directory):
 
     label_order = corr_matrix.iloc[:, g.dendrogram_row.reordered_ind].columns
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'Hierarchical_Linkage'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='Hierarchical_Linkage')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #       os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'Hierarchical_Linkage'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
 def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
@@ -426,14 +446,16 @@ def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
     print(corr)
     plt.gcf()
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Correlation_Strength'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='Correlation_Strength')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Correlation_Strength'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
 def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
@@ -447,14 +469,16 @@ def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
     plt.xticks(rotation=90)
     plt.colorbar()
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'Spearman_Correlation_Plot'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='Spearman_Correlation_Plot')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'Spearman_Correlation_Plot'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
 def plot_correlation_matrix2(conf, image_save_directory, total_values):
@@ -472,14 +496,17 @@ def plot_correlation_matrix2(conf, image_save_directory, total_values):
     # FIXME: Legend is incorrect shown. Only numbers instead of class names
     g.add_legend()
     g.set(alpha=0.5)
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'Pairplot'), dpi=300)
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='Pairplot')
+
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'Pairplot'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 def plot_correlation_matrix(conf, features, image_save_directory, total_values):
     # Select column values to use in the correlation plot
@@ -505,13 +532,15 @@ def plot_correlation_matrix(conf, features, image_save_directory, total_values):
             # to make sure y axis names are outside the plot area
             ax.yaxis.labelpad = 50
     # plt.yticks(rotation=90)
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, "Scatter-Matrix"), dpi=300)
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename="Scatter-Matrix")
+
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, "Scatter-Matrix"), dpi=300)
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 
 def rescale(conf, features, y):

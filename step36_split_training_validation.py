@@ -37,8 +37,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, precision_recall_curve, auc, make_scorer, recall_score, accuracy_score, precision_score, f1_score, confusion_matrix
 
 # Own modules
-#import data_visualization_functions as vis
-import data_handling_support_functions as sup
+#import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
 from filepaths import Paths
 
 __author__ = 'Alexander Wendt'

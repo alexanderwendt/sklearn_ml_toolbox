@@ -34,15 +34,15 @@ import json
 import joblib
 import pandas as pd
 import matplotlib.dates as mdates
-import sklearn_utils as model_util
+import utils.sklearn_utils as model_util
 from pandas.plotting import register_matplotlib_converters
 import numpy as np
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
-import execution_utils as step40
-import evaluation_utils as eval
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
+import utils.execution_utils as step40
+import utils.evaluation_utils as eval
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \

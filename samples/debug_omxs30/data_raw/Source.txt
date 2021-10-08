@@ -1,0 +1,3 @@
+Th swedish stock index OMXS30 is used as a data source.
+Dataset source: http://www.nasdaqomxnordic.com/indexes/historical_prices?Instrument=SE0000337842
+

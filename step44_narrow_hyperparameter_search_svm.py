@@ -41,8 +41,7 @@ import pickle
 
 #from IPython.core.display import display
 
-import execution_utils as exe
-import data_visualization_functions_for_SVM as svmvis
+#import utils.execution_utils as exe
 import matplotlib.pyplot as plt
 
 ## %% First run with a wide grid search
@@ -51,19 +50,12 @@ from pickle import dump
 
 #import sklearn_utils as modelutil
 import numpy as np
-#import copy
-
-#from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
-#from imblearn.over_sampling import SMOTE
-#from imblearn.over_sampling import ADASYN
-#from imblearn.over_sampling import RandomOverSampler
-#from imblearn.combine import SMOTEENN
-#from imblearn.combine import SMOTETomek
 
 # Own modules
-#import data_visualization_functions as vis
-import data_handling_support_functions as sup
-import execution_utils as exe
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
+import utils.execution_utils as exe
+import utils.data_visualization_functions_for_SVM as svmvis
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -145,11 +137,15 @@ def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter
 
         plt.gca()
         plt.tight_layout()
-        plt.savefig(save_fig_prefix + '_' + 'run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
-                    + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection), dpi=300)
-        plt.show(block = False)
-        plt.pause(0.01)
-        plt.close()
+
+        vis.save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
+                    + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection))
+
+        #plt.savefig(save_fig_prefix + '_' + 'run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
+        #            + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection), dpi=300)
+        #plt.show(block = False)
+        #plt.pause(0.01)
+        #plt.close()
 
         print("===============================================================")
 

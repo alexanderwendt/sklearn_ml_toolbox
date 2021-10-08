@@ -36,7 +36,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 from sklearn.model_selection import train_test_split
 
-import sklearn_utils as model_util
+import utils.sklearn_utils as model_util
 
 import argparse
 from pandas.plotting import register_matplotlib_converters
@@ -45,9 +45,9 @@ import pickle
 import numpy as np
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
-import execution_utils as exe
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
+import utils.execution_utils as exe
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \

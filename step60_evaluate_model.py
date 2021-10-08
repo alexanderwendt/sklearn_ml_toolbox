@@ -33,17 +33,16 @@ import time
 import json
 import joblib
 from sklearn.metrics import precision_recall_curve
-import sklearn_utils as model_util
+import utils.sklearn_utils as model_util
 import argparse
 from pandas.plotting import register_matplotlib_converters
 import pickle
 import numpy as np
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
-import execution_utils as exe
-import evaluation_utils as eval
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
+import utils.evaluation_utils as evalutil
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -108,15 +107,15 @@ def evaluate_model(config_path, config_section="Evaluation"):
     # Get data
     config = sup.load_config(config_path)
 
-    X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
+    X_val, y_val, labels, model, external_params = evalutil.load_evaluation_data(config, config_section)
     y_classes = labels #train['label_map']
 
     result_directory = config['Paths'].get('result_directory')
-    model_name = config['Common'].get('dataset_name')
+    #model_name = config['Common'].get('dataset_name')
 
     title = config.get(config_section, 'title')
 
-    figure_path_prefix = result_directory + '/model_images/' + title + "_"
+    figure_path_prefix = result_directory + '/model_images/' + title
     if not os.path.isdir(result_directory + '/model_images'):
         os.makedirs(result_directory + '/model_images')
         print("Created folder: ", result_directory + '/model_images')
@@ -151,13 +150,13 @@ def evaluate_model(config_path, config_section="Evaluation"):
     if len(y_classes) == 2:
         print("Plot precision recall graphs")
         precision, recall, thresholds = precision_recall_curve(y_val, y_test_pred_scores)
-        vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold, title_prefix=title + "_", save_fig_prefix=figure_path_prefix)
+        vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold, save_fig_prefix=figure_path_prefix)
 
     #Plot evaluation
     #vis.plot_precision_recall_evaluation(y_train, y_train_pred_adjust, y_train_pred_proba, reduced_class_dict_train,
     #                                 save_fig_prefix=figure_path_prefix + "_step46_train_")
     vis.plot_precision_recall_evaluation(y_val, y_test_pred_adjust, y_test_pred_proba, reduced_class_dict_test,
-                                         title_prefix=title + "_", save_fig_prefix=figure_path_prefix)
+                                         save_fig_prefix=figure_path_prefix)
     #Plot decision boundary plot
     X_decision = X_val.values[0:1000, :]
     y_decision = y_val[0:1000]

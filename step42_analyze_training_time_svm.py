@@ -40,11 +40,11 @@ from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
 
 # Own modules
-#import data_visualization_functions as vis
+import utils.data_visualization_functions as vis
 #import data_handling_support_functions as sup
-import execution_utils as exe
-from evaluation_utils import Metrics
-import data_handling_support_functions as sup
+import utils.execution_utils as exe
+from utils.metrics import Metrics
+import utils.data_handling_support_functions as sup
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -157,14 +157,16 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
     plt.ylabel('Duration [s]')
     plt.title("Training Duration")
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'SVM_Duration_Samples'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='SVM_Duration_Samples')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'SVM_Duration_Samples'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
     plt.figure()
     plt.plot(xaxis, scores)
@@ -172,14 +174,16 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
     plt.ylabel('F1-Score on cross validation set (=the rest). Size={}'.format(X_test.shape[0]))
     plt.title("F1 Score Improvement With More Data")
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, 'SVM_F1_Samples'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='SVM_F1_Samples')
 
-    plt.show(block = False)
-    plt.pause(0.1)
-    plt.close()
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, 'SVM_F1_Samples'), dpi=300)
+
+    #plt.show(block = False)
+    #plt.pause(0.1)
+    #plt.close()
 
 def run_training_predictors(data_input_path, algorithm):
     '''

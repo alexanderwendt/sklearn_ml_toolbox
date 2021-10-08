@@ -45,8 +45,8 @@ from sklearn.linear_model import LogisticRegressionCV
 from sklearn.feature_selection import RFE
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -105,12 +105,14 @@ def execute_lasso_feature_selection(X_scaled, y, conf, image_save_directory):
     plt.title("Feature importance using Lasso Model")
     plt.tight_layout()
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Lasso_Model_Weights'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename="Lasso_Model_Weights")
 
-    plt.show(block = False)
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Lasso_Model_Weights'), dpi=300)
+
+    #plt.show(block = False)
 
     return coefList
 
@@ -146,12 +148,14 @@ def execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory)
     plt.vlines(threshold, 0, len(X_scaled.columns), color='red')
     plt.tight_layout()
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Tree_Based_Importance'), dpi=300)
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename="Tree_Based_Importance")
 
-    plt.show(block = False)
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_Tree_Based_Importance'), dpi=300)
+
+    #plt.show(block = False)
 
     return treecoefList
 
@@ -197,7 +201,7 @@ def execute_recursive_elimination_feature_selection(X_scaled, y):
     model = LogisticRegressionCV(solver='liblinear', cv=3)
     print("Start Recursive Elimination. Fit model with {} examples.".format(X_scaled.shape[0]))
     # Initializing RFE model, 3 features selected
-    rfe = RFE(model, 1)  # It has to be one to get a unique index
+    rfe = RFE(model)
     # Transforming data using RFE
     X_rfe = rfe.fit_transform(X_scaled, y)
     # Fitting the data to model
@@ -290,10 +294,10 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
                                                                                   y[X_train_index_subset])
     relevantFeatureList.extend(relevant_features)
 
-    step_size = np.round(len(X_scaled.columns) / 4, 0).astype("int")
+    step_size = np.round(len(X_scaled.columns) / 4, 0).astype(int)
     for i in range(step_size, len(X_scaled.columns), step_size):
         selected_feature_list = selected_feature_list.append(
-            pd.Series(name='RecursiveTop' + str(i), data=rfe_coef.loc[0:i - 1]))
+            pd.Series(name='RecursiveTop' + str(i), data=rfe_coef.iloc[0:i-1]).reset_index()['RecursiveTop' + str(i)])
         print('Created RecursiveTop{}'.format(str(i)))
 
     ### Add the top coloums from all methods

@@ -40,8 +40,8 @@ import numpy as np
 
 # Own modules
 #import data_vsualization_functions as vis
-import data_handling_support_functions as sup
-import execution_utils as exe
+import utils.data_handling_support_functions as sup
+import utils.execution_utils as exe
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \

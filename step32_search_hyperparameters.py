@@ -42,7 +42,8 @@ import pandas as pd
 import numpy as np
 
 # Own modules
-import data_handling_support_functions as sup
+import utils.data_handling_support_functions as sup
+import utils.data_visualization_functions as vis
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -96,15 +97,18 @@ def find_tsne_parmeters(X_scaled_subset, y_subset, class_labels, conf, image_sav
                                                                                    len(exaggregation)))
     fig.subplots_adjust(hspace=0.3)
 
-    plt.gcf()
+    tsne_param_fig = plt.gcf()
 
-    if image_save_directory:
-        if not os.path.isdir(image_save_directory):
-            os.makedirs(image_save_directory)
-        plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_TSNE_Calibration_Plot'), dpi=300)
+    vis.save_figure(tsne_param_fig, image_save_directory=image_save_directory,
+                    filename=conf['Common'].get('dataset_name') + '_TSNE_Calibration_Plot')
+
+    #if image_save_directory:
+    #    if not os.path.isdir(image_save_directory):
+    #        os.makedirs(image_save_directory)
+    #    plt.savefig(os.path.join(image_save_directory, conf['Common'].get('dataset_name') + '_TSNE_Calibration_Plot'), dpi=300)
 
 
-    plt.show(block = False)
+    #plt.show(block = False)
 
 
 def main(config_path):

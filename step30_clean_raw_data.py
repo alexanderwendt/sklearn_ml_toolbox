@@ -39,8 +39,8 @@ from pandas.core.dtypes.common import is_string_dtype
 from pandas.plotting import register_matplotlib_converters
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -213,12 +213,15 @@ def print_characteristics(features_raw, image_save_directory, dataset_name, save
             fig = vis.paintHistogram(features_raw, features_raw.columns[i])
 
         plt.figure(fig.number)
-        if save_graphs == True:
-            plt.savefig(
-                image_save_directory + '/' + 'feature_{}-{}'.format(i, features_raw.columns[i]),
-                dpi=300)
-        plt.show(block = False)
-        plt.close()
+
+        vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='feature_{}-{}'.format(i, features_raw.columns[i]))
+
+        #if save_graphs == True:
+        #    plt.savefig(
+        #        image_save_directory + '/' + 'feature_{}-{}'.format(i, features_raw.columns[i]),
+        #        dpi=300)
+        #plt.show(block = False)
+        #plt.close()
 
 
 def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_name, no_images=False, on_inference_data=False):

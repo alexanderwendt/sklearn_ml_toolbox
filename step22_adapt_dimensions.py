@@ -33,8 +33,8 @@ import numpy as np
 import argparse
 
 # Own modules
-import data_handling_support_functions as sup
-import custom_methods as custom
+import utils.data_handling_support_functions as sup
+import utils.custom_methods as custom
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \

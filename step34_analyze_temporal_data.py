@@ -38,8 +38,8 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \

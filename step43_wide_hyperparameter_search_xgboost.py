@@ -39,7 +39,7 @@ from pickle import dump
 from imblearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
-import sklearn_utils as modelutil
+import utils.sklearn_utils as modelutil
 import numpy as np
 import copy
 
@@ -51,10 +51,10 @@ from imblearn.combine import SMOTEENN
 from imblearn.combine import SMOTETomek
 
 # Own modules
-import data_visualization_functions as vis
-import data_handling_support_functions as sup
-import execution_utils as exe
-from evaluation_utils import Metrics
+import utils.data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
+import utils.execution_utils as exe
+from utils.metrics import Metrics
 from filepaths import Paths
 
 __author__ = 'Alexander Wendt'

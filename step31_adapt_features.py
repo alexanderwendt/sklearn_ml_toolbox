@@ -39,8 +39,8 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
 # Own modules
-import data_handling_support_functions as sup
-import data_visualization_functions as vis
+import utils.data_handling_support_functions as sup
+from utils import data_visualization_functions as vis
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -156,19 +156,24 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
 
     # Print missing value graph
     vis.paintBarChartForMissingValues(features.columns, missingValueShare)
+    barplot = plt.gcf()
+    vis.save_figure(plt.gcf(), image_save_directory=result_dir, filename=str(barplot.axes[0].get_title()).replace(' ', '_'))
 
     # Visualize missing data with missingno
     #fig = plt.figure(num=None, figsize=(8, 8), dpi=80, facecolor='w', edgecolor='k')
     msno.matrix(features)
-    plt.gcf()
-    plt.savefig(os.path.join(result_dir,'_missing_numbers_matrix'))
-    plt.show(block = False)
+    fig_matrix = plt.gcf()
+    vis.save_figure(fig_matrix, image_save_directory=result_dir, filename='missing_numbers_matrix')
+
+    #plt.savefig(os.path.join(result_dir,'_missing_numbers_matrix'))
+    #plt.show(block = False)
 
     if features.isnull().values.sum() > 0:
         plt.gcf()
         msno.heatmap(features)
-        plt.savefig(os.path.join(result_dir, '_missing_numbers_heatmap'))
-        plt.show(block = False)
+        vis.save_figure(plt.gcf(), image_save_directory=result_dir, filename='missing_numbers_heatmap')
+        #plt.savefig(os.path.join(result_dir, '_missing_numbers_heatmap'))
+        #plt.show(block = False)
 
     #### View Prepared Binary Features
     # We need some more plots for the binary data types.
