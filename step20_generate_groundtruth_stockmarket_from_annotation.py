@@ -493,16 +493,17 @@ def main(config_path):
     y_labels = pd.read_csv(conf["Paths"].get("labels_path"), sep=';', header=None).set_index(0).to_dict()[1]
 
     # Generating filenames for saving the files
-    image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_generation")
-    outcomes_filename_raw = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp_outcomes_uncut" + ".csv")
+    image_save_directory = os.path.join(conf['Paths'].get('results_directory'), "data_generation")
+    outcomes_filename_raw = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp", "temp_outcomes_uncut" + ".csv")
+    os.makedirs(os.path.dirname(outcomes_filename_raw), exist_ok=True)
 
-    if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
-        os.makedirs(conf['Paths'].get('prepared_data_directory'))
-        print("Created directory ", conf['Paths'].get('training_data_directory'))
+    #if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
+    ##    os.makedirs(conf['Paths'].get('prepared_data_directory'))
+    #    print("Created directory ", conf['Paths'].get('training_data_directory'))
 
-    if os.path.isdir(conf['Paths'].get('result_directory'))==False:
-        os.makedirs(conf['Paths'].get('result_directory'))
-        print("Created directory ", conf['Paths'].get('result_directory'))
+    #if os.path.isdir(conf['Paths'].get('results_directory'))==False:
+    #    os.makedirs(conf['Paths'].get('result_directory'))
+    #   print("Created directory ", conf['Paths'].get('result_directory'))
 
     #Load only a subset of the whole raw data to create a debug dataset
     source = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]

@@ -278,22 +278,23 @@ def main(config_path, on_inference_data, no_images):
 
     #if not on_inference_data:
     data_directory = conf['Paths'].get('prepared_data_directory')
-    result_directory = os.path.join(conf['Paths'].get('result_directory'), "data_preparation")
+    result_directory = os.path.join(conf['Paths'].get('results_directory'), "data_preparation")
     #annotations_filename = conf["Paths"].get("annotations_file")
 
-    if not os.path.isdir(result_directory):
-        os.makedirs(result_directory)
-        print("Created directory: ", result_directory)
+    #if not os.path.isdir(result_directory):
+    #    os.makedirs(result_directory)
+    #    print("Created directory: ", result_directory)
 
-    data_preparation_dump_file_path = os.path.join(data_directory, "step31out.pickle")
+    data_preparation_dump_file_path = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp", "step31out.pickle")
+    os.makedirs(os.path.dirname(data_preparation_dump_file_path), exist_ok=True)
     #if not os.path.isdir("tmp"):
     #    os.makedirs("tmp")
     #    print("Created directory: ", "tmp")
 
-    features_path = os.path.join(data_directory, conf['Preparation'].get('features_in'))
-    outcomes_path = os.path.join(data_directory, conf['Preparation'].get('outcomes_in'))
+    features_path = os.path.join(conf['Preparation'].get('features_in'))
+    outcomes_path = os.path.join(conf['Preparation'].get('outcomes_in'))
     labels_path = conf['Paths'].get('labels_path')
-    source_path = os.path.join(data_directory, conf['Preparation'].get('source_in'))
+    source_path = os.path.join(conf['Preparation'].get('source_in'))
 
     # Load files
     features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(features_path, outcomes_path, source_path, labels_path)

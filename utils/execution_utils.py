@@ -160,11 +160,11 @@ def load_training_input_input(conf):
 
     '''
     # Load input
-    X_train_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('features_train_in'))
-    y_train_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('outcomes_train_in'))
-    X_val_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('features_val_in'))
-    y_val_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('outcomes_val_in'))
-    labels_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('labels_in'))
+    X_train_path = os.path.join(conf['Training'].get('features_train_in'))
+    y_train_path = os.path.join(conf['Training'].get('outcomes_train_in'))
+    X_val_path = os.path.join(conf['Training'].get('features_val_in'))
+    y_val_path = os.path.join(conf['Training'].get('outcomes_val_in'))
+    labels_path = os.path.join(conf['Training'].get('labels_in'))
 
     X_train, _, y_train = load_data(X_train_path, y_train_path)
     X_val, _, y_val = load_data(X_val_path, y_val_path)
@@ -174,8 +174,7 @@ def load_training_input_input(conf):
     y_classes = labels  # train['label_map']
 
     print("Load feature columns")
-    feature_columns_path = os.path.join(conf['Paths'].get('prepared_data_directory'),
-                                        conf['Training'].get('selected_feature_columns_in'))
+    feature_columns_path = os.path.join(conf['Training'].get('selected_feature_columns_in'))
     selected_features, feature_dict, df_feature_columns = load_feature_columns(feature_columns_path, X_train)
 
     print("Load metrics")
@@ -184,7 +183,7 @@ def load_training_input_input(conf):
     refit_scorer_name = metrics.refit_scorer_name
 
     print("Load paths")
-    paths = Paths(conf).path
+    paths = Paths(conf).paths
 
     return X_train, y_train, X_val, y_val, y_classes, selected_features, feature_dict, paths, scorers, refit_scorer_name
 
@@ -359,8 +358,7 @@ def get_top_median_method(method_name, model_results, refit_scorer_name, top_sha
     return median_values, source
 
 
-def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, model,
-                    subset_share=0.1, n_splits=5):
+def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, pipeline, subset_share=0.1, n_splits=5):
     '''
     Run a SKLearn model
 
@@ -381,13 +379,14 @@ def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, mo
     print("Got subset sizes X train: {} and y train: {}".format(X_train_subset.shape, y_train_subset.shape))
 
     # Main pipeline for the grid search
-    pipe_run1 = Pipeline([
-        ('imputer', SimpleImputer(missing_values=np.nan, strategy='median')),
-        ('scaler', StandardScaler()),
-        ('sampling', modelutil.Nosampler()),
-        ('feat', modelutil.ColumnExtractor(cols=None)),
-        ('model', model)
-    ])
+    pipe_run1 = pipeline
+    #Pipeline([
+    #    ('imputer', SimpleImputer(missing_values=np.nan, strategy='median')),
+    #    ('scaler', StandardScaler()),
+    #    ('sampling', modelutil.Nosampler()),
+    #    ('feat', modelutil.ColumnExtractor(cols=None)),
+    #    ('model', model)
+    #])
 
     print("Pipeline: ", pipe_run1)
 
@@ -395,7 +394,7 @@ def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, mo
     # INFO: KFold Splitter with shuffle=True to get random values
     skf = StratifiedKFold(n_splits=n_splits, random_state=3, shuffle=True)
 
-    pipe_run1 = pipe_run1
+    #pipe_run1 = pipe_run1
     params_run1 = parameters  # params_debug #params_run1
     grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=2, cv=skf, scoring=scorers, refit=refit_scorer_name,
                                     return_train_score=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
@@ -544,7 +543,7 @@ def get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_s
         :parameter_svm: Continuous parameter range for continuous variables
 
     '''
-    best_kernel = str(pipe_run_best_first_selection['svm'].get_params()['kernel']).strip()
+    best_kernel = str(pipe_run_best_first_selection['model'].get_params()['kernel']).strip()
     print("Best kernel", best_kernel)
     print(pipe_run_best_first_selection)
     # Define pipeline, which is constant for all tests
@@ -553,34 +552,34 @@ def get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_s
     # Initial parameters
     if best_kernel == 'rbf':
         params_run2 = {
-            'svm__C': [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5],
-            'svm__gamma':
+            'model__C': [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5],
+            'model__gamma':
                 [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]
         }
     elif best_kernel == 'linear' or best_kernel == 'sigmoid':
         params_run2 = {
-            'svm__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
-            'svm__gamma': [1e0, 1.01e0]
+            'model__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
+            'model__gamma': [1e0, 1.01e0]
         }
     elif best_kernel == 'poly':
         params_run2 = {
-            'svm__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
-            'svm__gamma': [1e0, 1.01e0]
+            'model__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
+            'model__gamma': [1e0, 1.01e0]
         }
     else:
         raise Exception('wrong kernel:{}'.format(best_kernel))
     print("Parameters for kernel {} are {}".format(best_kernel, params_run2))
     # Get limits of the best values and focus in this area
     param_svm_C_minmax = pd.Series(
-        data=[np.min(params_run2['svm__C']),
-              np.max(params_run2['svm__C'])],
+        data=[np.min(params_run2['model__C']),
+              np.max(params_run2['model__C'])],
         index=['min', 'max'],
-        name='param_svm__C')
+        name='param_model__C')
     param_svm_gamma_minmax = pd.Series(data=[
-        np.min(params_run2['svm__gamma']),
-        np.max(params_run2['svm__gamma'])],
+        np.min(params_run2['model__gamma']),
+        np.max(params_run2['model__gamma'])],
         index=['min', 'max'],
-        name='param_svm__gamma')
+        name='param_model__gamma')
     parameter_svm = pd.DataFrame([param_svm_C_minmax, param_svm_gamma_minmax])
     print("The initial parameters are in this area")
     print(parameter_svm)
@@ -602,12 +601,12 @@ def generate_parameter_limits_for_SVM(results, plot_best=20):
     '''
     # Get limits of the best values and focus in this area
     param_svm_C_minmax = pd.Series(
-        data=[np.min(results['param_svm__C'].head(plot_best)), np.max(results['param_svm__C'].head(plot_best))],
-        index=['min', 'max'], name='param_svm__C')
+        data=[np.min(results['param_model__C'].head(plot_best)), np.max(results['param_model__C'].head(plot_best))],
+        index=['min', 'max'], name='param_model__C')
 
     param_svm_gamma_minmax = pd.Series(
-        data=[np.min(results['param_svm__gamma'].head(plot_best)), np.max(results['param_svm__gamma'].head(plot_best))],
-        index=['min', 'max'], name='param_svm__gamma')
+        data=[np.min(results['param_model__gamma'].head(plot_best)), np.max(results['param_model__gamma'].head(plot_best))],
+        index=['min', 'max'], name='param_model__gamma')
 
     parameter_svm = pd.DataFrame([param_svm_C_minmax, param_svm_gamma_minmax])
 
@@ -643,9 +642,9 @@ def run_random_cv_for_SVM(X_train, y_train, parameter_svm, pipe_run, scorers, re
     # Main set of parameters for the grid search run 2: Select solver parameter
     # Reciprocal for the logarithmic range
     params_run = {
-        'svm__C': reciprocal(parameter_svm.loc['param_svm__C']['min'], parameter_svm.loc['param_svm__C']['max']),
-        'svm__gamma': reciprocal(parameter_svm.loc['param_svm__gamma']['min'],
-                                 parameter_svm.loc['param_svm__gamma']['max'])
+        'model__C': reciprocal(parameter_svm.loc['param_model__C']['min'], parameter_svm.loc['param_model__C']['max']),
+        'model__gamma': reciprocal(parameter_svm.loc['param_model__gamma']['min'],
+                                 parameter_svm.loc['param_model__gamma']['max'])
     }
 
     # K-Fold settings

@@ -43,6 +43,7 @@ import numpy as np
 import utils.data_visualization_functions as vis
 import utils.data_handling_support_functions as sup
 import utils.evaluation_utils as evalutil
+from filepaths import Paths
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -64,7 +65,7 @@ np.set_printoptions(suppress=True)
 parser = argparse.ArgumentParser(description='Step 6.0 - Evaluation model')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
-parser.add_argument("-sec", '--config_section', default="Evaluation",
+parser.add_argument("-sec", '--config_section', default="EvaluationTraining",
                     help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
@@ -99,26 +100,28 @@ args = parser.parse_args()
 #     return X_val, y_val, labels, model, external_params
 
 
-def evaluate_model(config_path, config_section="Evaluation"):
+def evaluate_model(config_path, config_section="EvaluationTraining"):
     '''
 
 
     '''
     # Get data
     config = sup.load_config(config_path)
+    print("Load paths")
+    paths = Paths(config).paths
 
     X_val, y_val, labels, model, external_params = evalutil.load_evaluation_data(config, config_section)
     y_classes = labels #train['label_map']
 
-    result_directory = config['Paths'].get('result_directory')
+    result_directory = paths['results_directory']
     #model_name = config['Common'].get('dataset_name')
 
     title = config.get(config_section, 'title')
 
     figure_path_prefix = result_directory + '/model_images/' + title
-    if not os.path.isdir(result_directory + '/model_images'):
-        os.makedirs(result_directory + '/model_images')
-        print("Created folder: ", result_directory + '/model_images')
+    #if not os.path.isdir(result_directory + '/model_images'):
+    os.makedirs(result_directory + '/model_images', exist_ok=True)
+    #    print("Created folder: ", result_directory + '/model_images')
 
     # Load model external parameters
     pr_threshold = external_params['pr_threshold']
@@ -129,7 +132,7 @@ def evaluate_model(config_path, config_section="Evaluation"):
     y_test_pred = model.predict(X_val.values)
     #If there is an error here, set model_pipe['svm'].probability = True
     y_test_pred_proba = model.predict_proba(X_val.values)
-    y_test_pred_scores = model.decision_function(X_val.values)
+    y_test_pred_scores = y_test_pred_proba[:,1] #model.decision_function(X_val.values)
 
     #Reduce the number of classes only to classes that can be found in the data
     #reduced_class_dict_train = model_util.reduce_classes(y_classes, y_train, y_train_pred)
@@ -156,7 +159,7 @@ def evaluate_model(config_path, config_section="Evaluation"):
     #vis.plot_precision_recall_evaluation(y_train, y_train_pred_adjust, y_train_pred_proba, reduced_class_dict_train,
     #                                 save_fig_prefix=figure_path_prefix + "_step46_train_")
     vis.plot_precision_recall_evaluation(y_val, y_test_pred_adjust, y_test_pred_proba, reduced_class_dict_test,
-                                         save_fig_prefix=figure_path_prefix)
+                                         save_fig_prefix_dir=figure_path_prefix)
     #Plot decision boundary plot
     X_decision = X_val.values[0:1000, :]
     y_decision = y_val[0:1000]

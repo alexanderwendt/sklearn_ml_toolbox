@@ -54,6 +54,8 @@ __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
 
+from filepaths import Paths
+
 register_matplotlib_converters()
 
 #Global settings
@@ -64,7 +66,7 @@ np.set_printoptions(suppress=True)
 parser = argparse.ArgumentParser(description='Step 7 - Predict Temporal Data')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
-parser.add_argument("-sec", '--config_section', default="Evaluation",
+parser.add_argument("-sec", '--config_section', default="EvaluationValidation",
                     help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
@@ -74,18 +76,18 @@ def visualize_temporal_data(config_path, config_section):
     # Load intermediate model, which has only been trained on training data
     # Get data
     # Load file paths
-    #paths, model, train, test = step40.load_training_files(paths_path)
     config = sup.load_config(config_path)
-    #paths, model, train, test = step40.load_training_files(paths_path)
+    print("Load paths")
+    paths = Paths(config).paths
     title = config.get(config_section, 'title')
 
     X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
 
-    y_classes = labels #train['label_map']
+    y_classes = labels
 
     model_name = config['Common'].get('dataset_name')
-    source_path = config['Evaluation'].get('source_in') #paths['source_path']
-    result_directory = config['Paths'].get('result_directory')
+    source_path = config[config_section].get('source_in')
+    result_directory = paths['results_directory']
 
     figure_path_prefix = result_directory + '/evaluation'
     if not os.path.isdir(result_directory + '/evaluation'):
@@ -98,7 +100,7 @@ def visualize_temporal_data(config_path, config_section):
 
 
     # Make predictions
-    y_test_pred_scores = model.decision_function(X_val.values)
+    y_test_pred_scores = model.predict_proba(X_val.values)[:,1]
     #y_test_pred_proba = evalclf.predict_proba(X_test.values)
     y_test_pred_adjust = model_util.adjusted_classes(y_test_pred_scores, pr_threshold)
 
@@ -120,7 +122,7 @@ def visualize_temporal_data(config_path, config_section):
                                df_time_graph['Close'][y_order_test_pred.index],
                                df_time_graph['Date'][y_order_test_pred.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
-                               title=title + "Inference_" + model_name,
+                               title=title + "_Inference_" + model_name,
                                save_fig_prefix=figure_path_prefix)
     #vis.plot_two_class_graph(y_order_test, y_order_test_pred,
     #                         save_fig_prefix=figure_path_prefix + "_test_")

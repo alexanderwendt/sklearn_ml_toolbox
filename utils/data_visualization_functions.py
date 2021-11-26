@@ -712,7 +712,7 @@ def visualize_parameter_grid_search(param_name, search_cv_parameters, search_cv_
     #indexList = [
     #    results_run1.loc[results_run1['param_' + name] == results_run1['param_' + name].unique()[i]].iloc[0, :].name for
     #    i in unique_list]
-    print("Plot best {} values".format(param_name))
+    print("Plot best values for: {}".format(param_name))
     #display(results_run1.loc[indexList[0]].round(3))
 
     # number of results to consider
@@ -768,15 +768,16 @@ def visualize_parameter_grid_search(param_name, search_cv_parameters, search_cv_
 
     return significance_matrix, medians
 
-def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pred_proba, reduced_class_dict, save_fig_prefix=None):
+def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pred_proba, reduced_class_dict,
+                                     save_fig_prefix_dir=None, title_prefix=""):
     # Calculate Precision, Recall, Accuracy, F1, Confusion Matrix, ROC
     np.set_printoptions(precision=3)
 
     print("Accuracy: ", accuracy_score(y_trainsub, y_trainsub_pred))
     report = classification_report(y_trainsub, y_trainsub_pred, target_names=list(reduced_class_dict.values()), output_dict=True)
     df = pd.DataFrame(report).transpose()
-    if save_fig_prefix != None:
-        df.to_csv(save_fig_prefix + '_classification_report.csv')
+    if save_fig_prefix_dir != None:
+        df.to_csv(os.path.join(save_fig_prefix_dir, title_prefix + '_classification_report.csv'))
 
     print(report)
 
@@ -788,7 +789,7 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
     fig_confusion_matrix = plot_confusion_matrix_multiclass(cnf_matrix, classes=list(reduced_class_dict.values()),
                                              title='Confusion matrix with normalization', normalize=True)
 
-    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='confusion_matrix')
+    save_figure(plt.gcf(), image_save_directory=save_fig_prefix_dir, filename=title_prefix + '_confusion_matrix')
 
     #if save_fig_prefix != None:
     #    fig_confusion_matrix.savefig(save_fig_prefix + '_confusion_matrix', dpi=300)
@@ -799,7 +800,7 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
 
     fig_pr_curve = skplt.metrics.plot_precision_recall_curve(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
 
-    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='pr_curve')
+    save_figure(plt.gcf(), image_save_directory=save_fig_prefix_dir, filename=title_prefix + 'pr_curve')
 
     #if save_fig_prefix != None:
     #    fig_pr_curve.figure.savefig(save_fig_prefix + '_pr_curve')
@@ -810,7 +811,7 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
 
     fig_roc_curve = skplt.metrics.plot_roc(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
 
-    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='roc_curve')
+    save_figure(plt.gcf(), image_save_directory=save_fig_prefix_dir, filename=title_prefix + 'roc_curve')
 
     #if save_fig_prefix != None:
     #    fig_roc_curve.figure.savefig(save_fig_prefix + '_roc_curve')
@@ -855,7 +856,7 @@ def precision_recall_threshold(y_adjusted_classes, y_test, p, r, thresholds, t, 
     # plot the current threshold on the line
     close_default_clf = np.argmin(np.abs(thresholds - t))
     plt.plot(r[close_default_clf], p[close_default_clf], '^', c='k', markersize=15)
-    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='pr_adjusted')
+    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename=title_prefix + '_pr_adjusted')
 
     #if save_fig_prefix != None:
     #    plt.savefig(save_fig_prefix + '_pr_adjusted')
@@ -883,7 +884,7 @@ def plot_precision_recall_vs_threshold(precisions, recalls, thresholds, optimal_
     plt.legend(loc='best')
     plt.grid()
 
-    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='pr_scores_of_decision_threshold')
+    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename=title_prefix + '_pr_scores_of_decision_threshold')
 
     #if save_fig_prefix != None:
     #    plt.savefig(save_fig_prefix + '_pr_scores_of_decision_threshold')
@@ -909,7 +910,7 @@ def plot_roc_curve(fpr, tpr, label=None, title_prefix="", save_fig_prefix=None):
     plt.ylabel("True Positive Rate (Recall)")
     plt.legend(loc='best')
 
-    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='roc_curve2')
+    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename=title_prefix + '_roc_curve2')
 
     #if save_fig_prefix != None:
     #    plt.savefig(save_fig_prefix + '_roc_curve')
@@ -943,7 +944,7 @@ def plot_decision_boundary(X, y, model, title_prefix="", save_fig_prefix=None):
     plt.scatter(X_Train_embedded[:, 0], X_Train_embedded[:, 1], c=y)
     plt.title(title_prefix + "Decision Boundary Plot Projected")
 
-    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename='decision_boundary_plot')
+    save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename=title_prefix + '_decision_boundary_plot')
 
     #if save_fig_prefix != None:
     #    plt.savefig(save_fig_prefix + '_decision_boundary_plot')

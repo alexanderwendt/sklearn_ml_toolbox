@@ -116,7 +116,7 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
         ### Binarize Multiclass Dataset
         # If the binarize setting is used, then binarize the class of the outcome.
         if conf['Common'].getboolean('binarize_labels') == True:
-            binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Common'].getint('class_number')).astype(np.int)
+            binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Common'].getint('class_number')).astype(int)
             y = binarized_outcome.values.flatten()
             print("y was binarized. Classes before: {}. Classes after: {}".format(np.unique(outcomes[conf['Common'].get('class_name')]),
                                                                                   np.unique(y)))
@@ -188,7 +188,7 @@ def main(config_path):
 
     data_directory = conf['Paths'].get('prepared_data_directory')
 
-    data_preparation_dump_file_path = os.path.join(data_directory, "step31out.pickle")
+    data_preparation_dump_file_path = os.path.join(data_directory, "temp", "step31out.pickle")
     (features_cleaned1, outcomes_cleaned1, class_labels,
      data_source_raw, data_directory, result_directory) = pickle.load(open(data_preparation_dump_file_path, "rb" ))
 
@@ -199,9 +199,9 @@ def main(config_path):
     #model_outcomes_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_outcomes_model.csv")
     #model_labels_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_labels_model.csv")
 
-    model_features_filename = os.path.join(data_directory, conf['Preparation'].get('features_out'))
-    model_outcomes_filename = os.path.join(data_directory, conf['Preparation'].get('outcomes_out'))
-    model_labels_filename = os.path.join(data_directory, conf['Preparation'].get('labels_out'))
+    model_features_filename = os.path.join(conf['Preparation'].get('features_out'))
+    model_outcomes_filename = os.path.join(conf['Preparation'].get('outcomes_out'))
+    model_labels_filename = os.path.join(conf['Preparation'].get('labels_out'))
 
     features, y, class_labels = adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_directory,
                                                          class_labels, conf)

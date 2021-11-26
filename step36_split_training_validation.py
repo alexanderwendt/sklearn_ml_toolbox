@@ -93,16 +93,16 @@ def split_train_validation_data(config_path):
 
     # Save results
     X_train.to_csv(
-        os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Preparation'].get('features_out_train')),
+        os.path.join(conf['Preparation'].get('features_out_train')),
         sep=';', index=True, header=True)
     X_val.to_csv(
-        os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Preparation'].get('features_out_val')),
+        os.path.join(conf['Preparation'].get('features_out_val')),
         sep=';', index=True, header=True)
     y_train.to_csv(
-        os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Preparation'].get('outcomes_out_train')),
+        os.path.join(conf['Preparation'].get('outcomes_out_train')),
         sep=';', index=True, header=True)
     y_val.to_csv(
-        os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Preparation'].get('outcomes_out_val')),
+        os.path.join(conf['Preparation'].get('outcomes_out_val')),
         sep=';', index=True, header=True)
 
     print("Saved training and validation files.")

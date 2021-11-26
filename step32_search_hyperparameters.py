@@ -118,7 +118,7 @@ def main(config_path):
     source_filename = conf['Paths'].get("prepared_data_directory") + "/" + "source" + ".csv"
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation"
+    image_save_directory = conf['Paths'].get('results_directory') + "/data_preparation"
 
     scaler = StandardScaler()  # Because normal distribution. Don't use minmax scaler for PCA or unsupervised learning
     # as the axis shall be centered and not shifted.

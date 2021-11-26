@@ -577,16 +577,17 @@ def get_periodical_indicators(source):
 def main(config_path, debug_param):
     conf = sup.load_config(config_path)
 
-    image_save_directory = os.path.join(conf['Paths'].get('result_directory'), "data_generation")
-    features_filename_uncut = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp_features_uncut" + ".csv")
+    image_save_directory = os.path.join(conf['Paths'].get('results_directory'), "data_generation")
+    features_filename_uncut = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp", "temp_features_uncut" + ".csv")
+    os.makedirs(os.path.dirname(features_filename_uncut), exist_ok=True)
 
-    if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
-        os.makedirs(conf['Paths'].get('prepared_data_directory'))
-        print("Created directory ", conf['Paths'].get('training_data_directory'))
+    #if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
+    #    os.makedirs(conf['Paths'].get('prepared_data_directory'))
+    #    print("Created directory ", conf['Paths'].get('training_data_directory'))
 
-    if os.path.isdir(conf['Paths'].get('result_directory'))==False:
-        os.makedirs(conf['Paths'].get('result_directory'))
-        print("Created directory ", conf['Paths'].get('result_directory'))
+    #if os.path.isdir(conf['Paths'].get('results_directory'))==False:
+    #    os.makedirs(conf['Paths'].get('results_directory'))
+    #    print("Created directory ", conf['Paths'].get('results_directory'))
 
     #Load only a subset of the whole raw data to create a debug dataset
     source = custom.load_source(conf['Paths'].get('source_path'))

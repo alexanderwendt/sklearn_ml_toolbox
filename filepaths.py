@@ -63,7 +63,7 @@ class Paths:
     def __init__(self, config):
         # Instance Variable
         #conf = sup.load_config(config_file_path)
-        self.path = self.generate_paths(config)
+        self.paths = self.generate_paths(config)
 
     def generate_paths(self, conf):
         '''
@@ -82,62 +82,79 @@ class Paths:
         # Constants for all notebooks in the Machine Learning Toolbox
         paths = dict()
 
-        # Model name
+        # Custom settings - Model name #
         dataset_name = conf['Common'].get('dataset_name')
         class_name = conf['Common'].get('class_name')
-        dataset_class_prefix = dataset_name + "_" + class_name
+        model_type = conf['Common'].get('model_type')
+
+        dataset_class_prefix = dataset_name # + "_" + class_name
         paths['dataset_name'] = conf['Common'].get('dataset_name')
+        paths['source_path'] = conf["Paths"].get("source_path")
+        paths['labels_path'] = conf["Paths"].get("labels_path")
 
-        # Generating directories
-        print("Directories")
+        ## Generating directories
+        subdir = dataset_name + "/" + model_type
+
         #paths['annotations_directory'] = conf['Paths'].get('annotations_directory')
-        paths['prepared_data_directory'] = conf['Paths'].get('prepared_data_directory')
+        ## Data path
+        paths['prepared_data_directory'] = os.path.join("prepared-data", dataset_name) #conf['Paths'].get('prepared_data_directory')
+        paths['config_directory'] = os.path.join("config")
         #paths['inference_data_directory'] = conf['Paths'].get('inference_data_directory')
-        paths['model_directory'] = conf['Paths'].get('model_directory')
-        paths['result_directory'] = conf['Paths'].get('result_directory')
-        paths['config_directory'] = "config"
+        #Model specific directory
+        paths['models_directory'] = os.path.join("models", subdir) #conf['Paths'].get('model_directory')
+        #paths['result_data_directory'] = os.path.join("results", dataset_name) #conf['Paths'].get('result_directory')
+        paths['results_directory'] = os.path.join("results", subdir)
 
-        if os.path.isdir(paths['model_directory'])==False:
-            os.makedirs(paths['model_directory'])
-            print("Created directory ", paths['model_directory'])
+        ## Create directories
+        #if os.path.isdir(paths['model_directory'])==False:
+        os.makedirs(paths['models_directory'], exist_ok=True)
+        #os.makedirs(paths['result_data_directory'], exist_ok=True)
+        os.makedirs(paths['results_directory'], exist_ok=True)
+        os.makedirs(paths['prepared_data_directory'], exist_ok=True)
+        os.makedirs(paths['config_directory'], exist_ok=True)
+        #print("Created directory ", paths['model_directory'])
 
+        print("Directories")
         print("Prepared data directory: ", paths['prepared_data_directory'])
-        print("Model directory: ", paths['model_directory'])
-        print("Results directory: ", paths['result_directory'])
+        print("Model directory: ", paths['models_directory'])
+        print("Results directory: ", paths['results_directory'])
+        print("Configs directory: ", paths['config_directory'])
 
-        # Dump file name
-        paths['model_input'] = paths['model_directory'] + "/" + "model.pickle"
-        paths['paths'] = paths['config_directory'] + "/" + "paths.pickle"
-        paths['train_record'] = paths['prepared_data_directory'] + "/" + "train.record"
-        paths['test_record'] = paths['prepared_data_directory'] + "/" + "test.record"
-        paths['inference_record'] = paths['prepared_data_directory'] + "/" + "inference.record"
+        ## Dump file name
+        paths['paths'] = os.path.join(paths['config_directory'], "paths.pickle")
 
-        # Generating filenames for loading the files
-        paths['model_features_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_features_for_model" + ".csv"
-        paths['model_outcomes_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_outcomes_for_model" + ".csv"
-        paths['source_filename'] = paths['prepared_data_directory'] + "/" + dataset_name + "_source" + ".csv"
+        # Prepared data #
+        paths['train_record'] = os.path.join(paths['prepared_data_directory'], "train.record")
+        paths['test_record'] = os.path.join(paths['prepared_data_directory'], "test.record")
+        paths['inference_record'] = os.path.join(paths['prepared_data_directory'], "inference.record")
+        paths['copied_source_path'] = os.path.join(paths['prepared_data_directory'], "source.csv")
+
+        ## Generating filenames for loading the files ##
+        paths['model_features_filename'] = os.path.join(paths['prepared_data_directory'], "features_for_model.csv")
+        paths['model_outcomes_filename'] = os.path.join(paths['prepared_data_directory'], "outcomes_for_model.csv")
+        #paths['source_filename'] = paths['source_path']
         #paths['inference_features_filename'] = paths['inference_data_directory'] + "/" + dataset_class_prefix + "_inference_features" + ".csv"
 
-        #Modified labels
-        paths['model_labels_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_labels_for_model" + ".csv"
+        ## Modified labels ##
+        paths['model_labels_filename'] = os.path.join(paths['prepared_data_directory'], "labels_for_model.csv")
         #Columns for feature selection
-        paths['selected_feature_columns_filename'] = paths['prepared_data_directory'] + "/" + dataset_class_prefix + "_selected_feature_columns.csv"
+        paths['selected_feature_columns_filename'] = os.path.join(paths['prepared_data_directory'], "selected_feature_columns.csv")
 
-        #Model specifics
-        paths['svm_evaluated_model_filename'] = paths['model_directory'] + "/" + dataset_class_prefix + "_svm_evaluated_model" + ".sav"
-        paths['svm_final_model_filename'] = paths['model_directory'] + "/" + dataset_class_prefix + "_svm_final_model" + ".sav"
-        paths['svm_external_parameters_filename'] = paths['model_directory'] + "/" + dataset_class_prefix + "_svm_model_ext_parameters" + ".json"
+        # Model specifics #
+        paths['model_input'] = os.path.join(paths['models_directory'], "model.pickle")
+        paths['evaluated_model_filename'] = os.path.join(paths['models_directory'], "evaluated_model.sav")
+        paths['final_model_filename'] = os.path.join(paths['models_directory'], "final_model.sav")
+        paths['external_parameters_filename'] = os.path.join(paths['models_directory'], "model_ext_parameters.json")
         #paths['svm_default_hyper_parameters_filename'] = paths['model_directory'] + "/" + conf['dataset_name'] + "_" + conf['class_name'] + "_svm_model_hyper_parameters" + ".json"
 
-        paths['svm_pipe_first_selection'] = paths['model_directory'] + "/" + dataset_class_prefix + '_pipe_run1_selection.pkl'
-        paths['svm_pipe_final_selection'] = paths['model_directory'] + "/" + dataset_class_prefix + '_pipe_run2_final.pkl'
+        paths['pipe_first_selection'] = os.path.join(paths['models_directory'], 'pipe_run1_selection.pkl')
+        paths['pipe_final_selection'] = os.path.join(paths['models_directory'], 'pipe_run2_final.pkl')
 
         #Results
-        paths['svm_run1_result_filename'] = paths['result_directory'] + "/" + dataset_class_prefix + '_results_run1.pkl'
-        paths['svm_run2_result_filename'] = paths['result_directory'] + "/" + dataset_class_prefix + '_results_run2.pkl'
+        paths['run1_result_filename'] = os.path.join(paths['results_directory'], 'results_run1.pkl')
+        paths['run2_result_filename'] = os.path.join(paths['results_directory'], 'results_run2.pkl')
 
         # Source data files folder paths
-        paths['source_path'] = paths['prepared_data_directory'] + "/" + dataset_name + "_source" + ".csv"
         #paths['source_path_inference'] = paths['inference_data_directory'] + "/" + dataset_name + "_source" + ".csv"
 
         print("=== Paths ===")

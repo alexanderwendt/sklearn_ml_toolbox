@@ -128,8 +128,8 @@ def main(config_path):
 
     #image_save_directory = conf['result_directory'] + "/data_preparation_images"
     prepared_data_directory = conf['Paths'].get('prepared_data_directory')
-    outcomes_filename_uncut = os.path.join(prepared_data_directory, "temp_outcomes_uncut" + ".csv")
-    features_filename_uncut = os.path.join(prepared_data_directory, "temp_features_uncut" + ".csv")
+    outcomes_filename_uncut = os.path.join(prepared_data_directory, "temp", "temp_outcomes_uncut" + ".csv")
+    features_filename_uncut = os.path.join(prepared_data_directory, "temp", "temp_features_uncut" + ".csv")
 
     # Load only a subset of the whole raw data to create a debug dataset
     source_uncut = custom.load_source(conf['Paths'].get('source_path'))
@@ -181,10 +181,10 @@ def main(config_path):
     print("Subset source shape: ", source_subset.shape)
     print("Subset features shape: ", features_subset.shape)
 
-    outcomes_out_filename = os.path.join(prepared_data_directory, conf['Generation'].get('outcomes_out')) #conf['Common'].get('dataset_name') + "_outcomes" + ".csv")
-    features_out_filename = os.path.join(prepared_data_directory, conf['Generation'].get('features_out'))
+    outcomes_out_filename = os.path.join(conf['Generation'].get('outcomes_out')) #conf['Common'].get('dataset_name') + "_outcomes" + ".csv")
+    features_out_filename = os.path.join(conf['Generation'].get('features_out'))
 
-    source_out_filename = os.path.join(prepared_data_directory, conf['Generation'].get('source_out'))
+    source_out_filename = os.path.join(conf['Generation'].get('source_out'))
 
     print("=== Paths ===")
     print("Features in: ", features_out_filename)

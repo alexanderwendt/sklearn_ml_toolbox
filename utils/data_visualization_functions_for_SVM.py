@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #Generate Scatter plot with results
-def visualize_random_search_results(random_search, refit_scorer_name, xlim=None, ylim=None):
+def visualize_random_search_results(random_search, refit_scorer_name, xlim=None, ylim=None,
+                                    param_x='param_model__C', param_y='param_model__gamma'):
     '''
     Generate a 2D scatter plot with results for SVM
 
@@ -10,8 +11,8 @@ def visualize_random_search_results(random_search, refit_scorer_name, xlim=None,
 
     '''
     cols = random_search.cv_results_['mean_test_' + refit_scorer_name]
-    x = random_search.cv_results_['param_svm__C']
-    y = random_search.cv_results_['param_svm__gamma']
+    x = random_search.cv_results_[param_x]
+    y = random_search.cv_results_[param_y]
 
     fig = plt.figure()
     ax = plt.gca()
@@ -60,7 +61,7 @@ def add_best_results_to_random_search_visualization(ax_random_search, results, p
 
     # Add plot for best x values from results
     [ax_random_search.plot(p[0], p[1], 'o', markersize=12, fillstyle='none', c='r', mew=3, label="best_value") for p in
-     zip(results['param_svm__C'].head(plot_best).values, results['param_svm__gamma'].head(plot_best).values)]
+     zip(results['param_model__C'].head(plot_best).values, results['param_model__gamma'].head(plot_best).values)]
     ax_random_search.set_ylabel("gamma")
     ax_random_search.set_xlabel("C")
 

@@ -572,10 +572,10 @@ def main(config_path):
     conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Preparation'].get("source_in"))
+    source_filename = os.path.join(conf['Preparation'].get("source_in"))
     source = sup.load_data_source(source_filename)
 
-    image_save_directory = conf['Paths'].get('result_directory') + "/data_preparation"
+    image_save_directory = conf['Paths'].get('results_directory') + "/data_preparation"
 
     #analyze_timegraph(source, features, y, conf, image_save_directory)
     print("WARNING: If a singular matrix occurs in a calculation, probably the outcome is "

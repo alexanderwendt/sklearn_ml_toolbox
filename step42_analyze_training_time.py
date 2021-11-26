@@ -73,53 +73,10 @@ log = logging.getLogger(__name__)
 parser = argparse.ArgumentParser(description='Step 4 - Calculate predictions for training like estimated time')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
                     help='Configuration file path', required=False)
-parser.add_argument("-algo", '--algorithm', default="svm",
-                    help='Select algorithm to test: SVM (svm) or XGBoost (xgboost). Deafult: SVM.', required=False)
+#parser.add_argument("-algo", '--algorithm', default="svm",
+#                    help='Select algorithm to test: SVM (svm) or XGBoost (xgboost). Deafult: SVM.', required=False)
 
 args = parser.parse_args()
-
-
-
-
-# def load_input(conf):
-#     '''
-#     Load input model and data from a prepared pickle file
-#
-#     :args:
-#         input_path: Input path of pickle file with prepared data
-#     :return:
-#         X_train: Training data
-#         y_train: Training labels as numbers
-#         X_test: Test data
-#         y_test: Test labels as numbers
-#         y_classes: Class names assigned to numbers
-#         scorer: Scorer for the evaluation, default f1
-#
-#     '''
-#     # Load input
-#     X_train_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('features_train_in'))
-#     y_train_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('outcomes_train_in'))
-#     X_val_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('features_val_in'))
-#     y_val_path = os.path.join(conf['Paths'].get('prepared_data_directory'), conf['Training'].get('outcomes_val_in'))
-#
-#     #paths, model, train, test = step40.load_training_files(paths_path)
-#     X_train, _, y_train = step40.load_data(X_train_path, y_train_path)
-#     X_val, _, y_val = step40.load_data(X_val_path, y_val_path)
-#
-#     labels = step40.load_labels(conf['Paths'].get('labels_path'))
-#
-#
-#     #X_train = train['X']
-#     #y_train = train['y']
-#     #X_test = test['X']
-#     #y_test = test['y']
-#     y_classes = labels #train['label_map']
-#     metrics = Metrics(conf)
-#     scorers = metrics.scorers #model['scorers']
-#     refit_scorer_name = metrics.refit_scorer_name #model['refit_scorer_name']
-#     scorer = scorers[refit_scorer_name]
-#
-#     return X_train, y_train, X_val, y_val, y_classes, scorer
 
 
 def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf, image_save_directory=None):
@@ -157,7 +114,7 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
     plt.ylabel('Duration [s]')
     plt.title("Training Duration")
 
-    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='SVM_Duration_Samples')
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='Duration_Samples')
 
     #if image_save_directory:
     #    if not os.path.isdir(image_save_directory):
@@ -174,7 +131,7 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
     plt.ylabel('F1-Score on cross validation set (=the rest). Size={}'.format(X_test.shape[0]))
     plt.title("F1 Score Improvement With More Data")
 
-    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='SVM_F1_Samples')
+    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='F1_Samples')
 
     #if image_save_directory:
     #    if not os.path.isdir(image_save_directory):
@@ -185,7 +142,7 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
     #plt.pause(0.1)
     #plt.close()
 
-def run_training_predictors(data_input_path, algorithm):
+def run_training_predictors(data_input_path):
     '''
 
 
@@ -193,13 +150,14 @@ def run_training_predictors(data_input_path, algorithm):
 
     conf = sup.load_config(data_input_path)
     metrics = Metrics(conf)
+    algorithm = conf['Common'].get('model_type')
 
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(conf)
     scorer = scorers[refit_scorer_name]
 
-    result_directory = conf['Paths'].get('result_directory')
-    save_fig_prefix = result_directory + '/model_images'
+    results_directory = paths['results_directory']
+    save_fig_prefix = results_directory + '/model_images'
 
     #Baseline test
     baseline_results = exe.execute_baseline_classifier(X_train, y_train, X_val, y_val, y_classes, scorer)
@@ -211,7 +169,7 @@ def run_training_predictors(data_input_path, algorithm):
         log.info("XBoost Classifier selected.")
     else:
         model_clf = SVC()
-        log.info("SVM (deafult) classifier selected.")
+        log.info("SVM (default) classifier selected.")
 
     run_training_estimation(X_train, y_train, X_val, y_val, scorer, model_clf, save_fig_prefix)
 
@@ -222,6 +180,6 @@ if __name__ == "__main__":
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
     # Execute wide search
-    run_training_predictors(args.config_path, args.algorithm)
+    run_training_predictors(args.config_path)
 
     print("=== Program end ===")

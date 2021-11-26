@@ -106,7 +106,7 @@ def get_optimal_precision_recall_threshold(X_train_full, y_train_full, y_classes
 
     print("Predict training data")
     y_trainsub_pred = optclf.predict(X_train.values)
-    y_trainsub_pred_scores = optclf.decision_function(X_train.values)
+    #y_trainsub_pred_scores = optclf.decision_function(X_train.values)
     y_trainsub_pred_proba = optclf.predict_proba(X_train.values)
 
     print("Predict y_val")
@@ -114,15 +114,19 @@ def get_optimal_precision_recall_threshold(X_train_full, y_train_full, y_classes
 
     print("Predict probabilities and scores of validation data")
     y_val_pred_proba = optclf.predict_proba(X_val.values)
-    y_val_pred_scores = optclf.decision_function(X_val.values)
+    #y_val_pred_scores = optclf.decision_function(X_val.values)
+    #y_val_pred_scores = y_val_pred_proba[:,1]
     print('Model properties: ', optclf)
 
     reduced_class_dict = model_util.reduce_classes(y_classes, y_val, y_val_pred)
 
-    vis.plot_precision_recall_evaluation(y_train, y_trainsub_pred, y_trainsub_pred_proba, reduced_class_dict, figure_path_prefix + "_training_data_")
-    vis.plot_precision_recall_evaluation(y_val, y_val_pred, y_val_pred_proba, reduced_class_dict, figure_path_prefix + "_validation_data_")
+    vis.plot_precision_recall_evaluation(y_train, y_trainsub_pred, y_trainsub_pred_proba, reduced_class_dict,
+                                         figure_path_prefix, title_prefix="training_data")
+    vis.plot_precision_recall_evaluation(y_val, y_val_pred, y_val_pred_proba, reduced_class_dict,
+                                         figure_path_prefix, title_prefix="validation_data")
 
-    precision, recall, thresholds = precision_recall_curve(y_val, y_val_pred_scores)
+    #y_val_pred_proba[:,1]: probability estimations of the positive class
+    precision, recall, thresholds = precision_recall_curve(y_val, y_val_pred_proba[:,1])
     # custom_threshold = 0.25
 
     # Get the optimal threshold
@@ -132,23 +136,23 @@ def get_optimal_precision_recall_threshold(X_train_full, y_train_full, y_classes
     closest_zero_r = recall[closest_zero_index]
 
     print("Optimal threshold value = {0:.2f}".format(optimal_threshold))
-    y_val_pred_roc_adjusted = model_util.adjusted_classes(y_val_pred_scores, optimal_threshold)
+    y_val_pred_roc_adjusted = model_util.adjusted_classes(y_val_pred_proba[:,1], optimal_threshold)
 
     vis.precision_recall_threshold(y_val_pred_roc_adjusted, y_val, precision, recall, thresholds, optimal_threshold,
-                                   save_fig_prefix=figure_path_prefix)
+                                   save_fig_prefix=figure_path_prefix, title_prefix="opt_pr")
     vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, optimal_threshold,
-                                           save_fig_prefix=figure_path_prefix)
+                                           save_fig_prefix=figure_path_prefix, title_prefix="opt_pr")
     print("Optimal threshold value = {0:.2f}".format(optimal_threshold))
 
     from sklearn.metrics import roc_curve, auc
 
-    fpr, tpr, auc_thresholds = roc_curve(y_val, y_val_pred_scores)
+    fpr, tpr, auc_thresholds = roc_curve(y_val, y_val_pred_proba[:,1])
     print("AUC without P/R adjustments: ", auc(fpr, tpr))  # AUC of ROC
-    vis.plot_roc_curve(fpr, tpr, label='ROC', save_fig_prefix=figure_path_prefix + "_without adjustments_")
+    vis.plot_roc_curve(fpr, tpr, label='ROC', title_prefix="Unadjusted_", save_fig_prefix=figure_path_prefix)
 
     fpr, tpr, auc_thresholds = roc_curve(y_val, y_val_pred_roc_adjusted)
     print("AUC with P/R adjustments: ", auc(fpr, tpr))  # AUC of ROC
-    vis.plot_roc_curve(fpr, tpr, label='ROC', save_fig_prefix=figure_path_prefix + "_with adjustments_")
+    vis.plot_roc_curve(fpr, tpr, label='ROC', title_prefix="Adjusted_", save_fig_prefix=figure_path_prefix)
 
     print("Classification report without threshold adjustment.")
     print(classification_report(y_val, y_val_pred, target_names=list(reduced_class_dict.values())))
@@ -182,33 +186,16 @@ def define_precision_recall_threshold(config_path):
     # Load complete training input
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
-    #f = open(data_input_path, "rb")
-    #prepared_data = pickle.load(f)
-    #print("Loaded data: ", prepared_data)
 
-    #X_train = train['X']
-    #y_train = train['y']
-    #X_test = test['X']
-    #y_test = test['y']
-
-    #y_classes = train['label_map']
-    #scorers = model['scorers']
-    #refit_scorer_name = model['refit_scorer_name']
-    #selected_features = prepared_data['selected_features']
-    #results_run2_file_path = prepared_data['paths']['svm_run2_result_filename']
-    #svm_pipe_first_selection = prepared_data['paths']['svm_pipe_first_selection']
-    svm_pipe_final_selection = os.path.join(config['Paths'].get('model_directory'), config['Training'].get('pipeline_out')) #paths['svm_pipe_final_selection']
-    #svm_external_parameters_filename = paths['svm_external_parameters_filename']
+    pipe_final_selection = config['Training'].get('pipeline_out')
     #Use config parameters
-    svm_external_parameters_filename = os.path.join(config['Paths'].get('model_directory'), config['Training'].get('ext_param_out'))
-    model_directory = paths['model_directory']
-    result_directory = paths['result_directory']
-    model_name = paths['dataset_name']
+    svm_external_parameters_filename = config['Training'].get('ext_param_out')
+    result_directory = paths['results_directory']
 
-    figure_path_prefix = result_directory + '/model_images/' + model_name
-    if not os.path.isdir(result_directory + '/model_images'):
-        os.makedirs(result_directory + '/model_images')
-        print("Created folder: ", result_directory + '/model_images')
+    figure_path_prefix = result_directory + '/model_images/'
+    #if not os.path.isdir(result_directory + '/model_images'):
+    os.makedirs(result_directory + '/model_images', exist_ok=True)
+    #    print("Created folder: ", result_directory + '/model_images')
 
     # Check if precision recall can be applied, i.e. it is a binary problem
     if len(y_classes) > 2:
@@ -219,9 +206,9 @@ def define_precision_recall_threshold(config_path):
 
         # Load model
         # Load saved results
-        r = open(svm_pipe_final_selection, "rb")
+        r = open(pipe_final_selection, "rb")
         model_pipe = pickle.load(r)
-        model_pipe['svm'].probability = True
+        model_pipe['model'].probability = True
 
         optimal_threshold = get_optimal_precision_recall_threshold(X_train, y_train, y_classes, model_pipe, figure_path_prefix)
 
@@ -229,7 +216,7 @@ def define_precision_recall_threshold(config_path):
     # save the optimal precision/recall value to disk
     print("Save external parameters, precision recall threshold to disk")
     extern_param = {}
-    extern_param['pr_threshold'] = optimal_threshold
+    extern_param['pr_threshold'] = float(optimal_threshold)
     with open(svm_external_parameters_filename, 'w') as fp:
         json.dump(extern_param, fp)
 

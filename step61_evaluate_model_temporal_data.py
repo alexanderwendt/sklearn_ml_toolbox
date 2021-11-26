@@ -41,7 +41,6 @@ import numpy as np
 # Own modules
 import utils.data_visualization_functions as vis
 import utils.data_handling_support_functions as sup
-import utils.execution_utils as step40
 import utils.evaluation_utils as eval
 
 __author__ = 'Alexander Wendt'
@@ -53,6 +52,8 @@ __version__ = '0.2.0'
 __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
+
+from filepaths import Paths
 
 register_matplotlib_converters()
 
@@ -76,6 +77,8 @@ def visualize_temporal_data(config_path, config_section):
     # Load file paths
     #paths, model, train, test = step40.load_training_files(paths_path)
     config = sup.load_config(config_path)
+    print("Load paths")
+    paths = Paths(config).paths
     #paths, model, train, test = step40.load_training_files(paths_path)
 
     X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
@@ -84,8 +87,8 @@ def visualize_temporal_data(config_path, config_section):
     title = config.get(config_section, 'title')
 
     model_name = config['Common'].get('dataset_name')
-    source_path = config['Evaluation'].get('source_in') #paths['source_path']
-    result_directory = config['Paths'].get('result_directory')
+    source_path = config[config_section].get('source_in') #paths['source_path']
+    result_directory = paths['results_directory']
 
     figure_path_prefix = result_directory + '/evaluation'
     if not os.path.isdir(result_directory + '/evaluation'):
@@ -104,7 +107,7 @@ def visualize_temporal_data(config_path, config_section):
     #y_train_pred_scores = evalclf.decision_function(X_train.values)
     #y_train_pred_proba = evalclf.predict_proba(X_train.values)
     #y_train_pred_adjust = model_util.adjusted_classes(y_train_pred_scores, pr_threshold)
-    y_test_pred_scores = model.decision_function(X_val.values)
+    y_test_pred_scores = model.predict_proba(X_val.values)[:,1]
     #y_test_pred_proba = evalclf.predict_proba(X_test.values)
     y_test_pred_adjust = model_util.adjusted_classes(y_test_pred_scores, pr_threshold)
 

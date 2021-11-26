@@ -205,11 +205,21 @@ def load_config_bak(config_file_path):
     return conf
 
 def load_config(config_file_path):
-    #config_path = Path(sys.path[0], "config", "classification.cfg")
-    config = configparser.ConfigParser()
-    config.read(config_file_path)
+    '''
+    Load config file
 
-    return config
+    '''
+    #config_path = Path(sys.path[0], "config", "classification.cfg")
+    conf = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+    conf.read(config_file_path)
+
+    # Create missing folders
+    os.makedirs(conf['Paths'].get('prepared_data_directory'), exist_ok=True)
+    os.makedirs(conf['Paths'].get('results_directory'), exist_ok=True)
+    os.makedirs(conf['Paths'].get('models_directory'), exist_ok=True)
+    os.makedirs(conf['Paths'].get('config_directory'), exist_ok=True)
+
+    return conf
 
 def load_data_source(source_filename):
     '''
@@ -261,9 +271,9 @@ def load_features(conf):
     #dataset_name = conf['Common'].get("dataset_name")
     #class_name = conf['Common'].get("class_name")
 
-    model_features_filename = os.path.join(training_data_directory, conf['Preparation'].get('features_out'))
-    model_outcomes_filename = os.path.join(training_data_directory, conf['Preparation'].get('outcomes_out'))
-    model_labels_filename = os.path.join(training_data_directory, conf['Preparation'].get('labels_out'))
+    model_features_filename = os.path.join(conf['Preparation'].get('features_out'))
+    model_outcomes_filename = os.path.join(conf['Preparation'].get('outcomes_out'))
+    model_labels_filename = os.path.join(conf['Preparation'].get('labels_out'))
 
     # === Load Features ===#
     features = pd.read_csv(model_features_filename, sep=';').set_index('id')  # Set ID to be the data id

@@ -3,7 +3,7 @@ import json
 import joblib
 import utils.execution_utils as exe
 
-def load_evaluation_data(conf, config_section="Evaluation"):
+def load_evaluation_data(conf, config_section="EvaluationTraining"):
     '''
 
 

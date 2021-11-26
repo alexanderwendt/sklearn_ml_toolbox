@@ -130,7 +130,7 @@ def train_final_model(config_path, config_section="Evaluation"):
     print("")
 
     print("Set probability measurements in the model to True")
-    pipe['svm'].probability = True
+    pipe['model'].probability = True
     print("Original final pipe: ", pipe)
 
     #Merge training and test data
