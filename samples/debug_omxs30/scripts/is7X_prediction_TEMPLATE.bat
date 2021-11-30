@@ -1,14 +1,23 @@
+@echo off
+
 echo #===========================================#
 echo # Alexander Wendts Machine Learning Toolbox #
 echo #===========================================#
 
-rem define config file to use
-set config_file="config/debug_timedata_omxS30.ini"
+:: define config file to use
+set CONFIG="debug_timedata_omxs30_datapreparation"
 set script_prefix="..\.."
 set env="sklearn"
 
+::Extract the model name from the current file name
+set THISFILENAME=%~n0
+set CONFIG=%THISFILENAME:is7X_prediction_=%
+echo Load config file %CONFIG%.ini
+
 echo setup environment %env%
 call conda activate %env%
+
+
 
 echo #===========================================#
 echo # Generate Dataset #
@@ -20,11 +29,6 @@ echo # Data Analysis and Preprocessing #
 echo #===========================================#
 
 
-echo #===========================================#
-echo # Hyperparameter Search #
-echo #===========================================#
-
-
 echo #=================================================#
 echo # Model Training#
 echo #=================================================#
@@ -33,12 +37,9 @@ echo #=================================================#
 echo #=================================================#
 echo # Model Evaluation for Temporal Datasets #
 echo #=================================================#
-python %script_prefix%\step60_evaluate_model.py --config_path=%config_file% --config_section="EvaluationTraining"
-python %script_prefix%\step61_evaluate_model_temporal_data.py --config_path=%config_file% --config_section="EvaluationTraining"
 
-python %script_prefix%\step60_evaluate_model.py --config_path=%config_file%
-python %script_prefix%\step61_evaluate_model_temporal_data.py --config_path=%config_file%
 
 echo #=================================================#
 echo # Prediction #
 echo #=================================================#
+python %script_prefix%\step70_predict_temporal_data.py --config_path=./config/%CONFIG%.ini --config_section="EvaluationInference"

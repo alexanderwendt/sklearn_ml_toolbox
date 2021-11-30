@@ -97,13 +97,13 @@ class Paths:
 
         #paths['annotations_directory'] = conf['Paths'].get('annotations_directory')
         ## Data path
-        paths['prepared_data_directory'] = os.path.join("prepared-data", dataset_name) #conf['Paths'].get('prepared_data_directory')
-        paths['config_directory'] = os.path.join("config")
+        paths['prepared_data_directory'] = conf.get("Paths", "prepared_data_directory") #    os.path.join("prepared-data", dataset_name) #conf['Paths'].get('prepared_data_directory')
+        paths['config_directory'] = conf.get("Paths", "config_directory") #os.path.join("config")
         #paths['inference_data_directory'] = conf['Paths'].get('inference_data_directory')
         #Model specific directory
-        paths['models_directory'] = os.path.join("models", subdir) #conf['Paths'].get('model_directory')
+        paths['models_directory'] = conf.get("Paths", "models_directory") #os.path.join("models", subdir) #conf['Paths'].get('model_directory')
         #paths['result_data_directory'] = os.path.join("results", dataset_name) #conf['Paths'].get('result_directory')
-        paths['results_directory'] = os.path.join("results", subdir)
+        paths['results_directory'] = conf.get("Paths", "results_directory") #os.path.join("results", subdir)
 
         ## Create directories
         #if os.path.isdir(paths['model_directory'])==False:

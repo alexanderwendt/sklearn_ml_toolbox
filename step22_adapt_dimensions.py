@@ -181,7 +181,13 @@ def main(config_path):
     print("Subset source shape: ", source_subset.shape)
     print("Subset features shape: ", features_subset.shape)
 
-    outcomes_out_filename = os.path.join(conf['Generation'].get('outcomes_out')) #conf['Common'].get('dataset_name') + "_outcomes" + ".csv")
+    if 'outcomes_out' in conf['Generation']:
+        outcomes_out_filename = os.path.join(conf['Generation'].get('outcomes_out')) #conf['Common'].get('dataset_name') + "_outcomes" + ".csv")
+    else:
+        outcomes_out_filename = None
+        outcomes = None
+        print("Only preparing features for inference. No outcomes file used.")
+
     features_out_filename = os.path.join(conf['Generation'].get('features_out'))
 
     source_out_filename = os.path.join(conf['Generation'].get('source_out'))

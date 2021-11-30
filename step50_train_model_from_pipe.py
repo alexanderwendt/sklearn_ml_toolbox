@@ -96,7 +96,7 @@ def train_final_model(config_path, config_section="Evaluation"):
     # Get data
     config = sup.load_config(config_path)
     #paths, model, train, test = step40.load_training_files(paths_path)
-    X_train, y_train, pipe = load_data(config)
+    X_train, y_train, pipe = load_data(config, config_section)
 
     #print("load inputs: ", data_input_path)
     #f = open(data_input_path, "rb")

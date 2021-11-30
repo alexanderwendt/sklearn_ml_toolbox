@@ -115,16 +115,16 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
 
         ### Binarize Multiclass Dataset
         # If the binarize setting is used, then binarize the class of the outcome.
-        if conf['Common'].getboolean('binarize_labels') == True:
-            binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Common'].getint('class_number')).astype(int)
+        if conf['Preparation'].getboolean('binarize_labels') == True:
+            binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Preparation'].getint('class_number')).astype(int)
             y = binarized_outcome.values.flatten()
             print("y was binarized. Classes before: {}. Classes after: {}".format(np.unique(outcomes[conf['Common'].get('class_name')]),
                                                                                   np.unique(y)))
 
             # Redefine class labels
             class_labels = {
-                0: conf['Common'].get('binary_0_label'),
-                1: conf['Common'].get('binary_1_label')
+                0: conf['Preparation'].get('binary_0_label'),
+                1: conf['Preparation'].get('binary_1_label')
             }
 
             print("Class labels redefined to: {}".format(class_labels))
@@ -192,16 +192,20 @@ def main(config_path):
     (features_cleaned1, outcomes_cleaned1, class_labels,
      data_source_raw, data_directory, result_directory) = pickle.load(open(data_preparation_dump_file_path, "rb" ))
 
-    #dataset_name = conf['Common'].get('dataset_name')
     class_name = conf['Common'].get('class_name')
 
-    #model_features_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_features_model.csv")
-    #model_outcomes_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_outcomes_model.csv")
-    #model_labels_filename = os.path.join(data_directory, dataset_name + "_" + class_name + "_labels_model.csv")
-
     model_features_filename = os.path.join(conf['Preparation'].get('features_out'))
-    model_outcomes_filename = os.path.join(conf['Preparation'].get('outcomes_out'))
-    model_labels_filename = os.path.join(conf['Preparation'].get('labels_out'))
+    if 'outcomes_out' in conf['Preparation']:
+        model_outcomes_filename = os.path.join(conf['Preparation'].get('outcomes_out'))
+    else:
+        model_outcomes_filename = None
+        print("No outcomes out defined. Use inference settings with no outcomes")
+
+    if 'labels_out' in conf['Preparation']:
+        model_labels_filename = os.path.join(conf['Preparation'].get('labels_out'))
+    else:
+        model_labels_filename = None
+        print("No labels file available for inference.")
 
     features, y, class_labels = adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_directory,
                                                          class_labels, conf)

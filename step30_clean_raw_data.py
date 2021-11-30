@@ -134,8 +134,8 @@ def load_files(features_path, outcomes_path, source_path, labels_path):
     #print("Data source: {}".format(data_directory))
 
     # Generating filenames for loading the files
-    input_features_filename = features_path #data_directory + "/" + dataset_name + "_features" + ".csv"
-    input_outcomes_filename = outcomes_path #data_directory + "/" + dataset_name + "_outcomes" + ".csv"
+    input_features_filename = features_path
+    input_outcomes_filename = outcomes_path
 
     source_filename = source_path #data_directory + "/" + dataset_name + "_source" + ".csv"
     #labels_filename = data_directory + "/" + dataset_name + "_labels" + ".csv"
@@ -159,12 +159,12 @@ def load_files(features_path, outcomes_path, source_path, labels_path):
     print(features_raw.head(1))
 
     # === Load Outcomes ===#
-    if os.path.isfile(input_outcomes_filename):
+    if input_outcomes_filename and os.path.isfile(input_outcomes_filename):
         #if not on_inference_data:
         outcomes_raw = pd.read_csv(input_outcomes_filename, sep=';').set_index('id')  # Set ID to be the data id
         print(outcomes_raw.head(1))
     else:
-        outcomes_raw =None
+        outcomes_raw = None
         print("No outcomes available for inference data")
 
     # === Load Source ===#
@@ -292,7 +292,11 @@ def main(config_path, on_inference_data, no_images):
     #    print("Created directory: ", "tmp")
 
     features_path = os.path.join(conf['Preparation'].get('features_in'))
-    outcomes_path = os.path.join(conf['Preparation'].get('outcomes_in'))
+    if 'outcomes_in' in conf['Preparation']:
+        outcomes_path = os.path.join(conf['Preparation'].get('outcomes_in'))
+    else:
+        outcomes_path = None
+        print("No outcomes in, do inference")
     labels_path = conf['Paths'].get('labels_path')
     source_path = os.path.join(conf['Preparation'].get('source_in'))
 
