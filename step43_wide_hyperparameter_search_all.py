@@ -53,12 +53,14 @@ from imblearn.combine import SMOTETomek
 
 from xgboost import XGBClassifier
 
+from pydoc import locate
+
 # Own modules
 import utils.data_visualization_functions as vis
 import utils.data_handling_support_functions as sup
 import utils.execution_utils as exe
-from model_param_svm import ModelParamSVM
-from model_param_xgboost import ModelParamXgboost
+# from model_param_svm import ModelParamSVM
+# from model_param_xgboost import ModelParamXgboost
 from utils.metrics import Metrics
 from filepaths import Paths
 
@@ -143,12 +145,17 @@ def execute_wide_search(config, use_debug_parameters=False):
 
     subset_share = float(config['Training'].get('subset_share'))  # 0.1
     max_features = int(config.get('Training', 'max_features'))
-    model_type = config.get('Common', 'model_type')
+    # model_type = config.get('Common', 'model_type')
+    pipeline_class_name = config.get('Training', 'pipeline_class', fallback='model_param_svm_default')
+    PipelineClass = locate('models.' + pipeline_class_name + '.ModelParam')
+    model_param = PipelineClass()
+    if model_param is None:
+        raise Exception("Model pipeline could not be found: ".format('models.' + pipeline_class_name + '.ModelParam'))
 
-    if model_type == 'svm':
-        model_param = ModelParamSVM()
-    elif model_type == 'xgboost':
-        model_param = ModelParamXgboost()
+    # if model_type == 'svm':
+    #    model_param = ModelParamSVM()
+    # elif model_type == 'xgboost':
+    #    model_param = ModelParamXgboost()
 
     # Load complete training input
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
@@ -375,16 +382,21 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
     results = pickle.load(s)
     results_run1 = results['result']
     params_run1 = results['parameter']
-    models_run1 = results['model'].get_params('estimator').get('estimator').steps[4][1] #Get model from pipe
-    model_type = config.get('Common', 'model_type')
+    models_run1 = results['model'].get_params('estimator').get('estimator').steps[4][1]  # Get model from pipe
+    #model_type = config.get('Common', 'model_type')
 
-    if model_type == 'svm':
-        model_param = ModelParamSVM()
-    elif model_type == 'xgboost':
-        model_param = ModelParamXgboost()
+    pipeline_class_name = config.get('Training', 'pipeline_class', fallback=None)
+    PipelineClass = locate('models.' + pipeline_class_name + '.ModelParam')
+    model_param = PipelineClass()
+    if model_param is None:
+        raise Exception("Model pipeline could not be found: {}".format('models.' + pipeline_class_name + '.ModelParam'))
 
+    #if model_type == 'svm':
+    #    model_param = ModelParamSVM()
+    #elif model_type == 'xgboost':
+    #    model_param = ModelParamXgboost()
 
-    #Create a result subset
+    # Create a result subset
     number_results = int(results_run1.shape[0] * top_percentage)
     print("The top {}% of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
     results_subset = results_run1.iloc[0:number_results, :]
@@ -402,17 +414,18 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
     save_fig_prefix = os.path.join(result_directory, 'model_images')
     os.makedirs(save_fig_prefix, exist_ok=True)
 
-    #if config.get('Common', 'model_type') == 'xgboost':
+    # if config.get('Common', 'model_type') == 'xgboost':
     categorical_fields = model_param.get_categorical_parameters()
-    #elif config.get('Common', 'model_type') == 'svm':
+    # elif config.get('Common', 'model_type') == 'svm':
     #    categorical_fields = get_categorical_parameters_svm()
-    #else:
+    # else:
     #    raise Exception("Model type does not exist: {}".format(config('Common', 'model_type')))
 
     best_values_dict = dict()
     for value_name in categorical_fields:
-        _, value_medians = vis.visualize_parameter_grid_search(value_name, params_run1_copy, results_subset_copy, refit_scorer_name,
-                                            save_fig_prefix=save_fig_prefix + "/")
+        _, value_medians = vis.visualize_parameter_grid_search(value_name, params_run1_copy, results_subset_copy,
+                                                               refit_scorer_name,
+                                                               save_fig_prefix=save_fig_prefix + "/")
         best_value = max(value_medians, key=value_medians.get)
         best_values_dict[value_name] = best_value
         print("Best {}: {}".format(value_name, best_value))
@@ -422,12 +435,12 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
     print("Best column indices: ", best_columns)
     print("Best column names: ", list(X_train.columns[best_columns]))
 
-    #if model_type=='xgboost':
+    # if model_type=='xgboost':
     pipe_run_best_first_selection = model_param.define_best_pipeline(best_values_dict, best_columns, models_run1)
-    #elif model_type=='svm':
+    # elif model_type=='svm':
     #    # Define pipeline, which is constant for all tests
     #    pipe_run_best_first_selection = define_best_pipeline_svm(best_values_dict, best_columns, models_run1)
-    #else:
+    # else:
     #    raise Exception("Incorrect model type " + model_type)
 
     print(pipe_run_best_first_selection)
@@ -453,7 +466,6 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
     print("Method end")
 
 
-
 def execute_wide_run(config_path, execute_search=True, debug_parameters=False):
     '''
     Execute a wide hyperparameter grid search, visualize the results and extract the best categorical parameters
@@ -470,7 +482,6 @@ def execute_wide_run(config_path, execute_search=True, debug_parameters=False):
     conf = sup.load_config(config_path)
     # metrics = Metrics(conf)
 
-
     # Execute algotihm
     if execute_search == True:
         if debug_parameters:
@@ -482,9 +493,8 @@ def execute_wide_run(config_path, execute_search=True, debug_parameters=False):
 
     # Visualize and get the best parameters
 
-
     extract_categorical_visualize_graphs_frame(conf)
-    #extract_categorical_visualize_graphs(conf)
+    # extract_categorical_visualize_graphs(conf)
 
 
 if __name__ == "__main__":

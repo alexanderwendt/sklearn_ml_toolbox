@@ -38,6 +38,7 @@ from pickle import dump
 # from IPython.core.display import display
 from imblearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+from sklearn.svm import SVC
 
 import utils.sklearn_utils as modelutil
 import numpy as np
@@ -50,15 +51,8 @@ from imblearn.over_sampling import RandomOverSampler
 from imblearn.combine import SMOTEENN
 from imblearn.combine import SMOTETomek
 
-from xgboost import XGBClassifier
-
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.execution_utils as exe
-from utils.metrics import Metrics
-from filepaths import Paths
-from model_param import ModelParamInterface
+from models.model_param import ModelParamInterface
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -71,16 +65,26 @@ __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
 
 
-class ModelParamXgboost(ModelParamInterface):
+class ModelParam(ModelParamInterface):
+    """
+    SVM Default parameters
+
+    To change the setup, modify the use_parameters method.
+
+    """
+
+    def __init__(self):
+        print("in init")
+
+    def get_model_type(self):
+        return 'svm'
 
     def use_parameters(self, X_train, selected_features):
-        '''
+        """
+        Default Parameter
 
+        """
 
-        Returns
-        -------
-
-        '''
         test_scaler = [StandardScaler(), RobustScaler(), QuantileTransformer(), Normalizer()]
         test_sampling = [modelutil.Nosampler(),
                          # ClusterCentroids(),
@@ -95,24 +99,20 @@ class ModelParamXgboost(ModelParamInterface):
                          SMOTEENN(),
                          SMOTETomek(),
                          ADASYN()]
+        test_C = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
+        test_C_linear = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]
 
-        ### XGBOOST
-        parameters = [{
-            'scaler': test_scaler,
-            'sampling': test_sampling,
-            'feat__cols': selected_features,
-            'model__nthread': [4],  # when use hyperthread, xgboost may become slower
-            'model__objective': ['binary:logistic'],
-            'model__learning_rate': [0.005, 0.01, 0.05, 0.1, 0.5],  # so called `eta` value
-            'model__max_depth': [6, 7, 8],
-            'model__min_child_weight': [11],
-            'model__silent': [0],
-            'model__subsample': [0.8],
-            'model__colsample_bytree': [0.7],
-            'model__n_estimators': [5, 100, 1000],  # number of trees, change it to 1000 for better results
-            'model__missing': [-999],
-            'model__seed': [1337]
-        }]
+        # gamma default parameters
+        param_scale = 1 / (X_train.shape[1] * np.mean(X_train.var()))
+
+        parameters = [
+            {
+                'scaler': test_scaler,
+                'sampling': test_sampling,
+                'feat__cols': selected_features,
+                'model__C': test_C_linear,  # default C=1
+                'model__kernel': ['linear']
+            }]
 
         # If no missing values, only one imputer strategy shall be used
         if X_train.isna().sum().sum() > 0:
@@ -125,40 +125,37 @@ class ModelParamXgboost(ModelParamInterface):
         # else:
         print("Parameters defined in the input: ", parameters)
 
-        ### XGBOOST
         return parameters
+
 
     def get_categorical_parameters(self):
         return [
             'scaler',
             'sampling',
+            'model__kernel',
             'feat__cols',
-            'model__learning_rate',
-            'model__max_depth',
-            'model__n_estimators'
         ]
 
     def use_debug_parameters(self, reduced_selected_features):
-        ### XGBOOST CODE start
-        params_debug = [{
-            'scaler': [StandardScaler()],
-            'sampling': [modelutil.Nosampler(), SMOTE(), SMOTEENN(), ADASYN()],
-            'feat__cols': reduced_selected_features[0:2],
-            'model__nthread': [4],  # when use hyperthread, xgboost may become slower
-            'model__objective': ['binary:logistic'],
-            'model__learning_rate': [0.05, 0.5],  # so called `eta` value
-            'model__max_depth': [6, 7, 8],
-            'model__min_child_weight': [11],
-            'model__silent': [1],
-            'model__subsample': [0.8],
-            'model__colsample_bytree':[0.7],
-            'model__n_estimators': [5, 10],  # number of trees, change it to 1000 for better results
-            'model__missing': [-999],
-            'model__seed': [1337]
-        }]
+        # Define parameters as an array of dicts in case different parameters are used for different optimizations
+        params_debug = [{'scaler': [StandardScaler()],
+                         'sampling': [modelutil.Nosampler(), SMOTE(), SMOTEENN(), ADASYN()],
+                         'feat__cols': reduced_selected_features[0:2],
+                         'model__kernel': ['linear'],
+                         'model__C': [0.1, 1, 10],
+                         'model__gamma': [0.1, 1, 10],
+                         },
+                        {
+                            'scaler': [StandardScaler(), Normalizer()],
+                            'sampling': [modelutil.Nosampler()],
+                            'feat__cols': reduced_selected_features[0:1],
+                            'model__C': [1],  # default C=1
+                            'model__kernel': ['rbf'],
+                            'model__gamma': [1]
+                            # Only relevant in rbf, default='auto'=1/n_features
+                        }]
 
         return params_debug
-
 
     def create_pipeline(self):
         pipe_run = Pipeline([
@@ -166,12 +163,9 @@ class ModelParamXgboost(ModelParamInterface):
             ('scaler', StandardScaler()),
             ('sampling', modelutil.Nosampler()),
             ('feat', modelutil.ColumnExtractor(cols=None)),
-            ('model', XGBClassifier())
+            ('model', SVC())
         ])
         return pipe_run
-
-
-
 
     def define_best_pipeline(self, best_values_dict, best_columns, models_run1):
         pipe_run_best_first_selection = Pipeline([
@@ -179,9 +173,7 @@ class ModelParamXgboost(ModelParamInterface):
             ('sampling', best_values_dict.get('sampling')),
             ('feat', modelutil.ColumnExtractor(cols=best_columns)),
             ('model', models_run1.set_params(
-                n_estimators=best_values_dict.get('model__n_estimators'),
-                n_learning_rate=best_values_dict.get('model__learning_rate'),
-                n_max_depth=best_values_dict.get('model__max_depth')
+                kernel=best_values_dict.get('model__kernel')
             ))
         ])
 

@@ -112,6 +112,7 @@ class Paths:
         os.makedirs(paths['results_directory'], exist_ok=True)
         os.makedirs(paths['prepared_data_directory'], exist_ok=True)
         os.makedirs(paths['config_directory'], exist_ok=True)
+        os.makedirs("./logs", exist_ok=True)
         #print("Created directory ", paths['model_directory'])
 
         print("Directories")

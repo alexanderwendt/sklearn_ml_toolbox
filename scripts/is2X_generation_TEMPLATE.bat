@@ -21,7 +21,8 @@ echo #===========================================#
 echo # Generate Dataset #
 echo #===========================================#
 rem python step20_generate_groundtruth_stockmarket.py --config_path=%config_file%
-python %script_prefix%\step21_generate_features.py --config_path=./config/%CONFIG%.ini -debug
+::python %script_prefix%\step21_generate_features.py --config_path=./config/%CONFIG%.ini -debug
+python %script_prefix%\step21_generate_features.py --config_path=./config/%CONFIG%.ini
 python %script_prefix%\step22_adapt_dimensions.py --config_path=./config/%CONFIG%.ini
 
 echo #===========================================#

@@ -27,6 +27,7 @@ echo #===========================================#
 echo #===========================================#
 echo # Data Analysis and Preprocessing #
 echo #===========================================#
+:: Set --on_inference_data only if there are no training data
 python %script_prefix%\step30_clean_raw_data.py --config_path=./config/%CONFIG%.ini --no_images --on_inference_data
 python %script_prefix%\step31_adapt_features.py --config_path=./config/%CONFIG%.ini
 rem python %script_prefix%\step32_search_hyperparameters.py --config_path=%config_file%

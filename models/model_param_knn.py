@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 4X Training: Train wide Search for XGBoost
+KNN Model setup
 License_info: ISC
 ISC License
 
@@ -38,6 +38,7 @@ from pickle import dump
 # from IPython.core.display import display
 from imblearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 
 import utils.sklearn_utils as modelutil
@@ -51,15 +52,8 @@ from imblearn.over_sampling import RandomOverSampler
 from imblearn.combine import SMOTEENN
 from imblearn.combine import SMOTETomek
 
-from xgboost import XGBClassifier
-
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.execution_utils as exe
-from utils.metrics import Metrics
-from filepaths import Paths
-from model_param import ModelParamInterface
+from models.model_param import ModelParamInterface
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -72,13 +66,25 @@ __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
 
 
-class ModelParamSVM(ModelParamInterface):
+class ModelParam(ModelParamInterface):
+    """
+    SVM Default parameters
+
+    To change the setup, modify the use_parameters method.
+
+    """
+
+    def __init__(self):
+        print("in init")
+
+    def get_model_type(self):
+        return 'knn'
 
     def use_parameters(self, X_train, selected_features):
-        '''
+        """
+        Default Parameter
 
-
-        '''
+        """
 
         test_scaler = [StandardScaler(), RobustScaler(), QuantileTransformer(), Normalizer()]
         test_sampling = [modelutil.Nosampler(),
@@ -94,43 +100,28 @@ class ModelParamSVM(ModelParamInterface):
                          SMOTEENN(),
                          SMOTETomek(),
                          ADASYN()]
-        test_C = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
-        test_C_linear = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]
+        #test_C = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
+        #test_C_linear = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]
 
         # gamma default parameters
-        param_scale = 1 / (X_train.shape[1] * np.mean(X_train.var()))
+        #param_scale = 1 / (X_train.shape[1] * np.mean(X_train.var()))
+
+        #parameters = [
+        #    {
+        #        'scaler': test_scaler,
+        #        'sampling': test_sampling,
+        #        'feat__cols': selected_features,
+        #        'model__n_neighbors': [3, 5, 7, 9, 11, 13, 15, 17, 19, 21],
+        #        'model__weights': ['uniform', 'distance']
+        #    }]
 
         parameters = [
             {
                 'scaler': test_scaler,
                 'sampling': test_sampling,
                 'feat__cols': selected_features,
-                'model__C': test_C,  # default C=1
-                'model__kernel': ['sigmoid']
-            },
-            {
-                'scaler': test_scaler,
-                'sampling': test_sampling,
-                'feat__cols': selected_features,
-                'model__C': test_C_linear,  # default C=1
-                'model__kernel': ['linear']
-            },
-            {
-                'scaler': test_scaler,
-                'sampling': test_sampling,
-                'feat__cols': selected_features,
-                'model__C': test_C,  # default C=1
-                'model__kernel': ['poly'],
-                'model__degree': [2, 3]  # Only relevant for poly
-            },
-            {
-                'scaler': test_scaler,
-                'sampling': test_sampling,
-                'feat__cols': selected_features,
-                'model__C': test_C,  # default C=1
-                'model__kernel': ['rbf'],
-                'model__gamma': [param_scale, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
-                # Only relevant in rbf, default='auto'=1/n_features
+                'model__n_neighbors': [13, 15, 21, 25],
+                'model__weights': ['uniform', 'distance']
             }]
 
         # If no missing values, only one imputer strategy shall be used
@@ -146,11 +137,13 @@ class ModelParamSVM(ModelParamInterface):
 
         return parameters
 
+
     def get_categorical_parameters(self):
         return [
             'scaler',
             'sampling',
-            'model__kernel',
+            'model__n_neighbors',
+            'model__weights',
             'feat__cols',
         ]
 
@@ -159,19 +152,9 @@ class ModelParamSVM(ModelParamInterface):
         params_debug = [{'scaler': [StandardScaler()],
                          'sampling': [modelutil.Nosampler(), SMOTE(), SMOTEENN(), ADASYN()],
                          'feat__cols': reduced_selected_features[0:2],
-                         'model__kernel': ['linear'],
-                         'model__C': [0.1, 1, 10],
-                         'model__gamma': [0.1, 1, 10],
-                         },
-                        {
-                            'scaler': [StandardScaler(), Normalizer()],
-                            'sampling': [modelutil.Nosampler()],
-                            'feat__cols': reduced_selected_features[0:1],
-                            'model__C': [1],  # default C=1
-                            'model__kernel': ['rbf'],
-                            'model__gamma': [1]
-                            # Only relevant in rbf, default='auto'=1/n_features
-                        }]
+                         'model__n_neighbors': [3, 5],
+                         'model__weights': ['uniform', 'distance']
+                         }]
 
         return params_debug
 
@@ -181,7 +164,7 @@ class ModelParamSVM(ModelParamInterface):
             ('scaler', StandardScaler()),
             ('sampling', modelutil.Nosampler()),
             ('feat', modelutil.ColumnExtractor(cols=None)),
-            ('model', SVC())
+            ('model', KNeighborsClassifier())
         ])
         return pipe_run
 
@@ -191,7 +174,8 @@ class ModelParamSVM(ModelParamInterface):
             ('sampling', best_values_dict.get('sampling')),
             ('feat', modelutil.ColumnExtractor(cols=best_columns)),
             ('model', models_run1.set_params(
-                kernel=best_values_dict.get('model__kernel')
+                n_neighbors=best_values_dict.get('model__n_neighbors'),
+                weights=best_values_dict.get('model__weights')
             ))
         ])
 

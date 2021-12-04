@@ -30,7 +30,8 @@ echo #===========================================#
 echo # Model Training #
 echo #===========================================#
 python %script_prefix%\step42_analyze_training_time.py --config_path=./config/%CONFIG%.ini
-python %script_prefix%\step43_wide_hyperparameter_search_all.py --config_path=./config/%CONFIG%.ini --execute_wide=True -debug
+python %script_prefix%\step43_wide_hyperparameter_search_all.py --config_path=./config/%CONFIG%.ini --execute_wide=True
+::python %script_prefix%\step43_wide_hyperparameter_search_all.py --config_path=./config/%CONFIG%.ini --execute_wide=True -debug
 python %script_prefix%\step44_narrow_hyperparameter_search_all.py --config_path=./config/%CONFIG%.ini
 python %script_prefix%\step45_define_precision_recall.py --config_path=./config/%CONFIG%.ini
 

@@ -32,6 +32,7 @@ import sys
 import argparse
 import os
 import logging
+from pydoc import locate
 
 import numpy as np
 from pandas.plotting import register_matplotlib_converters
@@ -148,12 +149,19 @@ def run_training_predictors(data_input_path):
 
     '''
 
-    conf = sup.load_config(data_input_path)
-    metrics = Metrics(conf)
-    algorithm = conf['Common'].get('model_type')
+    config = sup.load_config(data_input_path)
+    metrics = Metrics(config)
+    #algorithm = config['Common'].get('model_type')
+
+    pipeline_class_name = config.get('Training', 'pipeline_class', fallback=None)
+    PipelineClass = locate('models.' + pipeline_class_name + '.ModelParam')
+    model_param = PipelineClass()
+    if model_param is None:
+        raise Exception("Model pipeline could not be found: {}".format('models.' + pipeline_class_name + '.ModelParam'))
+
 
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
-    feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(conf)
+    feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
     scorer = scorers[refit_scorer_name]
 
     results_directory = paths['results_directory']
@@ -164,12 +172,17 @@ def run_training_predictors(data_input_path):
     print("Baseline results=", baseline_results)
 
     #Set classifier and estimate performance
-    if algorithm=='xgboost':
-        model_clf = XGBClassifier(objective="binary:logistic", random_state=42)
-        log.info("XBoost Classifier selected.")
-    else:
-        model_clf = SVC()
-        log.info("SVM (default) classifier selected.")
+
+    model_clf = model_param.create_pipeline()['model']
+    log.info("{} selected.".format(model_clf))
+
+    #algorithm=""
+    #if algorithm=='xgboost':
+    #    model_clf = XGBClassifier(objective="binary:logistic", random_state=42)
+    #    log.info("XBoost Classifier selected.")
+    #else:
+    #    model_clf = SVC()
+    #    log.info("SVM (default) classifier selected.")
 
     run_training_estimation(X_train, y_train, X_val, y_val, scorer, model_clf, save_fig_prefix)
 

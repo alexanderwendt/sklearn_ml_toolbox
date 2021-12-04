@@ -42,6 +42,15 @@ __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
 
 class ModelParamInterface:
+    """
+    Interface for creating pipelines for ML training models, e.g. SVM
+
+
+    """
+
+    def get_model_type(self):
+        pass
+
     def use_parameters(self, X_train, selected_features):
         pass
 
@@ -56,3 +65,10 @@ class ModelParamInterface:
 
     def define_best_pipeline(self, best_values_dict, best_columns, models_run1):
         pass
+
+    def load_dynamic_class(self, class_name):
+        from pydoc import locate
+        #my_class = locate('my_package.my_module.MyClass')
+
+        my_class = locate(class_name)
+        return my_class

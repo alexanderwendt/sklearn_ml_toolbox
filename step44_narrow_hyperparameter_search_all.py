@@ -31,6 +31,7 @@ import os
 # Libs
 import argparse
 import warnings
+from pydoc import locate
 
 from pandas.plotting import register_matplotlib_converters
 import pickle
@@ -185,7 +186,13 @@ def execute_narrow_search(config_path):
     # Load complete training input
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
-    model_type = config.get('Common', 'model_type')
+    #model_type = config.get('Common', 'model_type')
+
+    pipeline_class_name = config.get('Training', 'pipeline_class', fallback=None)
+    PipelineClass = locate('models.' + pipeline_class_name + '.ModelParam')
+    model_param = PipelineClass()
+    if model_param is None:
+        raise Exception("Model pipeline could not be found: {}".format('models.' + pipeline_class_name + '.ModelParam'))
 
     # Load narrow training parameters
     samples = json.loads(config.get("Training", "narrow_samples"))
@@ -226,21 +233,22 @@ def execute_narrow_search(config_path):
     r = open(pipe_first_selection, "rb")
     pipe_run_best_first_selection = pickle.load(r)
 
-    if model_type == 'svm':
+    if model_param.get_model_type() == 'svm':
         # SVM Code Start
         pipe_run_second_selection, results_run2 = perform_run2_svm(X_train, iter_setup, pipe_run_best_first_selection,
                                                                    refit_scorer_name,
                                                                    save_fig_prefix, scorers, y_train)
         # SVM Code End
-    elif model_type == 'xgboost':
+    else:
         # XGBoost Code start
+        warnings.warn("No 2nd search will be performed for {}".format(model_param.get_model_type()))
         pipe_run_second_selection, results_run2 = perform_run2_xgboost(X_train, iter_setup,
                                                                        pipe_run_best_first_selection,
                                                                        refit_scorer_name, save_fig_prefix, scorers,
                                                                        y_train)
         # XGBoost Code end
-    else:
-        raise Exception("No valid model for model type {}".format(model_type))
+    #else:
+    #    raise Exception("No valid model for model type {}".format(model_param.get_model_type()))
 
     print("Model parameters defined", pipe_run_second_selection)
 

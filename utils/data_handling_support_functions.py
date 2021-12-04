@@ -210,6 +210,8 @@ def load_config(config_file_path):
 
     '''
     #config_path = Path(sys.path[0], "config", "classification.cfg")
+    if not os.path.isfile(config_file_path):
+        raise Exception("File not found: {}".format(config_file_path))
     conf = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
     conf.read(config_file_path)
 
