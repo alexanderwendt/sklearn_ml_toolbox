@@ -153,13 +153,15 @@ def evaluate_model(config_path, config_section="EvaluationTraining"):
     if len(y_classes) == 2:
         print("Plot precision recall graphs")
         precision, recall, thresholds = precision_recall_curve(y_val, y_test_pred_scores)
-        vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold, save_fig_prefix=figure_path_prefix)
+        vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold,
+                                               save_fig_prefix=figure_path_prefix, title_prefix="pr_adjusted")
 
-    #Plot evaluation
-    #vis.plot_precision_recall_evaluation(y_train, y_train_pred_adjust, y_train_pred_proba, reduced_class_dict_train,
-    #                                 save_fig_prefix=figure_path_prefix + "_step46_train_")
-    vis.plot_precision_recall_evaluation(y_val, y_test_pred_adjust, y_test_pred_proba, reduced_class_dict_test,
-                                         save_fig_prefix_dir=figure_path_prefix)
+        vis.plot_precision_recall_evaluation(y_val, y_test_pred_adjust, y_test_pred_proba, reduced_class_dict_test,
+                                             save_fig_prefix_dir=figure_path_prefix, title_prefix="pr_adjusted")
+
+    #Plot evaluation for unadjusted values
+    vis.plot_precision_recall_evaluation(y_val, y_test_pred, y_test_pred_proba, reduced_class_dict_test,
+                                         save_fig_prefix_dir=figure_path_prefix, title_prefix="")
     #Plot decision boundary plot
     X_decision = X_val.values[0:1000, :]
     y_decision = y_val[0:1000]

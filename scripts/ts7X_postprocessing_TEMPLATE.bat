@@ -11,7 +11,7 @@ set env="sklearn"
 
 ::Extract the model name from the current file name
 set THISFILENAME=%~n0
-set CONFIG=%THISFILENAME:is2X_generation_=%
+set CONFIG=%THISFILENAME:ts7X_postprocessing_=%
 echo Load config file %CONFIG%.ini
 
 echo setup environment %env%
@@ -20,9 +20,7 @@ call conda activate %env%
 echo #===========================================#
 echo # Generate Dataset #
 echo #===========================================#
-rem python step20_generate_groundtruth_stockmarket.py --config_path=%config_file%
-python %script_prefix%\step21_generate_features.py --config_path=./config/%CONFIG%.ini -debug
-python %script_prefix%\step22_adapt_dimensions.py --config_path=./config/%CONFIG%.ini
+
 
 echo #===========================================#
 echo # Data Analysis and Preprocessing #
@@ -30,11 +28,22 @@ echo #===========================================#
 
 
 echo #===========================================#
-echo # Model Training #
+echo # Hyperparameter Search #
 echo #===========================================#
 
 
 echo #=================================================#
-echo # Training Model Evaluation for Temporal Datasets #
+echo # Model Training#
 echo #=================================================#
 
+
+echo #=================================================#
+echo # Model Evaluation for Temporal Datasets #
+echo #=================================================#
+
+python %script_prefix%\step71_value_postprocessing.py --config_path=./config/%CONFIG%.ini --config_section="EvaluationValidation"
+python %script_prefix%\step72_backtesting.py --config_path=./config/%CONFIG%.ini --config_section="EvaluationValidation"
+
+echo #=================================================#
+echo # Prediction #
+echo #=================================================#

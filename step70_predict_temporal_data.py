@@ -70,6 +70,7 @@ parser.add_argument("-sec", '--config_section', default="EvaluationValidation",
                     help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
+print(args)
 
 
 def visualize_temporal_data(config_path, config_section):
@@ -90,9 +91,7 @@ def visualize_temporal_data(config_path, config_section):
     result_directory = paths['results_directory']
 
     figure_path_prefix = result_directory + '/evaluation'
-    if not os.path.isdir(result_directory + '/evaluation'):
-        os.makedirs(result_directory + '/evaluation')
-        print("Created folder: ", result_directory + '/evaluation')
+    os.makedirs(result_directory + '/evaluation', exist_ok=True)
 
     # Load model external parameters
     pr_threshold = external_params['pr_threshold']
@@ -101,6 +100,7 @@ def visualize_temporal_data(config_path, config_section):
 
     # Make predictions
     y_test_pred_scores = model.predict_proba(X_val.values)[:,1]
+    y_test_pred = model.predict(X_val.values)
     #y_test_pred_proba = evalclf.predict_proba(X_test.values)
     y_test_pred_adjust = model_util.adjusted_classes(y_test_pred_scores, pr_threshold)
 
@@ -113,6 +113,9 @@ def visualize_temporal_data(config_path, config_section):
 
     # Create a df from the y array for the visualization functions
     y_order_test_pred = pd.DataFrame(index=X_val.index,
+                                     data=pd.Series(data=y_test_pred, index=X_val.index, name="y")).sort_index()
+
+    y_order_test_pred_adjust = pd.DataFrame(index=X_val.index,
                                      data=pd.Series(data=y_test_pred_adjust, index=X_val.index, name="y")).sort_index()
 
 
@@ -123,6 +126,13 @@ def visualize_temporal_data(config_path, config_section):
                                df_time_graph['Date'][y_order_test_pred.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
                                title=title + "_Inference_" + model_name,
+                               save_fig_prefix=figure_path_prefix)
+
+    vis.plot_three_class_graph(y_order_test_pred_adjust['y'].values,
+                               df_time_graph['Close'][y_order_test_pred.index],
+                               df_time_graph['Date'][y_order_test_pred.index], 0, 0, 0,
+                               ('close', 'neutral', 'positive', 'negative'),
+                               title=title + "_Inference_Adjusted" + model_name,
                                save_fig_prefix=figure_path_prefix)
     #vis.plot_two_class_graph(y_order_test, y_order_test_pred,
     #                         save_fig_prefix=figure_path_prefix + "_test_")

@@ -108,6 +108,7 @@ def visualize_temporal_data(config_path, config_section):
     #y_train_pred_proba = evalclf.predict_proba(X_train.values)
     #y_train_pred_adjust = model_util.adjusted_classes(y_train_pred_scores, pr_threshold)
     y_test_pred_scores = model.predict_proba(X_val.values)[:,1]
+    y_test_pred = model.predict(X_val.values)
     #y_test_pred_proba = evalclf.predict_proba(X_test.values)
     y_test_pred_adjust = model_util.adjusted_classes(y_test_pred_scores, pr_threshold)
 
@@ -118,18 +119,14 @@ def visualize_temporal_data(config_path, config_section):
     print("Loaded feature names for time graph={}".format(df_time_graph.columns))
     print("X. Shape={}".format(df_time_graph.shape))
 
-    # Create a df from the y array for the visualization functions
-    #y_order_train = pd.DataFrame(index=X_train.index,
-    #                             data=pd.Series(data=y_train, index=X_train.index, name="y")).sort_index()
-
-    #y_order_train_pred = pd.DataFrame(index=X_train.index,
-    #                                  data=pd.Series(data=y_train_pred_adjust, index=X_train.index, name="y")).sort_index()
-
     y_order_test = pd.DataFrame(index=X_val.index,
                                 data=pd.Series(data=y_val, index=X_val.index, name="y")).sort_index()
 
-    y_order_test_pred = pd.DataFrame(index=X_val.index,
+    y_order_test_pred_adjust = pd.DataFrame(index=X_val.index,
                                      data=pd.Series(data=y_test_pred_adjust, index=X_val.index, name="y")).sort_index()
+
+    y_order_test_pred = pd.DataFrame(index=X_val.index,
+                                     data=pd.Series(data=y_test_pred, index=X_val.index, name="y")).sort_index()
 
 
     #Visualize the results
@@ -146,6 +143,13 @@ def visualize_temporal_data(config_path, config_section):
                                df_time_graph['Date'][y_order_test.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
                                title=title + "_Pred_" + model_name,
+                               save_fig_prefix=figure_path_prefix)
+
+    vis.plot_three_class_graph(y_order_test_pred_adjust['y'].values,
+                               df_time_graph['Close'][y_order_test.index],
+                               df_time_graph['Date'][y_order_test.index], 0, 0, 0,
+                               ('close', 'neutral', 'positive', 'negative'),
+                               title=title + "_Pred_Adjust" + model_name,
                                save_fig_prefix=figure_path_prefix)
 
 

@@ -239,13 +239,13 @@ def calculate_moving_average(source, debug_param=False):
 
     for i in meanList:
         # Mean
-        ta.sma(close, i, 0)
+        #ta.sma(close, i, 0)
         meanCol = ta.sma(close, i, 0) #MA(close, i, 0);  # Trailing MA with i
         # meanCol.fillna(0, inplace=True)
         meanColreshaped = np.reshape(meanCol.values, (1, np.product(meanCol.values.shape)))[0]
         # Calculate diff from price in %
-        diffPriceCol = np.divide(meanColreshaped - close.values, close.values)
-        temp_source = pd.DataFrame(diffPriceCol, columns=['MA' + str(i) + 'Norm'])
+        diffPriceCol = np.divide(close.values - meanColreshaped, meanColreshaped)
+        temp_source = pd.DataFrame(diffPriceCol, columns=['SMA' + str(i) + ''])
         # print(temp_source)
         meanfeatures = meanfeatures.join(temp_source)
         # meanTable(:,i) = diffPriceCol;
@@ -580,14 +580,6 @@ def main(config_path, debug_param):
     image_save_directory = os.path.join(conf['Paths'].get('results_directory'), "data_generation")
     features_filename_uncut = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp", "temp_features_uncut" + ".csv")
     os.makedirs(os.path.dirname(features_filename_uncut), exist_ok=True)
-
-    #if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
-    #    os.makedirs(conf['Paths'].get('prepared_data_directory'))
-    #    print("Created directory ", conf['Paths'].get('training_data_directory'))
-
-    #if os.path.isdir(conf['Paths'].get('results_directory'))==False:
-    #    os.makedirs(conf['Paths'].get('results_directory'))
-    #    print("Created directory ", conf['Paths'].get('results_directory'))
 
     #Load only a subset of the whole raw data to create a debug dataset
     source = custom.load_source(conf['Paths'].get('source_path'))

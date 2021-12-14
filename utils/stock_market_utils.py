@@ -34,12 +34,14 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 import numpy as np
 from scipy.ndimage.interpolation import shift
 from pandas.plotting import register_matplotlib_converters
+
 register_matplotlib_converters()
+import matplotlib.dates as mdates
 
 # Own modules
-#import data_handling_support_functions as sup
-#import custom_methods as custom
-#import data_visualization_functions as vis
+# import data_handling_support_functions as sup
+# import custom_methods as custom
+# import data_visualization_functions as vis
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -51,15 +53,16 @@ __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
 
+
 def find_tops_bottoms(source):
     ### Calculate Tops and Bottoms
 
     m = source.shape[0]
     factor = 10000000
     topsTemp = np.zeros([m, 4]);
-    #topsTemp
+    # topsTemp
     bottomsTemp = np.ones([m, 4]) * factor;
-    #bottomsTemp
+    # bottomsTemp
     # close=source['Close']
     # close
 
@@ -130,7 +133,7 @@ def find_tops_bottoms(source):
     plt.plot(source['Date'], bottoms[:])
     plt.title("OMXS30 Tops and Bottoms")
     fig_tops_bot = plt.gcf()
-    #plt.show(block = False)
+    # plt.show(block = False)
 
     latestBottoms = calculateLatestEvent(bottoms)
     latestTops = calculateLatestEvent(tops)
@@ -141,9 +144,10 @@ def find_tops_bottoms(source):
     plt.plot(source['Date'], latestBottoms[:])
     plt.title("OMXS30 Latest Tops and Bottoms")
     fig_latest_tops_latest_bot = plt.gcf()
-    #plt.show(block = False)
+    # plt.show(block = False)
 
     return bottoms, tops, latestTops, latestBottoms, fig_tops_bot, fig_latest_tops_latest_bot
+
 
 def calculateLatestEvent(eventList):
     '''
@@ -161,15 +165,17 @@ def calculateLatestEvent(eventList):
             result[i] = previousItem
     return result
 
+
 def calculate_lowess(source, days_to_consider):
     '''
     # Fraction for the lowess smoothing function
 
 
     '''
-    if sum(np.isnan(source['Close']))>0:
-        raise Exception("Notice: If there are any NaN in the data, these rows are removed. It causes a dimension problem.")
-        #print("Notice: If there are any NaN in the data, these rows are removed. It causes a dimension problem.")
+    if sum(np.isnan(source['Close'])) > 0:
+        raise Exception(
+            "Notice: If there are any NaN in the data, these rows are removed. It causes a dimension problem.")
+        # print("Notice: If there are any NaN in the data, these rows are removed. It causes a dimension problem.")
 
     frac = days_to_consider / len(source['Close'])
     filtered = lowess(source['Close'], source['Date'], frac=frac)
@@ -186,3 +192,20 @@ def calculate_lowess(source, days_to_consider):
     # plt.plot(source['Date'], filtered[:, 1]*pos_trend_cleaned, 'y-', linewidth=3)
 
     return pos_trend, fig
+
+
+def load_ohlc_graph(source_path):
+    """
+    Load a source ohlc data file
+
+    """
+
+    # Load original data for visualization
+    df_time_graph = pd.read_csv(source_path, delimiter=';').set_index('id')
+    df_time_graph['Date'] = pd.to_datetime(df_time_graph['Date'])
+    df_time_graph['Date'].apply(mdates.date2num)
+    df_time_graph['Volume'] = pd.Series(data=np.zeros(len(df_time_graph.index)), index=df_time_graph.index, dtype=np.float32)
+    print("Loaded feature names for time graph={}".format(df_time_graph.columns))
+    print("X. Shape={}".format(df_time_graph.shape))
+
+    return df_time_graph
