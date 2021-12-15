@@ -1,9 +1,8 @@
 # The SKLearn Machine Learning Toolbox
-The Machine Learning Toolbox represents a complete tool-chain of data preparation, data analysis, model training and prediction of unknown data. 
-The machine learning toolbox is supposed to be used for primary small and middle sized, structured datasets. 
+The SKLearn Machine Learning Toolbox represents a complete tool-chain of data preparation, data analysis, model training and prediction of unknown tabular data. The purpose is to have a comprehensive set of tools to handle many types of data.
 
-In this toolbox, a stock index prediction example is provided to show how to use the tools. The tools contains several methods collected from 
-different sources like stack overflow. The purpose is to have a comprehensive set of tools to handle many types of data. Methods that have been 
+In this toolbox, a stock market index prediction example is provided to show how to use the tools. The tools contain several methods collected from 
+different sources like stack overflow. Methods that have been 
 copied are referenced by the url. 
 
 Machine Learning algorithms from the Scikit Learn library are used in the implementations.
@@ -23,8 +22,7 @@ pip install -r requirements.txt
 In case all libraries cannot be setup correctly, they can be installed manually based on the requirements.txt
 
 ## Setup a Project
-The toolbox contains several python scripts that are divided into steps, e.g. "step20_". In the following, each step will be described. The file structure 
-with scripts is supposed to be used as a template to adapt to an arbitrary dataset, as scripts almost always have to be adapted to their specific use case.  
+The toolbox contains several python scripts that are divided into steps, e.g. "step20_". The naming convention with steps and numbers is to make it easier for the user to know what to execute in which order. In the following, each step will be described. The file structure with scripts is supposed to be used as a template to adapt to an arbitrary dataset, as scripts almost always have to be adapted to their specific use case.  
 
 Toolbox default directories:
 - (root): all python scripts used in the process
