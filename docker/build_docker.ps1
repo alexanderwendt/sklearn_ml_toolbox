@@ -1,0 +1,1 @@
+docker build -t sklearn_ml_toolbox:py38 .
