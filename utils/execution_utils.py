@@ -552,18 +552,18 @@ def get_continuous_parameter_range_for_SVM_based_on_kernel(pipe_run_best_first_s
     # Initial parameters
     if best_kernel == 'rbf':
         params_run2 = {
-            'model__C': [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5],
+            'model__C': [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3],
             'model__gamma':
-                [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]
+                [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
         }
     elif best_kernel == 'linear' or best_kernel == 'sigmoid':
         params_run2 = {
-            'model__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
+            'model__C': [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3],
             'model__gamma': [1e0, 1.01e0]
         }
     elif best_kernel == 'poly':
         params_run2 = {
-            'model__C': [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4],
+            'model__C': [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3],
             'model__gamma': [1e0, 1.01e0]
         }
     else:
