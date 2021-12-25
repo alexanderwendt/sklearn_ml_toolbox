@@ -31,6 +31,7 @@ import os
 import argparse
 import warnings
 
+from imblearn.under_sampling import RandomUnderSampler, ClusterCentroids
 from pandas.plotting import register_matplotlib_converters
 import pickle
 from pickle import dump
@@ -45,7 +46,7 @@ import numpy as np
 import copy
 
 from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
-from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE, BorderlineSMOTE
 from imblearn.over_sampling import ADASYN
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.combine import SMOTEENN
@@ -87,15 +88,17 @@ class ModelParam(ModelParamInterface):
 
         test_scaler = [StandardScaler(), RobustScaler(), QuantileTransformer(), Normalizer()]
         test_sampling = [modelutil.Nosampler(),
-                         # ClusterCentroids(),
-                         # RandomUnderSampler(),
+                         ClusterCentroids(),
+                         RandomUnderSampler(),
                          # NearMiss(version=1),
                          # EditedNearestNeighbours(),
                          # AllKNN(),
                          # CondensedNearestNeighbour(random_state=0),
                          # InstanceHardnessThreshold(random_state=0,
                          #                          estimator=LogisticRegression(solver='lbfgs', multi_class='auto')),
+                         RandomOverSampler(random_state=0),
                          SMOTE(),
+                         BorderlineSMOTE(),
                          SMOTEENN(),
                          SMOTETomek(),
                          ADASYN()]
@@ -106,13 +109,13 @@ class ModelParam(ModelParamInterface):
         param_scale = 1 / (X_train.shape[1] * np.mean(X_train.var()))
 
         parameters = [
-            {
-                'scaler': test_scaler,
-                'sampling': test_sampling,
-                'feat__cols': selected_features,
-                'model__C': test_C,  # default C=1
-                'model__kernel': ['sigmoid']
-            },
+            #{
+            #    'scaler': test_scaler,
+            #    'sampling': test_sampling,
+            #    'feat__cols': selected_features,
+            #    'model__C': test_C,  # default C=1
+            #    'model__kernel': ['sigmoid']
+            #},
             {
                 'scaler': test_scaler,
                 'sampling': test_sampling,
@@ -120,14 +123,14 @@ class ModelParam(ModelParamInterface):
                 'model__C': test_C_linear,  # default C=1
                 'model__kernel': ['linear']
             },
-            {
-                'scaler': test_scaler,
-                'sampling': test_sampling,
-                'feat__cols': selected_features,
-                'model__C': test_C,  # default C=1
-                'model__kernel': ['poly'],
-                'model__degree': [2, 3]  # Only relevant for poly
-            },
+            #{
+            #    'scaler': test_scaler,
+            #    'sampling': test_sampling,
+            #    'feat__cols': selected_features,
+            #    'model__C': test_C,  # default C=1
+            #    'model__kernel': ['poly'],
+            #    'model__degree': [2, 3]  # Only relevant for poly
+            #},
             {
                 'scaler': test_scaler,
                 'sampling': test_sampling,

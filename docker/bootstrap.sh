@@ -39,7 +39,7 @@ if [ ! -d "$TF2ODAENV" ] ; then
   #pip install --no-cache-dir --upgrade setuptools cython wheel
   
   # Install EML libraries
-  pip install --no-cache-dir sklearn seaborn pandas pandas-ta numpy matplotlib imbalanced-learn scikit-plot scipy statsmodels umap-learn xgboost pip install missingno backtesting
+  pip install --no-cache-dir sklearn seaborn pandas pandas-ta numpy matplotlib imbalanced-learn scikit-plot scipy statsmodels umap-learn xgboost missingno backtesting
   
   cd $ROOTFOLDER
 

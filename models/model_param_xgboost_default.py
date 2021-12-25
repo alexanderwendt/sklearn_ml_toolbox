@@ -31,6 +31,7 @@ import os
 import argparse
 import warnings
 
+from imblearn.under_sampling import ClusterCentroids, RandomUnderSampler
 from pandas.plotting import register_matplotlib_converters
 import pickle
 from pickle import dump
@@ -44,11 +45,13 @@ import numpy as np
 import copy
 
 from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
-from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE, BorderlineSMOTE
 from imblearn.over_sampling import ADASYN
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.combine import SMOTEENN
 from imblearn.combine import SMOTETomek
+
+import multiprocessing
 
 from xgboost import XGBClassifier
 
@@ -87,15 +90,17 @@ class ModelParam(ModelParamInterface):
         '''
         test_scaler = [StandardScaler(), RobustScaler(), QuantileTransformer(), Normalizer()]
         test_sampling = [modelutil.Nosampler(),
-                         # ClusterCentroids(),
-                         # RandomUnderSampler(),
+                         ClusterCentroids(),
+                         RandomUnderSampler(),
                          # NearMiss(version=1),
                          # EditedNearestNeighbours(),
                          # AllKNN(),
                          # CondensedNearestNeighbour(random_state=0),
                          # InstanceHardnessThreshold(random_state=0,
                          #                          estimator=LogisticRegression(solver='lbfgs', multi_class='auto')),
+                         RandomOverSampler(random_state=0),
                          SMOTE(),
+                         BorderlineSMOTE(),
                          SMOTEENN(),
                          SMOTETomek(),
                          ADASYN()]
@@ -165,12 +170,16 @@ class ModelParam(ModelParamInterface):
 
 
     def create_pipeline(self):
+        n_jobs = multiprocessing.cpu_count() - 1
+        n_jobs = 10
+        print("Number of CPUs: {}. Using {}".format(multiprocessing.cpu_count(), n_jobs))
+
         pipe_run = Pipeline([
             ('imputer', SimpleImputer(missing_values=np.nan, strategy='median')),
             ('scaler', StandardScaler()),
             ('sampling', modelutil.Nosampler()),
             ('feat', modelutil.ColumnExtractor(cols=None)),
-            ('model', XGBClassifier(use_label_encoder=False, eval_metric='logloss'))
+            ('model', XGBClassifier(use_label_encoder=False, eval_metric='logloss', n_jobs=n_jobs))
         ])
         return pipe_run
 

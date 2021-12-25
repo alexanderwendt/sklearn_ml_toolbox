@@ -198,6 +198,7 @@ def define_precision_recall_threshold(config_path):
     #    print("Created folder: ", result_directory + '/model_images')
 
     # Check if precision recall can be applied, i.e. it is a binary problem
+    print("Classes: {}".format(y_classes))
     if len(y_classes) > 2:
         print("The problem is a multi class problem. No precision/recall optimization will be done.")
         optimal_threshold = 0
