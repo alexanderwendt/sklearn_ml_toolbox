@@ -34,18 +34,9 @@ import warnings
 from pydoc import locate
 
 from pandas.plotting import register_matplotlib_converters
-import pickle
-from pickle import dump
 from copy import deepcopy
-
-from imblearn.pipeline import Pipeline
-from sklearn.svm import SVC
-
 import pickle
 
-# from IPython.core.display import display
-
-# import utils.execution_utils as exe
 import matplotlib.pyplot as plt
 
 ## %% First run with a wide grid search

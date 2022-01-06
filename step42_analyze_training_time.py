@@ -36,8 +36,6 @@ from pydoc import locate
 
 import numpy as np
 from pandas.plotting import register_matplotlib_converters
-from sklearn.svm import SVC
-from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
 
 # Own modules
