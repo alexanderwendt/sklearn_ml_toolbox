@@ -26,6 +26,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 # Built-in/Generic Imports
 import os
+import warnings
+import sys
+import traceback
 
 # Libs
 from pandas.plotting import register_matplotlib_converters
@@ -77,8 +80,11 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 
 args = parser.parse_args()
 
+def unique_cols(df):
+    a = df.values
+    return (a[0] == a).all(0)
 
-def analyse_features(features, y, class_labels, source, conf, image_save_directory):
+def analyse_features(features, y, class_labels, conf, image_save_directory):
     '''
 
 
@@ -96,59 +102,77 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     # transform the training and the test data.The reason is that the scaler only must depend on the training data,
     # in order to prevent leakage of information from the test data.
 
+    # === Remove Columns that are all the same
+    features_reduced = features.loc[:, np.invert(unique_cols(features))]
+    print("Reduce columns that are duplicated in terms of values.")
+    features = features_reduced
+
     # === Select the best type of scaler ===#
-    X_scaled, y_scaled = rescale(conf, features, y)
-    print("Merged features and outcomes to use in correlation matrix")
-    total_values_scaled = X_scaled.join(y_scaled)
+    X_scaled = rescale_features(features)
+    if y is not None:
+        y_scaled = rescale_outcomes(conf, features, y)
+        print("Merged features and outcomes to use in correlation matrix")
+        total_values_scaled = X_scaled.join(y_scaled)
+
+        plot_correlation_matrix2(conf, image_save_directory, total_values_scaled)
+
+        plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled)
+    else:
+        total_values_scaled = X_scaled
+        print("Only features will be used in for correlations.")
 
     ### Feature and Outcomes Correlation Matrix
-    plot_correlation_matrix(conf, features, image_save_directory, total_values_scaled)
+    plot_correlation_matrix(features, image_save_directory, total_values_scaled)
 
     #fixme: Class names not correct shown
-    plot_correlation_matrix2(conf, image_save_directory, total_values_scaled)
-
-    plot_spearman_correlation_matrix(conf, image_save_directory, total_values_scaled)
-
-    plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled)
+    plot_spearman_correlation_matrix(image_save_directory, total_values_scaled)
 
     #from tabulate import tabulate
     #print(tabulate(X_scaled, headers='keys', tablefmt='psql'))
 
-    plot_hierarchical_linkage(X_scaled, conf, image_save_directory)
+    try:
+        plot_hierarchical_linkage(X_scaled, conf, image_save_directory)
+    except:
+        warnings.warn("Cannot execute hiearchical linkage")
+        traceback.print_exc()
 
     ### Feature visualization with Parallel Coordinates
     # Select a random subset to visualize
     import random
 
-    df_y = y_scaled = pd.DataFrame(data=y.reshape(-1, 1), index=features.index, columns=[conf['Common'].get('class_name')])
-    total_values = features.join(df_y)
-    print("Merged features and outcomes to use in correlation matrix unscaled")
-
     # Reduce the training set with the number of samples randomly chosen
     X_train_index_subset = sup.get_random_data_subset_index(1000, features)
     X_train_scaled_subset = X_scaled.iloc[X_train_index_subset, :]
-    y_train_subset = np.array(y[X_train_index_subset]).flatten()
 
-    # Select column values to use in the correlation plot
-    feature_plot = list(range(0, 10, 1))
-    # cols = ['MA2Norm', 'MA50Norm', 'MA200Norm', 'MA400Norm', 'MA200NormDiff', 'MA400NormDiff']
-    cols = total_values.columns[feature_plot]
-    print(feature_plot)
-    print(cols)
+    if y is not None:
+        df_y = y_scaled = pd.DataFrame(data=y.reshape(-1, 1), index=features.index, columns=[conf['Common'].get('class_name')])
+        total_values = features.join(df_y)
+        print("Merged features and outcomes to use in correlation matrix unscaled")
+        y_train_subset = np.array(y[X_train_index_subset]).flatten()
 
-    comparison_name = conf['Common'].get('class_name')
-    print("Class name: ", comparison_name)
+        # Select column values to use in the correlation plot
+        feature_plot = list(range(0, 10, 1))
+        # cols = ['MA2Norm', 'MA50Norm', 'MA200Norm', 'MA400Norm', 'MA200NormDiff', 'MA400NormDiff']
+        cols = total_values.columns[feature_plot]
+        print(feature_plot)
+        print(cols)
 
-    df_fv = total_values.iloc[X_train_index_subset, :]
+        comparison_name = conf['Common'].get('class_name')
+        print("Class name: ", comparison_name)
 
-    # Use parallel coordinates to visualize the classes and all features for plotting
-    # https://plot.ly/python/parallel-coordinates-plot/
-    # http://benalexkeen.com/parallel-coordinates-in-matplotlib/
+        df_fv = total_values.iloc[X_train_index_subset, :]
 
-    m.rc_file_defaults()  # Reset sns
-    colors = ['#2e8ad8', '#cd3785', '#c64c00', '#889a00']
-    plot_parallel_coordinates(df_fv, cols, colors, comparison_name, conf, image_save_directory)
-    #plot_parallel_coordinates(X_train_index_subset, cols, comparison_name, total_values)
+        # Use parallel coordinates to visualize the classes and all features for plotting
+        # https://plot.ly/python/parallel-coordinates-plot/
+        # http://benalexkeen.com/parallel-coordinates-in-matplotlib/
+
+        m.rc_file_defaults()  # Reset sns
+        colors = ['#2e8ad8', '#cd3785', '#c64c00', '#889a00']
+        plot_parallel_coordinates(df_fv, cols, colors, comparison_name, conf, image_save_directory)
+        #plot_parallel_coordinates(X_train_index_subset, cols, comparison_name, total_values)
+    else:
+        y_train_subset = None
+        warnings.warn("No y value. Parallel coordinates will not be calculated.")
 
     #### t-SNE Parameter Grid Search
     #calibrate_tsne = False
@@ -156,24 +180,28 @@ def analyse_features(features, y, class_labels, source, conf, image_save_directo
     #    find_tsne_parmeters(X_train_scaled_subset, y_train_scaled_subset, class_labels)
 
     # t-SNE plot
-    plot_t_sne(X_train_scaled_subset, y_train_subset, class_labels, conf, image_save_directory)
+    plot_t_sne(X_train_scaled_subset, y_train_subset, class_labels, image_save_directory)
 
     ### UMAP Cluster Analysis
-    plot_umap(X_scaled, class_labels, conf, image_save_directory, y)
+    plot_umap(X_scaled, class_labels, image_save_directory, y)
 
     ### PCA Analysis
-    plot_pca(X_scaled, class_labels, conf, image_save_directory, y)
+    try:
+        plot_pca(X_scaled, class_labels, image_save_directory, y)
+    except:
+        warnings.warn("Cannot execute PCA")
+        traceback.print_exc()
 
 
-def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
+def plot_pca(X_scaled, class_labels, image_save_directory, y):
 
     m.rc_file_defaults()  # Reset sns
-    pca_trafo = PCA().fit(X_scaled);
+    pca_trafo = PCA().fit(X_scaled)
     pca_values = pca_trafo.transform(X_scaled)
     # from adjustText import adjust_text
     targets = np.array(y).flatten()
     fig, ax1 = plt.subplots(figsize=(10, 8))
-    plt.semilogy(pca_trafo.explained_variance_ratio_, '--o');
+    plt.semilogy(pca_trafo.explained_variance_ratio_, '--o')
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
     plt.semilogy(pca_trafo.explained_variance_ratio_.cumsum(), '--o', color='green');
     plt.xlabel("Principal Component")
@@ -184,15 +212,6 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
 
     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='PCA_Variance_Coverage')
 
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, 'PCA_Variance_Coverage'), dpi=300)
-
-    #plt.show(block = False)
-    #plt.pause(0.1)
-    #plt.close()
-
 
     fig = plt.figure()
     sns.heatmap(np.log(pca_trafo.inverse_transform(np.eye(X_scaled.shape[1]))), cmap="hot", cbar=True)
@@ -200,12 +219,6 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
     print("95% variance covered with the {} first components. Values={}".format(len(necessary_components), necessary_components))
 
     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='PCA_Heatmap')
-
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, 'PCA_Heatmap'), dpi=300)
-
 
     plt.figure(figsize=(10, 10))
     # plt.scatter(pca_values[:,0], pca_values[:,1], c=targets, edgecolor='none', label=class_labels.values(), alpha=0.5)
@@ -218,90 +231,37 @@ def plot_pca(X_scaled, class_labels, conf, image_save_directory, y):
 
     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='PCA_Plot')
 
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, 'PCA_Plot'), dpi=300)
 
-    #plt.show(block = False)
-    #plt.pause(0.1)
-    #plt.close()
-
-
-def plot_umap(X_scaled, class_labels, conf, image_save_directory, y):
+def plot_umap(X_scaled, class_labels, image_save_directory, y):
     # Use a supervised / unsupervised analysis to make the clusters
 
     sns.set(style='white', context='poster')
     # import umap
     # %time #Time of the whole cell
-    embeddingUnsupervised = umap.UMAP(n_neighbors=5).fit_transform(X_scaled)
+    embeddingUnsupervised = umap.UMAP(n_neighbors=5, random_state=42, init='random').fit_transform(X_scaled)
     # %time #Time of the whole cell
-    embeddingSupervised = umap.UMAP(n_neighbors=5).fit_transform(X_scaled, y=y)
-    vis.plotUmap(embeddingUnsupervised, y, list(class_labels.values()), 'Dataset unsupervised clustering',
-                 cmapString='RdYlGn')
 
+    if y is not None:
+        embeddingSupervised = umap.UMAP(n_neighbors=5, random_state=42, init='random').fit_transform(X_scaled, y=y)
+        vis.plotUmap(embeddingSupervised, y, list(class_labels.values()), 'Dataset supervised clustering')
+
+        vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='UMAP_Supervised')
+        print("Plot UMAP supervised")
+
+        vis.plotUmap(embeddingUnsupervised, y, list(class_labels.values()), 'Dataset unsupervised clustering', cmapString='RdYlGn')
+        print("Plot UMAP unsupervised with class labels")
+    else:
+        warnings.warn("No y values.")
+        vis.plotUmap(embeddingUnsupervised, None, None, 'Dataset unsupervised clustering', cmapString='RdYlGn')
+        print("Plot UMAP unsupervised without class labels")
+
+    
     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='UMAP_Unsupervised')
-
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, 'UMAP_Unsupervised'), dpi=300)
-
-    #plt.show(block = False)
-
-    vis.plotUmap(embeddingSupervised, y, list(class_labels.values()), 'Dataset supervised clustering')
-
-    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='UMAP_Supervised')
-
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, 'UMAP_Supervised'), dpi=300)
-
-    #plt.show(block = False)
-    #plt.pause(0.1)
-    #plt.close()
+    print("Plot UMAP unsupervised")
+        
 
 
-# def find_tsne_parmeters(X_scaled_subset, y_scaled_subset, class_labels):
-#     # Optimize t-sne plot
-#     #tne_gridsearch = False
-#     # Create a TSNE grid search with two variables
-#     perplex = [5, 10, 30, 50, 100]
-#     exaggregation = [5, 12, 20, 50, 100]
-#     # learning_rate = [10, 50, 200]
-#     fig, axarr = plt.subplots(len(perplex), len(exaggregation), figsize=(15, 15))
-#     #if tne_gridsearch == True:
-#     # for m,l in enumerate(learning_rate):
-#     for k, p in enumerate(perplex):
-#         # print("i {}, p {}".format(i, p))
-#         for j, e in enumerate(exaggregation):
-#             # print("j {}, e {}".format(j, e))
-#             X_embedded = TSNE(n_components=2, perplexity=p, early_exaggeration=e, n_iter=5000,
-#                               n_iter_without_progress=1000, learning_rate=10).fit_transform(
-#                 X_scaled_subset)
-#
-#             for i, t in enumerate(set(y_scaled_subset)):
-#                 idx = y_scaled_subset == t
-#                 axarr[k, j].scatter(X_embedded[idx, 0], X_embedded[idx, 1], label=class_labels[t])
-#
-#             axarr[k, j].set_title("p={}, e={}".format(p, e))
-#
-#             # clear_output(wait=True)
-#             print('perplex paramater={}/{}, exaggregation parameterj={}/{}'.format(k, len(perplex), j,
-#                                                                                    len(exaggregation)))
-#     fig.subplots_adjust(hspace=0.3)
-#
-#     plt.gcf()
-#
-#     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='UMAP_Supervised')
-#
-#     plt.show(block = False)
-#     plt.pause(0.1)
-#     plt.close()
-
-
-def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_directory):
+def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, image_save_directory):
     ### Visualize Data with t-SNE
     # Select a random subset to visualize
     import random
@@ -320,13 +280,21 @@ def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, conf, image_save_
     #targets = np.array(y[X_train_index_subset]).flatten()
     plt.figure(figsize=(10, 10))
     texts = []
-    for i, t in enumerate(set(y_scaled_subset)):
-        idx = y_scaled_subset == t
-        # for x, y in zip(X_embedded[idx, 0], X_embedded[idx, 1]):
-        # texts.append(plt.text(x, y, t))
-        plt.scatter(X_embedded[idx, 0], X_embedded[idx, 1], label=class_labels[t])
-    # adjust_text(texts, force_points=0.2, force_text=0.2, expand_points=(1,1), expand_text=(1,1), arrowprops=dict(arrowstyle="-", color='black', lw=0.5))
-    plt.legend(bbox_to_anchor=(1, 1));
+
+    if y_scaled_subset is not None and class_labels is not None:
+        print("Plot t-sne with known classes")
+        for i, t in enumerate(set(y_scaled_subset)):
+            idx = y_scaled_subset == t
+            # for x, y in zip(X_embedded[idx, 0], X_embedded[idx, 1]):
+            # texts.append(plt.text(x, y, t))
+            plt.scatter(X_embedded[idx, 0], X_embedded[idx, 1], label=class_labels[t])
+        # adjust_text(texts, force_points=0.2, force_text=0.2, expand_points=(1,1), expand_text=(1,1), arrowprops=dict(arrowstyle="-", color='black', lw=0.5))
+        plt.legend(bbox_to_anchor=(1, 1));
+    else:
+        print("Plot t-sne without known classes")
+        plt.scatter(X_embedded[:, 0], X_embedded[:, 1])
+
+
 
     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='T-SNE_Plot')
 
@@ -458,7 +426,7 @@ def plot_correlation_bar(X_scaled, conf, image_save_directory, y_scaled):
     #plt.close()
 
 
-def plot_spearman_correlation_matrix(conf, image_save_directory, total_values):
+def plot_spearman_correlation_matrix(image_save_directory, total_values):
     # http://benalexkeen.com/correlation-in-python/
     matfig = plt.figure(figsize=(20, 20))
     plt.matshow(total_values.corr(method='spearman'), fignum=1,
@@ -508,7 +476,7 @@ def plot_correlation_matrix2(conf, image_save_directory, total_values):
     #plt.pause(0.1)
     #plt.close()
 
-def plot_correlation_matrix(conf, features, image_save_directory, total_values):
+def plot_correlation_matrix(features, image_save_directory, total_values):
     # Select column values to use in the correlation plot
     feature_plot = list(range(0, 10, 1))
     # Select outcomes to show
@@ -518,32 +486,28 @@ def plot_correlation_matrix(conf, features, image_save_directory, total_values):
     # http://benalexkeen.com/correlation-in-python/
     # https://stackoverflow.com/questions/26975089/making-the-labels-of-the-scatterplot-vertical-and-horizontal-in-pandas
 
-    m.rc_file_defaults()  # Reset sns
-    axs = pd.plotting.scatter_matrix(total_values.iloc[:, feature_plot], figsize=(15, 15), alpha=0.2, diagonal='kde')
-    n = len(features.iloc[:, feature_plot].columns)
-    for i in range(n):
-        for j in range(n):
-            # to get the axis of subplots
-            ax = axs[i, j]
-            # to make x axis name vertical
-            ax.xaxis.label.set_rotation(90)
-            # to make y axis name horizontal
-            ax.yaxis.label.set_rotation(0)
-            # to make sure y axis names are outside the plot area
-            ax.yaxis.labelpad = 50
-    # plt.yticks(rotation=90)
-    vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename="Scatter-Matrix")
-
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, "Scatter-Matrix"), dpi=300)
-    #plt.show(block = False)
-    #plt.pause(0.1)
-    #plt.close()
+    #Check if the matrix is singular
+    if np.linalg.cond(total_values.iloc[:, feature_plot]) < 1/sys.float_info.epsilon:
+        m.rc_file_defaults()  # Reset sns
+        axs = pd.plotting.scatter_matrix(total_values.iloc[:, feature_plot], figsize=(15, 15), alpha=0.2, diagonal='kde')
+        n = len(features.iloc[:, feature_plot].columns)
+        for i in range(n):
+            for j in range(n):
+                # to get the axis of subplots
+                ax = axs[i, j]
+                # to make x axis name vertical
+                ax.xaxis.label.set_rotation(90)
+                # to make y axis name horizontal
+                ax.yaxis.label.set_rotation(0)
+                # to make sure y axis names are outside the plot area
+                ax.yaxis.labelpad = 50
+        # plt.yticks(rotation=90)
+        vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename="Scatter-Matrix")
+    else:
+        warnings.warn("Inputmatrix is singular and cannot be calculated. ")
 
 
-def rescale(conf, features, y):
+def rescale_features(features):
     '''
 
 
@@ -558,6 +522,15 @@ def rescale(conf, features, y):
     print(features.iloc[0:2, :])
     print("Scaled values")
     print(X_scaled.iloc[0:2, :])
+
+    return X_scaled
+
+def rescale_outcomes(conf, features, y):
+    '''
+    
+    
+    '''
+    scaler = preprocessing.StandardScaler()
     scaler.fit(y.reshape(-1, 1))
     y_scaled = pd.DataFrame(data=scaler.transform(y.reshape(-1, 1)), index=features.index, columns=[conf['Common'].get('class_name')])
     print("Unscaled values")
@@ -565,22 +538,21 @@ def rescale(conf, features, y):
     print("Scaled values")
     print(y_scaled.iloc[0:10, :])
 
-    return X_scaled, y_scaled
-
+    return y_scaled
 
 def main(config_path):
     conf = sup.load_config(config_path)
     features, y, df_y, class_labels = sup.load_features(conf)
 
-    source_filename = os.path.join(conf['Preparation'].get("source_in"))
-    source = sup.load_data_source(source_filename)
+    #source_filename = os.path.join(conf['Preparation'].get("source_in"))
+    #source = sup.load_data_source(source_filename)
 
     image_save_directory = conf['Paths'].get('results_directory') + "/data_preparation"
 
     #analyze_timegraph(source, features, y, conf, image_save_directory)
     print("WARNING: If a singular matrix occurs in a calculation, probably the outcome is "
           "only one value.")
-    analyse_features(features, y, class_labels, source, conf, image_save_directory)
+    analyse_features(features, y, class_labels, conf, image_save_directory)
 
 
 
