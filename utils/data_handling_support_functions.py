@@ -5,6 +5,7 @@ import random
 import numpy as np
 import pandas as pd
 import matplotlib.dates as mdates
+import warnings
 
 
 def inverse_dict(dictionary):
@@ -282,11 +283,22 @@ def load_features(conf):
     print(features.head(1))
 
     # === Load y values ===#
-    df_y = pd.read_csv(model_outcomes_filename, delimiter=';').set_index('id')
-    y = df_y.values.flatten()
+    if model_outcomes_filename and os.path.isfile(model_outcomes_filename):
+        df_y = pd.read_csv(model_outcomes_filename, delimiter=';').set_index('id')
+        y = df_y.values.flatten()
+        print("Outcome (y) file found: {}".format(model_outcomes_filename))
+    else:
+        df_y = None
+        y = None
+        warnings.warn("No outcome (y) file could be found: {}".format(model_outcomes_filename))        
 
     #=== Load classes ===#
-    class_labels = load_class_labels(model_labels_filename)
+    if model_labels_filename and os.path.isfile(model_labels_filename):
+        class_labels = load_class_labels(model_labels_filename)
+        print("Class labels file found: {}".format(model_labels_filename))
+    else:
+        class_labels = None
+        warnings.warn("Class labels file not found: {}".format(model_labels_filename))
 
     print("Loaded files to analyse")
 

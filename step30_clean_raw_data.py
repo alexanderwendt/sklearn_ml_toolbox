@@ -69,6 +69,8 @@ parser.add_argument("-n", "--no_images", action='store_true', default=False,
                          "It is usually done for inference data.")
 parser.add_argument("-i", "--on_inference_data", action='store_true',
                     help="Set inference if only inference and no training")
+parser.add_argument("-nds", "--no_source_data", action='store_true',
+                    help="Load no source data if the data does not need to be visualized in time charts.")
 
 args = parser.parse_args()
 
@@ -129,7 +131,7 @@ def clean_features_first_pass(features_raw, class_name):
     return features
 
 
-def load_files(features_path, outcomes_path, source_path, labels_path):
+def load_files(features_path, outcomes_path, source_path, labels_path, no_source_data=False):
     # Constants for all notebooks in the Machine Learning Toolbox
     #print("Data source: {}".format(data_directory))
 
@@ -169,12 +171,22 @@ def load_files(features_path, outcomes_path, source_path, labels_path):
 
     # === Load Source ===#
     # Load original data for visualization
-    data_source_raw = sup.load_data_source(source_filename)
+    if source_filename and os.path.isfile(source_filename) and not no_source_data:
+        data_source_raw = sup.load_data_source(source_filename)
+        print("Loading data source as time graph")
+    else:
+        data_source_raw = None
+        print("No raw data source found or no source data should be loaded as it would be for temporal processing.")
 
     # === Load class labels or modify ===#
     #Load annotations
     #annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
-    class_labels = load_class_labels(labels_path)
+    if labels_path and os.path.isfile(labels_path):
+        class_labels = load_class_labels(labels_path)
+        print("Class labels found")
+    else:
+        class_labels = None
+        print("No class labels found")
 
     return features_raw, outcomes_raw, data_source_raw, class_labels
 
@@ -273,7 +285,7 @@ def unique_cols(df):
     a = df.to_numpy() # df.values (pandas<0.24)
     return sum((a[0] == a).all(0))==0
 
-def main(config_path, on_inference_data, no_images):
+def main(config_path, on_inference_data, no_images, no_source_data):
     conf = sup.load_config(config_path)
 
     #if not on_inference_data:
@@ -301,7 +313,7 @@ def main(config_path, on_inference_data, no_images):
     source_path = os.path.join(conf['Preparation'].get('source_in'))
 
     # Load files
-    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(features_path, outcomes_path, source_path, labels_path)
+    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(features_path, outcomes_path, source_path, labels_path, no_source_data)
 
     ## Data Cleanup of Features and Outcomes before Features are Modified
     features_cleaned1 = clean_features_first_pass(features_raw, class_labels)
@@ -317,6 +329,6 @@ def main(config_path, on_inference_data, no_images):
 
 if __name__ == "__main__":
 
-    main(args.config_path, args.on_inference_data, args.no_images)
+    main(args.config_path, args.on_inference_data, args.no_images, args.no_source_data)
 
     print("=== Program end ===")

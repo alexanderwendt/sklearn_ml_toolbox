@@ -343,15 +343,28 @@ def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, 
 	
 def plotUmap(embedding, y, classList, title, cmapString='RdYlGn'):
     fig, ax = plt.subplots(1, figsize=(14, 10))
-    #plt.scatter(*embedding.T, s=0.3, c=y, cmap='Spectral', alpha=1.0)
-    plt.scatter(*embedding.T, s=0.3, c=y, cmap=cmapString, alpha=1.0)
     plt.setp(ax, xticks=[], yticks=[])
+
+    if embedding.shape[0] < 20:
+        dot_size = 200.3
+    else:
+        dot_size = 0.3
+
+    if y is not None and classList is not None:
+        #plt.scatter(*embedding.T, s=dot_size, c=y, cmap='Spectral', alpha=1.0)
+        plt.scatter(*embedding.T, s=dot_size, c=y, cmap=cmapString, alpha=1.0)
+        cbar = plt.colorbar(boundaries=np.arange(len(classList)+1)-0.5)
+        #cbar.set_ticks(np.arange(10))
+        cbar.set_ticks(np.arange(len(classList)))
+        cbar.set_ticklabels(classList)
+        print("Plotting with existing classes: {}".format(classList))
+    else:
+        plt.scatter(*embedding.T, s=dot_size, cmap=cmapString, alpha=1.0)
+        print("Plotting completely unsupervised")
+    
     #cbar = plt.colorbar(boundaries=np.arange(11)-0.5)
-    cbar = plt.colorbar(boundaries=np.arange(len(classList)+1)-0.5)
-    #cbar.set_ticks(np.arange(10))
-    cbar.set_ticks(np.arange(len(classList)))
-    cbar.set_ticklabels(classList)
-    plt.title(title);
+    plt.tight_layout()
+    plt.title(title)
 	
 def amplifyForPlot(binaryArray, targetArray, distance):
     return binaryArray * targetArray * (1-distance)
