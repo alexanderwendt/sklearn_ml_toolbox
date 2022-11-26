@@ -100,7 +100,7 @@ def load_input(conf):
 
     labels = exe.load_labels(conf['Paths'].get('labels_path'))
 
-    y_classes = labels  # train['label_map']
+    y_classes = labels
 
     print("Load feature columns")
     feature_columns_path = os.path.join(conf['Paths'].get('prepared_data_directory'),
@@ -134,11 +134,6 @@ def execute_wide_search(config, use_debug_parameters=False):
     model_param = PipelineClass()
     if model_param is None:
         raise Exception("Model pipeline could not be found: ".format('models.' + pipeline_class_name + '.ModelParam'))
-
-    # if model_type == 'svm':
-    #    model_param = ModelParamSVM()
-    # elif model_type == 'xgboost':
-    #    model_param = ModelParamXgboost()
 
     # Load complete training input
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
@@ -181,162 +176,12 @@ def execute_wide_search(config, use_debug_parameters=False):
     result['result'] = results_run1
     result['pipe'] = pipe_run1
 
-    ## %%
-    # merged_params_run1={}
-    # for d in params_run1:
-    #    merged_params_run1.update(d)
-
-    # results_run1 = modelutil.generate_result_table(grid_search_run1, merged_params_run1, refit_scorer_name)
-    # print("Result size=", results_run1.shape)
-    # print("Number of NaN results: {}. Replace them with 0".format(np.sum(results_run1['mean_test_' + refit_scorer_name].isna())))
-    # results_run1[results_run1['mean_test_' + refit_scorer_name].isna()]=0
-    # print("Result size after dropping NAs=", results_run1.shape)
     print(result['result'].round(4).head(10))
 
     # Save results
     dump(result, open(results_file_path, 'wb'))
 
     print("Stored results of run 1 to ", results_file_path)
-
-
-# def extract_categorical_visualize_graphs(config, top_percentage=0.2):
-#     '''
-#     Of the results of a wide search algorithm, find the top x percent (deafult=20%), calculate the median value for
-#     each parameter and select the parameter value with the best median result.
-#
-#     Visualize results of the search algorithm.
-#
-#     :args:
-#         data_path: Path to the pickle with the complete results of the run
-#         top_percentage: Top share of results to consider. def: 0.2.
-#     :return:
-#         Nothing
-#     '''
-#
-#     # Get necessary data from the data preparation
-#     # X_train, y_train, X_val, y_val, y_classes = load_input(config)
-#     X_train, y_train, X_val, y_val, y_classes, selected_features, \
-#     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
-#
-#     # feature_columns_path = os.path.join(config['Paths'].get('prepared_data_directory'), config['Training'].get('selected_feature_columns_in'))
-#     # selected_features, feature_dict, df_feature_columns = exe.load_feature_columns(feature_columns_path, X_train)
-#
-#     # model_directory = paths['model_directory']
-#     result_directory = paths['results_directory']
-#     results_file_path = paths['run1_result_filename']
-#
-#     svm_pipe_first_selection = paths['pipe_first_selection']
-#
-#     s = open(results_file_path, "rb")
-#     results = pickle.load(s)
-#     results_run1 = results['result']
-#     params_run1 = results['parameter']
-#     models_run1 = results['model'].get_params('estimator').get('estimator').steps[4][1]
-#
-#     # Create result table
-#     # merged_params_run1 = {}
-#     # for d in params_run1:
-#     #    merged_params_run1.update(d)
-#
-#     # Get the top x% values from the results
-#     # number of results to consider
-#     # top_percentage = 0.2
-#     number_results = np.int(results_run1.shape[0] * top_percentage)
-#     print("The top {}% of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
-#     results_subset = results_run1.iloc[0:number_results, :]
-#
-#     # Prepare the inputs: Replace the lists with strings
-#     result_subset_copy = results_subset.copy()
-#     print("Convert feature lists to names")
-#     sup.list_to_name(selected_features, list(feature_dict.keys()), result_subset_copy['param_feat__cols'])
-#
-#     # Replace lists in the parameters with strings
-#     params_run1_copy = copy.deepcopy(params_run1)
-#     sup.replace_lists_in_grid_search_params_with_strings(selected_features, feature_dict, params_run1_copy)
-#
-#     # Plot the graphs
-#     save_fig_prefix = result_directory + '/model_images'
-#     if not os.path.isdir(save_fig_prefix):
-#         os.makedirs(save_fig_prefix)
-#         print("Created folder: ", save_fig_prefix)
-#
-#     _, scaler_medians = vis.visualize_parameter_grid_search('scaler', params_run1, results_subset, refit_scorer_name,
-#                                                             save_fig_prefix=save_fig_prefix + "/")
-#     _, sampler_medians = vis.visualize_parameter_grid_search('sampling', params_run1, results_subset, refit_scorer_name,
-#                                                              save_fig_prefix=save_fig_prefix + "/")
-#     _, feat_cols_medians = vis.visualize_parameter_grid_search('feat__cols', params_run1_copy, result_subset_copy,
-#                                                                refit_scorer_name,
-#                                                                save_fig_prefix=save_fig_prefix + "/")
-#
-#     _, n_estimators_medians = vis.visualize_parameter_grid_search('model__n_estimators', params_run1, results_subset,
-#                                                                   refit_scorer_name,
-#                                                                   save_fig_prefix=save_fig_prefix + "/")
-#
-#     ## Get the best parameters
-#
-#     # Get the best scaler from median
-#     best_scaler = max(scaler_medians, key=scaler_medians.get)
-#     print("Best scaler: ", best_scaler)
-#     best_sampler = max(sampler_medians, key=sampler_medians.get)
-#     print("Best sampler: ", best_sampler)
-#
-#     # Get best feature result
-#     # Get the best kernel
-#     best_feat_cols = max(feat_cols_medians, key=feat_cols_medians.get)  # source.idxmax()
-#     # print("Best {}: {}".format(name, best_feature_combi))
-#     best_columns = feature_dict.get(best_feat_cols)
-#
-#     print("Best feature selection: ", best_feat_cols)
-#     print("Best column indices: ",
-#           best_columns)  # feature_dict.get((results_run1[result_columns_run1].loc[indexList]['param_feat__cols'].iloc[best_feature_combi])))
-#     print("Best column names: ", list(X_train.columns[best_columns]))
-#
-#     best_n_estimators = max(n_estimators_medians, key=n_estimators_medians.get)
-#     print("Best n_estimators: ", best_n_estimators)
-#
-#     # Define pipeline, which is constant for all tests
-#     # pipe_run_best_first_selection = Pipeline([
-#     #    ('scaler', best_scaler),
-#     #    ('sampling', best_sampler),
-#     #    ('feat', modelutil.ColumnExtractor(cols=best_columns)),
-#     #    ('svm', SVC(kernel=best_kernel))
-#     # ])
-#
-#     ### XGBOOST start
-#
-#     pipe_run_best_first_selection = Pipeline([
-#         ('scaler', best_scaler),
-#         ('sampling', best_sampler),
-#         ('feat', modelutil.ColumnExtractor(cols=best_columns)),
-#         ('model', models_run1.set_params(n_estimators=best_n_estimators))
-#     ])
-#
-#     ### XGBOOST end
-#
-#     print(pipe_run_best_first_selection)
-#
-#     # Save best pipe
-#     dump(pipe_run_best_first_selection, open(svm_pipe_first_selection, 'wb'))
-#     print("Stored pipe_run_best_first_selection at ", svm_pipe_first_selection)
-#
-#     result_save = results_run1.copy()
-#     sup.list_to_name(selected_features, list(feature_dict.keys()), result_save['param_feat__cols'])
-#     result_save.to_csv(results_file_path + ".csv", sep=";")
-#
-#     # result['pipe'].to_json(results_file_path + ".csv", sep=";")
-#
-#     with open(results_file_path + "_pipe.txt", 'w') as f:
-#         print("=== Best results of run1 ===", file=f)
-#         print("Best scaler: ", best_scaler, file=f)
-#         print("Best sampler: ", best_sampler, file=f)
-#         print("Best n_estimators: ", best_n_estimators, file=f)
-#         print("Best feature selection: ", best_feat_cols, file=f)
-#         print("Best column indices: ", best_columns, file=f)
-#         print("Best column names: ", list(X_train.columns[best_columns]), file=f)
-#         print("=== Best pipe after discrete parameters have been fixed ===", file=f)
-#         print(pipe_run_best_first_selection, file=f)
-#
-#     print("Method end")
 
 
 def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
@@ -374,11 +219,6 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
     if model_param is None:
         raise Exception("Model pipeline could not be found: {}".format('models.' + pipeline_class_name + '.ModelParam'))
 
-    #if model_type == 'svm':
-    #    model_param = ModelParamSVM()
-    #elif model_type == 'xgboost':
-    #    model_param = ModelParamXgboost()
-
     # Create a result subset
     number_results = int(results_run1.shape[0] * top_percentage)
     print("The top {}% of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
@@ -397,12 +237,7 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
     save_fig_prefix = os.path.join(result_directory, 'model_images')
     os.makedirs(save_fig_prefix, exist_ok=True)
 
-    # if config.get('Common', 'model_type') == 'xgboost':
     categorical_fields = model_param.get_categorical_parameters()
-    # elif config.get('Common', 'model_type') == 'svm':
-    #    categorical_fields = get_categorical_parameters_svm()
-    # else:
-    #    raise Exception("Model type does not exist: {}".format(config('Common', 'model_type')))
 
     best_values_dict = dict()
     for value_name in categorical_fields:
@@ -418,13 +253,7 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
     print("Best column indices: ", best_columns)
     print("Best column names: ", list(X_train.columns[best_columns]))
 
-    # if model_type=='xgboost':
     pipe_run_best_first_selection = model_param.define_best_pipeline(best_values_dict, best_columns, models_run1)
-    # elif model_type=='svm':
-    #    # Define pipeline, which is constant for all tests
-    #    pipe_run_best_first_selection = define_best_pipeline_svm(best_values_dict, best_columns, models_run1)
-    # else:
-    #    raise Exception("Incorrect model type " + model_type)
 
     print(pipe_run_best_first_selection)
 

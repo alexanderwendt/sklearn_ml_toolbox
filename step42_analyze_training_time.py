@@ -40,9 +40,7 @@ import matplotlib.pyplot as plt
 
 # Own modules
 import utils.data_visualization_functions as vis
-#import data_handling_support_functions as sup
 import utils.execution_utils as exe
-from utils.metrics import Metrics
 import utils.data_handling_support_functions as sup
 
 __author__ = 'Alexander Wendt'
@@ -62,10 +60,11 @@ np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
+os.makedirs("./logs", exist_ok=True)
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(message)s',
                     datefmt='%Y%m%d %H:%M:%S',
-                    handlers=[logging.FileHandler("logs/" + "test" + ".log"), logging.StreamHandler()])
+                    handlers=[logging.FileHandler("logs/" + "toolbox" + ".log"), logging.StreamHandler()])
 log = logging.getLogger(__name__)
 
 
@@ -93,17 +92,13 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
 
     '''
     # Estimate training duration
-    # run_training_estimation = True
 
-    #if run_training_estimation==True:
-        #Set test range
+    #Set test range
     test_range = list(range(100, 6500+1, 500))
-    #test_range = list(range(100, 1000, 200))
     print("Test range", test_range)
 
     # SVM model
-    # Define the model
-
+    # Define the mode
     xaxis, durations, scores = exe.estimate_training_duration(model_clf, X_train, y_train, X_test, y_test, test_range, scorer)
 
     # Paint figure
@@ -115,15 +110,6 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
 
     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='Duration_Samples')
 
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, 'SVM_Duration_Samples'), dpi=300)
-
-    #plt.show(block = False)
-    #plt.pause(0.1)
-    #plt.close()
-
     plt.figure()
     plt.plot(xaxis, scores)
     plt.xlabel('Number of training examples')
@@ -132,15 +118,6 @@ def run_training_estimation(X_train, y_train, X_test, y_test, scorer, model_clf,
 
     vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='F1_Samples')
 
-    #if image_save_directory:
-    #    if not os.path.isdir(image_save_directory):
-    #        os.makedirs(image_save_directory)
-    #    plt.savefig(os.path.join(image_save_directory, 'SVM_F1_Samples'), dpi=300)
-
-    #plt.show(block = False)
-    #plt.pause(0.1)
-    #plt.close()
-
 def run_training_predictors(data_input_path):
     '''
 
@@ -148,8 +125,6 @@ def run_training_predictors(data_input_path):
     '''
 
     config = sup.load_config(data_input_path)
-    metrics = Metrics(config)
-    #algorithm = config['Common'].get('model_type')
 
     pipeline_class_name = config.get('Training', 'pipeline_class', fallback=None)
     PipelineClass = locate('models.' + pipeline_class_name + '.ModelParam')
@@ -170,27 +145,14 @@ def run_training_predictors(data_input_path):
     print("Baseline results=", baseline_results)
 
     #Set classifier and estimate performance
-
     model_clf = model_param.create_pipeline()['model']
     log.info("{} selected.".format(model_clf))
-
-    #algorithm=""
-    #if algorithm=='xgboost':
-    #    model_clf = XGBClassifier(objective="binary:logistic", random_state=42)
-    #    log.info("XBoost Classifier selected.")
-    #else:
-    #    model_clf = SVC()
-    #    log.info("SVM (default) classifier selected.")
 
     run_training_estimation(X_train, y_train, X_val, y_val, scorer, model_clf, save_fig_prefix)
 
 
 if __name__ == "__main__":
-
-    #if not args.pb and not args.xml:
-    #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
-
-    # Execute wide search
+    # Execute analysis
     run_training_predictors(args.config_path)
 
     print("=== Program end ===")

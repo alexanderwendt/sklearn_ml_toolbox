@@ -70,35 +70,6 @@ parser.add_argument("-sec", '--config_section', default="EvaluationTraining",
 
 args = parser.parse_args()
 
-# def load_evaluation_data(conf):
-#     '''
-#
-#
-#     '''
-#
-#     X_path = conf['Evaluation'].get('features_in')
-#     y_path = conf['Evaluation'].get('outcomes_in')
-#     labels_path = conf['Evaluation'].get('labels_in')
-#     model_in = conf['Evaluation'].get('model_in')
-#     ext_param_in = conf['Evaluation'].get('ext_param_in')
-#
-#     # Load X and y
-#     X_val, _, y_val = exe.load_data(X_path, y_path)
-#
-#     # Labels
-#     labels = exe.load_labels(labels_path)
-#
-#     # Load model
-#     model = joblib.load(model_in)
-#     print("Loaded trained evaluation model from ", model_in)
-#     print("Model", model)
-#
-#     # Load external parameters
-#     with open(ext_param_in, 'r') as fp:
-#         external_params = json.load(fp)
-#
-#     return X_val, y_val, labels, model, external_params
-
 
 def evaluate_model(config_path, config_section="EvaluationTraining"):
     '''
@@ -111,7 +82,7 @@ def evaluate_model(config_path, config_section="EvaluationTraining"):
     paths = Paths(config).paths
 
     X_val, y_val, labels, model, external_params = evalutil.load_evaluation_data(config, config_section)
-    y_classes = labels #train['label_map']
+    y_classes = labels
 
     result_directory = paths['results_directory']
     #model_name = config['Common'].get('dataset_name')
@@ -119,9 +90,7 @@ def evaluate_model(config_path, config_section="EvaluationTraining"):
     title = config.get(config_section, 'title')
 
     figure_path_prefix = result_directory + '/model_images/' + title
-    #if not os.path.isdir(result_directory + '/model_images'):
     os.makedirs(result_directory + '/model_images', exist_ok=True)
-    #    print("Created folder: ", result_directory + '/model_images')
 
     # Load model external parameters
     pr_threshold = external_params['pr_threshold']

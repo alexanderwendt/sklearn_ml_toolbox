@@ -14,7 +14,7 @@ conda create -n sklearn python=3.8
 ```
 
 
-In a python 3.6+ environment, run 
+In a python 3.6-3.8 environment, run 
 ```shell
 pip install -r requirements.txt
 ```
@@ -40,6 +40,13 @@ tables into the prepared data folder.
 - config: This is the location, where the configuration files are located. In the script arguments, this path is provided.
 - (root): Shell or bat scripts that are used to run the pipeline. They refer to the location of the scripts.
 
+In the sample project at ../sklearn_ml_toolbox_samples, sample projects with complete setup and run scripts are available as .bat and .sh scripts. To be ale to use the
+scripts without reconfiguration, it is important to keep the following folder structure:
+```
+./sklearn_ml_toolbox
+./sklearn_ml_toolbox_samples/PROJECT
+./OTHER_PROJECTS/YOUR_PROJECT
+```
 
 ## Machine Learning Toolbox Process
 The process and the scripts will be described with a example. To demonstrate the machine learning toolbox, the problem of classifying the 

@@ -178,7 +178,7 @@ def load_training_input_input(conf):
     selected_features, feature_dict, df_feature_columns = load_feature_columns(feature_columns_path, X_train)
 
     print("Load metrics")
-    metrics = Metrics(conf)
+    metrics = Metrics(conf, list(labels.values()))
     scorers = metrics.scorers
     refit_scorer_name = metrics.refit_scorer_name
 

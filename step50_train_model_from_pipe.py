@@ -68,7 +68,7 @@ parser.add_argument("-sec", '--config_section', default="Model",
 
 args = parser.parse_args()
 
-def load_data(conf, config_section="Model"):
+def load_data(conf, config_section="ModelTrain"):
     '''
 
 
@@ -92,53 +92,18 @@ def load_data(conf, config_section="Model"):
 
     return X_train, y_train, pipe
 
-def train_final_model(config_path, config_section="Evaluation"):
+def train_final_model(config_path, config_section="EvaluationTraining"):
     # Get data
     config = sup.load_config(config_path)
     #paths, model, train, test = step40.load_training_files(paths_path)
     X_train, y_train, pipe = load_data(config, config_section)
 
-    #print("load inputs: ", data_input_path)
-    #f = open(data_input_path, "rb")
-    #prepared_data = pickle.load(f)
-    #print("Loaded data: ", prepared_data)
-
-    #X_train = train['X']
-    #y_train = train['y']
-    #X_test = test['X']
-    #y_test = test['y']
-    #y_classes = train['label_map']
-
     #svm_pipe_final_selection = paths['svm_pipe_final_selection']
-    svm_final_model_filepath = config[config_section].get('model_out') #paths['svm_final_model_filename']
-    #model_directory = paths['model_directory']
-    #model_name = paths['dataset_name']
-
-    #figure_path_prefix = model_directory + '/images/' + model_name
-
-    # Load model external parameters
-    #with open(svm_external_parameters_filename, 'r') as fp:
-    #    external_params = json.load(fp)
-
-    #pr_threshold = external_params['pr_threshold']
-    #print("Loaded precision/recall threshold: ", pr_threshold)
-
-    # Load model
-    #r = open(svm_pipe_final_selection, "rb")
-    #model_pipe = pickle.load(r)
-    #model_pipe['svm'].probability = True
-    print("")
+    svm_final_model_filepath = config[config_section].get('model_out')
 
     print("Set probability measurements in the model to True")
     pipe['model'].probability = True
     print("Original final pipe: ", pipe)
-
-    #Merge training and test data
-    #X = X_train.append(X_test)
-    #y = np.append(y_train, y_test)
-    #print("Merge training and test data from sizes train {} and test {} to all data {}".format(
-    #    X_train.shape, X_train.shape, X.shape
-    #))
 
     t = time.time()
     local_time = time.ctime(t)

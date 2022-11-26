@@ -4,18 +4,18 @@ from sklearn.metrics import make_scorer, precision_score, recall_score, accuracy
 import warnings
 
 class Metrics:
-    def __init__(self, config):
+    def __init__(self, config, labels):
         self.refit_scorer_name = config['Training'].get('refit_scorer_name')
 
         # Load custom scorer setup (fallback = 0)
         average_method = config['Training'].get('average_method', fallback='macro')
-        used_labels = config['Training'].get('labels', fallback=None)
-        if used_labels=='None':
-            used_labels = None
-        else:
-            used_labels = json.loads(used_labels)
-        pos_label = config['Training'].get('pos_label', fallback=1)
-        pos_label = json.loads(pos_label)
+        used_labels = None #labels
+        #if used_labels is None:
+        #    used_labels = None
+        #else:
+        #    used_labels = json.loads(used_labels)
+        pos_label = None #config['Training'].get('pos_label', fallback=None)
+        #pos_label = json.loads(pos_label)
         if not average_method=='average':
             pos_label=1
         self.scorers = self.__generate_scorers(average_method, used_labels, pos_label)

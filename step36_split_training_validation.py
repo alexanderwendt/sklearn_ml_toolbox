@@ -61,8 +61,6 @@ np.set_printoptions(suppress=True)
 parser = argparse.ArgumentParser(description='Step 3 - Prepare data for machine learning algorithms')
 parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
                     help='Configuration file path', required=False)
-#parser.add_argument("-i", "--do_inference", action='store_true',
-#                    help="Set inference if only inference and no training")
 
 args = parser.parse_args()
 

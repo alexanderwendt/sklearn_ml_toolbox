@@ -277,9 +277,6 @@ def perform_run2_xgboost(X_train, iter_setup, pipe_run_best_first_selection, ref
     param_final, results_run2 = (None, None)
 
     # Enhance kernel with found parameters
-    # pipe_run_second_selection['model'].C = param_final['C']
-    # pipe_run_second_selection['model'].gamma = param_final['gamma']
-
     warnings.warn("For XGBoost, the same parameters are used as in pipe 1, i.e. no fine tuning. TODO: make fine tuning.")
 
     return pipe_run_second_selection, results_run2
