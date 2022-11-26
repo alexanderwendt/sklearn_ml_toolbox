@@ -1,4 +1,4 @@
-﻿Backtesting==0.3.3
+Backtesting==0.3.3
 bokeh==2.4.3
 certifi==2021.5.30
 contourpy==1.0.6
