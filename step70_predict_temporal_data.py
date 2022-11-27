@@ -134,8 +134,24 @@ def visualize_temporal_data(config_path, config_section):
                                ('close', 'neutral', 'positive', 'negative'),
                                title=title + "_Inference_Adjusted" + model_name,
                                save_fig_prefix=figure_path_prefix)
-    #vis.plot_two_class_graph(y_order_test, y_order_test_pred,
-    #                         save_fig_prefix=figure_path_prefix + "_test_")
+    #Visulaize 2 class results
+    if np.unique(y_order_test_pred['y'].values)==2:
+        vis.plot_two_class_graph(y_order_test_pred['y'].values,
+                                 df_time_graph['Close'][y_order_test_pred.index],
+                                 df_time_graph['Date'][y_order_test_pred.index],
+                                 0,
+                                 ('close', 'Positive Trend'),
+                                 title=title + "_Inference_2_Class" + model_name,
+                                 save_fig_prefix=figure_path_prefix)
+        vis.plot_two_class_graph(y_order_test_pred_adjust['y'].values,
+                                 df_time_graph['Close'][y_order_test_pred.index],
+                                 df_time_graph['Date'][y_order_test_pred.index],
+                                 0,
+                                 ('close', 'Positive Trend'),
+                                 title=title + "_Inference_Adjusted_2_Class" + model_name,
+                                 save_fig_prefix=figure_path_prefix)
+    else:
+        print("Data is not binarized.")
 
 
 if __name__ == "__main__":

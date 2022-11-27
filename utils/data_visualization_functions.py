@@ -416,27 +416,6 @@ def plot_two_class_graph(binclass, y_ref, y_time, offset_binclass, legend, title
 
     save_figure(plt.gcf(), image_save_directory=save_fig_prefix, filename=title + '_2class')
 
-    #if save_fig_prefix:
-    #    if not os.path.isdir(save_fig_prefix):
-    #        os.makedirs(save_fig_prefix)
-    #    plt.savefig(os.path.join(save_fig_prefix, title + '_3class'), dpi=300)
-
-    #plt.show(block=False)
-    #plt.pause(0.1)
-    #plt.close()
-
-#def plot_two_class_graph(y_order_train, y_order_train_pred):
-#    plt.figure(num=None, figsize=(11.5, 7), dpi=80, facecolor='w', edgecolor='k')
-#    plt.plot(df_timegraph['Date'][y_order_train.index], df_timegraph['Close'][y_order_train.index])
-#    plt.plot(df_timegraph['Date'][y_order_train.index],
-#             vis.amplifyForPlot(y_order_train['y'].values, df_timegraph['Close'][y_order_train.index].values, 0.00),
-#             color='green')
-#    plt.plot(df_timegraph['Date'][y_order_train.index],
-#             vis.amplifyForPlot(y_order_train_pred['y'].values, df_timegraph['Close'][y_order_train.index].values,
-#                              0.00), color='yellow')
-#    plt.title("Plot results")
-#    plt.show()
-
 def plot_grid_search_validation_curve(grid, param_to_vary, refit_scorer_name, title='Validation Curve', ylim=None, xlim=None, log=None):
     """Plots train and cross-validation scores from a GridSearchCV instance's
     best params while varying one of those params.
