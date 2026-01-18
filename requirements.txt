@@ -1,6 +1,6 @@
 Backtesting==0.3.3
 bokeh==2.4.3
-certifi==2021.5.30
+certifi==2022.12.7
 contourpy==1.0.6
 cycler==0.10.0
 imbalanced-learn==0.8.1
