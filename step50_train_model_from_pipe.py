@@ -2,7 +2,23 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 4X Training: Train final model
+Step 4X Training: Train the final model.
+
+This script trains the final machine learning model using the best pipeline and
+hyperparameters found in the previous steps. The trained model is then saved to
+a file for later use in evaluation and prediction.
+
+Inputs:
+    - Training data.
+    - The final, fine-tuned pipeline from the narrow search.
+
+Outputs:
+    - `model_out.joblib`: A joblib file containing the trained model.
+
+Main Functions:
+    - `train_final_model`: Loads the data and the pipeline, trains the model, and
+      saves the trained model to a joblib file.
+
 License_info: ISC
 ISC License
 
@@ -101,8 +117,10 @@ def train_final_model(config_path, config_section="EvaluationTraining"):
     #svm_pipe_final_selection = paths['svm_pipe_final_selection']
     svm_final_model_filepath = config[config_section].get('model_out')
 
-    print("Set probability measurements in the model to True")
-    pipe['model'].probability = True
+    problem_type = config['Common'].get('problem_type', fallback='classification')
+    if problem_type == 'classification' and hasattr(pipe['model'], 'probability'):
+        print("Set probability measurements in the model to True")
+        pipe['model'].probability = True
     print("Original final pipe: ", pipe)
 
     t = time.time()

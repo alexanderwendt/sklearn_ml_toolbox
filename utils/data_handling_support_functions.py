@@ -232,10 +232,13 @@ def load_data_source(source_filename):
     source = pd.read_csv(source_filename, sep=';').set_index('id')  # Set ID to be the data id
     print(source.head(1))
 
-    source = pd.read_csv(source_filename, delimiter=';').set_index('id')
-    source['Date'] = pd.to_datetime(source['Date'])
-    source['Date'].apply(mdates.date2num)
-    print("Loaded source time graph={}".format(source.columns))
+    if 'Date' in source.columns:
+        source['Date'] = pd.to_datetime(source['Date'])
+        source['Date_num'] = source['Date'].apply(mdates.date2num)
+        print("Loaded source time graph with Date={}".format(source.columns))
+    else:
+        print("Loaded source without Date={}".format(source.columns))
+
     print("X. Shape={}".format(source.shape))
     print(source.head())
 

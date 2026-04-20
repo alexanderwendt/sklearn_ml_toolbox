@@ -2,7 +2,31 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 4X Training: Train wide Search for XGBoost
+Step 4X Training: Perform a wide hyperparameter search.
+
+This script executes a wide grid search to find the best combination of
+hyperparameters for the machine learning model. It explores a broad range of
+parameter values to identify the most promising regions in the parameter space.
+
+Inputs:
+    - Training and validation data.
+    - A machine learning pipeline with a defined parameter grid.
+
+Outputs:
+    - `run1_result.pickle`: A pickle file containing the results of the grid search.
+    - `pipe_first_selection.pickle`: A pickle file with the best pipeline found
+      during the wide search.
+    - Visualization of the grid search results, saved as PNG files in the
+      `model_images` subdirectory of the results directory.
+
+Main Functions:
+    - `execute_wide_search`: Performs the wide grid search using `GridSearchCV`
+      from scikit-learn.
+    - `extract_categorical_visualize_graphs_frame`: Visualizes the results of the
+      grid search and extracts the best categorical parameters.
+    - `execute_wide_run`: Orchestrates the wide search, visualization, and extraction
+      of the best parameters.
+
 License_info: ISC
 ISC License
 
@@ -156,17 +180,20 @@ def execute_wide_search(config, use_debug_parameters=False):
     else:
         parameters = model_param.use_parameters(X_train, reduced_selected_features)
 
+    problem_type = config['Common'].get('problem_type', fallback='classification')
     if use_debug_parameters:
         grid_search_run1, params_run1, pipe_run1, results_run1 = exe.run_basic_model(X_train, y_train, scorers,
                                                                                      refit_scorer_name, parameters,
                                                                                      pipeline,
-                                                                                     subset_share=0.01, n_splits=2)
+                                                                                     subset_share=0.01, n_splits=2,
+                                                                                     problem_type=problem_type)
     else:
         grid_search_run1, params_run1, pipe_run1, results_run1 = exe.run_basic_model(X_train, y_train, scorers,
                                                                                      refit_scorer_name, parameters,
                                                                                      pipeline,
                                                                                      subset_share=subset_share,
-                                                                                     n_splits=3)
+                                                                                     n_splits=3,
+                                                                                     problem_type=problem_type)
 
     print('Final score is: ', grid_search_run1.score(X_val, y_val))
 

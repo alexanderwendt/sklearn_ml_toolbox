@@ -2,7 +2,26 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Data analysis for temporal data
+Step 3X Preprocessing: Data analysis for temporal data.
+
+This script performs a temporal analysis of the data, focusing on autocorrelation
+and partial autocorrelation. It helps in understanding the time-dependent
+structures within the data, which is crucial for time series forecasting.
+
+Inputs:
+    - Features and outcomes from the previous steps (loaded via `sup.load_features`).
+    - Source data file (specified in the config).
+
+Outputs:
+    - Autocorrelation and partial autocorrelation plots for the source data and
+      selected features, saved in the `data_preparation` subdirectory of the
+      results directory.
+
+Main Functions:
+    - `analyze_timegraph`: Performs the temporal analysis, generating the
+      autocorrelation and partial autocorrelation plots.
+    - `main`: Loads the data and calls `analyze_timegraph`.
+
 License_info: ISC
 ISC License
 

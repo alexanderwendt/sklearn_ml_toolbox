@@ -2,7 +2,38 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 2X Data generation: Generate ground truth for stock markets based on OHLC data
+Step 2X Data generation: Generate ground truth for stock markets based on OHLC data.
+
+This script processes raw stock market OHLC (Open, High, Low, Close) data to generate
+various ground truth signals, such as 1-day, 5-day, 20-day, and long-term trends,
+as well as identifying tops and bottoms. It also includes functions to clean
+and refine these signals. The generated outcomes are saved to a CSV file,
+and several plots are created to visualize the trends and signals.
+
+Inputs:
+    - Configuration file (specified by --config_path argument): Contains paths
+      for raw data, prepared data, and results directories, as well as dataset
+      name and class number.
+    - Raw stock market OHLC data: Loaded from the path specified in the config file.
+
+Outputs:
+    - `outcomes_cut.csv`: A CSV file containing the generated ground truth signals
+      (1dTrend, 5dTrend, 20dTrend, LongTrend, TopsBottoms).
+    - Various PNG plots: Visualizations of the raw data, identified tops and bottoms,
+      LOWESS trends, and the generated ground truth signals (e.g., _GT_1dTrend.png,
+      _GT_LongTrend.png). These are saved in a 'data_generation' subdirectory
+      within the configured results directory.
+
+Main Functions:
+    - `calculate_y_signals`: Calculates initial 1d, 5d, 20d, and long-term trends.
+    - `clean_bad_signals_1`, `clean_bad_signals_2`, `clean_bad_signals_3`:
+      Refine and clean the generated signals to reduce noise and enhance trends.
+    - `define_tops_bottoms`: Merges identified tops and bottoms into a single signal.
+    - `generate_features_outcomes`: Orchestrates the generation of all ground truth
+      signals and saves relevant plots.
+    - `main`: Parses arguments, loads configuration, loads raw data, calls
+      `generate_features_outcomes`, and saves the final outcomes.
+
 License_info: ISC
 ISC License
 
@@ -62,7 +93,7 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 
 args = parser.parse_args()
 
-def calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_trend_long, pos_trend_short):
+def calculate_y_signals(source, bottoms, tops, latest_bottoms, latest_tops, pos_trend_long, pos_trend_short):
     '''
     Calculate the Y values for 1d, 5d, 20d and the Long Trend
 
@@ -85,7 +116,7 @@ def calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_tr
     y20day = np.zeros(m)
     # long term trend
     ylong = np.zeros(m)
-    signalLong = 0
+    signal_long = 0
 
     for i in range(m - 50):
         # === 1d trend ===#
@@ -108,15 +139,15 @@ def calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_tr
 
         # === long term trend ===#
         # Trigger positive, buy
-        if pos_trend_long[i] == True and close[i] > latestTops[i]:
-            signalLong = 1
+        if pos_trend_long[i] == True and close[i] > latest_tops[i]:
+            signal_long = 1
         # negative, sell
-        elif pos_trend_long[i] == False and close[i] < latestBottoms[i]:
-            signalLong = 2
+        elif pos_trend_long[i] == False and close[i] < latest_bottoms[i]:
+            signal_long = 2
 
-        if signalLong == 1:
+        if signal_long == 1:
             ylong[i] = 1
-        elif signalLong == 2:
+        elif signal_long == 2:
             ylong[i] = 2
         else:
             ylong[i] = 0

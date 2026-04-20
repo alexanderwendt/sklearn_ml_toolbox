@@ -2,7 +2,31 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 2X Data Generation: Adapt dimensions of generated features and outcomes
+Step 2X Data Generation: Adapt dimensions of generated features and outcomes.
+
+This script takes the generated features and outcomes and adapts their dimensions
+to ensure they are aligned and ready for the next steps in the machine learning
+pipeline. This includes removing unusable samples (e.g., from the beginning
+of a moving average calculation), cleaning NaN values, and ensuring that the
+features, outcomes, and source data all have the same length and index.
+
+Inputs:
+    - `temp_features_uncut.csv`: CSV file with the generated features.
+    - `temp_outcomes_uncut.csv`: CSV file with the generated outcomes.
+    - Raw source data file (specified in the config).
+
+Outputs:
+    - `features_out.csv`: CSV file with the dimensionally-adapted features.
+    - `outcomes_out.csv`: CSV file with the dimensionally-adapted outcomes.
+    - `source_out.csv`: CSV file with the dimensionally-adapted source data.
+
+Main Functions:
+    - `cut_unusable_parts_of_dataframe`: Removes a specified number of rows from
+      the beginning or end of a DataFrame.
+    - `clean_nan`: Removes all rows containing NaN values from a DataFrame.
+    - `main`: Loads the data, calls the cleaning and cutting functions, and saves
+      the adapted DataFrames to new CSV files.
+
 License_info: ISC
 ISC License
 

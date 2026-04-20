@@ -8,8 +8,9 @@
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/samples/debug_omxs30" />
-    <option name="IS_MODULE_SDK" value="true" />
+    <option name="SDK_NAME" value="sklearn312" />
+    <option name="WORKING_DIRECTORY" value="C:\Projekte\15_Sklearn_Toolbox\sklearn_ml_toolbox\samples\grades" />
+    <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />

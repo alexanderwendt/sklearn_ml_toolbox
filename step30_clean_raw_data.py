@@ -2,7 +2,34 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Clean raw data
+Step 3X Preprocessing: Clean raw data.
+
+This script performs the initial cleaning of the raw feature and outcome data.
+It handles missing values, renames columns, and performs a basic analysis of the
+data to identify potential issues. The cleaned data is then saved for further
+processing in the next steps.
+
+Inputs:
+    - Raw features CSV file (specified in the config).
+    - Raw outcomes CSV file (specified in the in the config).
+    - Raw source data file (specified in the config).
+    - Labels file (specified in the config).
+
+Outputs:
+    - `step31out.pickle`: A pickle file containing the cleaned features, outcomes,
+      class labels, and other relevant data for the next step.
+    - Various plots in the results directory, showing the distribution of each
+      feature and the missing data matrix.
+
+Main Functions:
+    - `clean_features_first_pass`: Performs initial cleaning of the feature
+      DataFrame, including renaming columns and handling missing values.
+    - `load_files`: Loads all the necessary input files.
+    - `analyze_raw_data`: Performs a basic analysis of the raw data, including
+      plotting feature distributions and checking for unique columns.
+    - `main`: Orchestrates the loading, cleaning, and analysis of the data, and
+      saves the cleaned data to a pickle file.
+
 License_info: ISC
 ISC License
 
@@ -22,7 +49,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 
 # Futures
-#from __future__ import print_function
+# from __future__ import print_function
 
 # Built-in/Generic Imports
 
@@ -30,17 +57,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import argparse
 import os
 from pickle import dump
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-#from IPython.core.display import display
-#from matplotlib.ticker import FuncFormatter, MaxNLocator
 from pandas.core.dtypes.common import is_string_dtype
 from pandas.plotting import register_matplotlib_converters
 
+import utils.data_handling_support_functions as sup
 # Own modules
 import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -76,10 +102,30 @@ args = parser.parse_args()
 
 
 def clean_features_first_pass(features_raw, class_name):
-    '''
+    """
+    Perform a first pass of cleaning on the raw feature data.
 
+    This function takes a raw features DataFrame and performs the following cleaning steps:
+    1.  Creates a copy of the DataFrame to avoid modifying the original.
+    2.  Renames columns by replacing spaces with underscores and slashes with hyphens.
+    3.  Strips leading/trailing whitespace from all string columns.
+    4.  Replaces specified missing value placeholders (e.g., '?') with `np.nan`.
+    5.  Prints information about the DataFrame, including its size, head, missing values, and column types.
 
-    '''
+    Parameters
+    ----------
+    features_raw : pd.DataFrame
+        The raw features DataFrame to be cleaned.
+    class_name : str
+        The name of the class column. Although this parameter is passed, it is not
+        currently used in the function. It is likely a remnant of a previous
+        implementation or intended for future use.
+
+    Returns
+    -------
+    pd.DataFrame
+        A new DataFrame with the initial cleaning steps applied.
+    """
 
     features = features_raw.copy()
 
@@ -133,14 +179,14 @@ def clean_features_first_pass(features_raw, class_name):
 
 def load_files(features_path, outcomes_path, source_path, labels_path, no_source_data=False):
     # Constants for all notebooks in the Machine Learning Toolbox
-    #print("Data source: {}".format(data_directory))
+    # print("Data source: {}".format(data_directory))
 
     # Generating filenames for loading the files
     input_features_filename = features_path
     input_outcomes_filename = outcomes_path
 
-    source_filename = source_path #data_directory + "/" + dataset_name + "_source" + ".csv"
-    #labels_filename = data_directory + "/" + dataset_name + "_labels" + ".csv"
+    source_filename = source_path  # data_directory + "/" + dataset_name + "_source" + ".csv"
+    # labels_filename = data_directory + "/" + dataset_name + "_labels" + ".csv"
     # Columns for feature selection
     # selected_feature_columns_filename = data_directory + "/" + dataset_name + "_" + class_name + "_selected_feature_columns.csv"
 
@@ -149,7 +195,7 @@ def load_files(features_path, outcomes_path, source_path, labels_path, no_source
     # print("Output Features: ", model_features_filename)
     print("Input Outcomes: ", input_outcomes_filename)
     # print("Output Outcomes: ", model_outcomes_filename)
-    #print("Labels: ", labels_filename)
+    # print("Labels: ", labels_filename)
     print("Original source: ", source_filename)
     # print("Labels for the model: ", model_labels_filename)
     # print("Selected feature columns: ", selected_feature_columns_filename)
@@ -162,7 +208,7 @@ def load_files(features_path, outcomes_path, source_path, labels_path, no_source
 
     # === Load Outcomes ===#
     if input_outcomes_filename and os.path.isfile(input_outcomes_filename):
-        #if not on_inference_data:
+        # if not on_inference_data:
         outcomes_raw = pd.read_csv(input_outcomes_filename, sep=';').set_index('id')  # Set ID to be the data id
         print(outcomes_raw.head(1))
     else:
@@ -179,8 +225,8 @@ def load_files(features_path, outcomes_path, source_path, labels_path, no_source
         print("No raw data source found or no source data should be loaded as it would be for temporal processing.")
 
     # === Load class labels or modify ===#
-    #Load annotations
-    #annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
+    # Load annotations
+    # annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
     if labels_path and os.path.isfile(labels_path):
         class_labels = load_class_labels(labels_path)
         print("Class labels found")
@@ -189,6 +235,7 @@ def load_files(features_path, outcomes_path, source_path, labels_path, no_source
         print("No class labels found")
 
     return features_raw, outcomes_raw, data_source_raw, class_labels
+
 
 def load_class_labels(labels_filename):
     '''
@@ -226,17 +273,19 @@ def print_characteristics(features_raw, image_save_directory, dataset_name, save
 
         plt.figure(fig.number)
 
-        vis.save_figure(plt.gcf(), image_save_directory=image_save_directory, filename='feature_{}-{}'.format(i, features_raw.columns[i]))
+        vis.save_figure(plt.gcf(), image_save_directory=image_save_directory,
+                        filename='feature_{}-{}'.format(i, features_raw.columns[i]))
 
-        #if save_graphs == True:
+        # if save_graphs == True:
         #    plt.savefig(
         #        image_save_directory + '/' + 'feature_{}-{}'.format(i, features_raw.columns[i]),
         #        dpi=300)
-        #plt.show(block = False)
-        #plt.close()
+        # plt.show(block = False)
+        # plt.close()
 
 
-def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_name, no_images=False, on_inference_data=False):
+def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_name, no_images=False,
+                     on_inference_data=False):
     # Define file names
     print("Results target: {}".format(result_directory))
 
@@ -282,26 +331,20 @@ def unique_cols(df):
     the columns have to be processed.
 
     '''
-    a = df.to_numpy() # df.values (pandas<0.24)
-    return sum((a[0] == a).all(0))==0
+    a = df.to_numpy()  # df.values (pandas<0.24)
+    return sum((a[0] == a).all(0)) == 0
+
 
 def main(config_path, on_inference_data, no_images, no_source_data):
     conf = sup.load_config(config_path)
 
-    #if not on_inference_data:
+    # if not on_inference_data:
     data_directory = conf['Paths'].get('prepared_data_directory')
     result_directory = os.path.join(conf['Paths'].get('results_directory'), "data_preparation")
-    #annotations_filename = conf["Paths"].get("annotations_file")
 
-    #if not os.path.isdir(result_directory):
-    #    os.makedirs(result_directory)
-    #    print("Created directory: ", result_directory)
-
-    data_preparation_dump_file_path = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp", "step31out.pickle")
+    data_preparation_dump_file_path = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp",
+                                                   "step31out.pickle")
     os.makedirs(os.path.dirname(data_preparation_dump_file_path), exist_ok=True)
-    #if not os.path.isdir("tmp"):
-    #    os.makedirs("tmp")
-    #    print("Created directory: ", "tmp")
 
     features_path = os.path.join(conf['Preparation'].get('features_in'))
     if 'outcomes_in' in conf['Preparation']:
@@ -313,12 +356,15 @@ def main(config_path, on_inference_data, no_images, no_source_data):
     source_path = os.path.join(conf['Preparation'].get('source_in'))
 
     # Load files
-    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(features_path, outcomes_path, source_path, labels_path, no_source_data)
+    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(features_path, outcomes_path,
+                                                                                source_path, labels_path,
+                                                                                no_source_data)
 
     ## Data Cleanup of Features and Outcomes before Features are Modified
     features_cleaned1 = clean_features_first_pass(features_raw, class_labels)
 
-    analyze_raw_data(features_cleaned1, outcomes_cleaned1, result_directory, conf['Common'].get('dataset_name'), conf['Common'].get('class_name'), no_images, on_inference_data)
+    analyze_raw_data(features_cleaned1, outcomes_cleaned1, result_directory, conf['Common'].get('dataset_name'),
+                     conf['Common'].get('class_name'), no_images, on_inference_data)
 
     # Save structures for further processing
     # Dump path data
@@ -328,7 +374,6 @@ def main(config_path, on_inference_data, no_images, no_source_data):
 
 
 if __name__ == "__main__":
-
     main(args.config_path, args.on_inference_data, args.no_images, args.no_source_data)
 
     print("=== Program end ===")

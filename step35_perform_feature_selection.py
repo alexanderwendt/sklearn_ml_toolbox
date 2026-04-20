@@ -2,7 +2,29 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Feature Selection
+Step 3X Preprocessing: Feature Selection.
+
+This script performs feature selection using various methods to identify the most
+important features for the machine learning model. The selected feature sets are
+then saved to a CSV file for use in the training steps.
+
+Inputs:
+    - Features and outcomes from the previous steps (loaded via `sup.load_features`).
+
+Outputs:
+    - `selected_feature_columns_out.csv`: A CSV file containing the names of the
+      selected features for different selection methods.
+    - `Lasso_Model_Weights.png` and `Tree_Based_Importance.png`: Plots showing the
+      feature importances for the Lasso and Tree-based models, saved in the
+      `data_preparation` subdirectory of the results directory.
+
+Main Functions:
+    - `perform_feature_selection_algorithms`: Executes various feature selection
+      algorithms, including Lasso, Tree-based, Backward Elimination, and
+      Recursive Feature Elimination.
+    - `main`: Loads the data, calls `perform_feature_selection_algorithms`, and
+      saves the selected feature sets to a CSV file.
+
 License_info: ISC
 ISC License
 
@@ -36,12 +58,12 @@ import matplotlib as m
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.linear_model import LassoCV
-from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.ensemble import ExtraTreesClassifier, ExtraTreesRegressor
 from sklearn.feature_selection import SelectFromModel
 import statsmodels.api as sm
-from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegressionCV, RidgeCV
 from sklearn.feature_selection import RFE
 
 # Own modules
@@ -72,13 +94,15 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 args = parser.parse_args()
 
 
-def predict_features_simple(X, y):
+def predict_features_simple(X, y, problem_type='classification'):
     '''
 
 
     '''
-
-    clf = LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial').fit(X, y)
+    if problem_type == 'classification':
+        clf = LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial').fit(X, y)
+    else:
+        clf = LinearRegression().fit(X, y)
     return clf.score(X, y)
 
 def execute_lasso_feature_selection(X_scaled, y, conf, image_save_directory):
@@ -116,14 +140,17 @@ def execute_lasso_feature_selection(X_scaled, y, conf, image_save_directory):
 
     return coefList
 
-def execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory):
+def execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory, problem_type='classification'):
     '''
 
 
     '''
 
     print("Tree based feature selection")
-    clf = ExtraTreesClassifier(n_estimators=50)
+    if problem_type == 'classification':
+        clf = ExtraTreesClassifier(n_estimators=50)
+    else:
+        clf = ExtraTreesRegressor(n_estimators=50)
     clf = clf.fit(X_scaled, y)
     print(clf.feature_importances_)
     print("Best score: %f" % clf.score(X_scaled, y))
@@ -191,14 +218,17 @@ def execute_backwardelimination_feature_selection(X_scaled, y):
 
     return selected_features_BE
 
-def execute_recursive_elimination_feature_selection(X_scaled, y):
+def execute_recursive_elimination_feature_selection(X_scaled, y, problem_type='classification'):
     '''
 
 
     '''
 
     print("Recursive elimination")
-    model = LogisticRegressionCV(solver='liblinear', cv=3)
+    if problem_type == 'classification':
+        model = LogisticRegressionCV(solver='liblinear', cv=3)
+    else:
+        model = RidgeCV(cv=3)
     print("Start Recursive Elimination. Fit model with {} examples.".format(X_scaled.shape[0]))
     # Initializing RFE model, 3 features selected
     rfe = RFE(model)
@@ -207,7 +237,7 @@ def execute_recursive_elimination_feature_selection(X_scaled, y):
     # Fitting the data to model
     model.fit(X_rfe, y)
 
-    print("Best accuracy score using built-in Logistic Regression: ", model.score(X_rfe, y))
+    print("Best score using built-in model: ", model.score(X_rfe, y))
     print("Ranking")
     rfe_coef = pd.Series(X_scaled.columns, index=rfe.ranking_ - 1).sort_index()
     print(rfe_coef)
@@ -244,6 +274,7 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
 
 
     '''
+    problem_type = conf['Common'].get('problem_type', fallback='classification')
 
     # Scale
     # Use this scaler also for the test data at the end
@@ -267,16 +298,16 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
     selected_feature_list = selected_feature_list.append(pd.Series(name='Lasso', data=coefList))
     relevantFeatureList.extend(coefList)
 
-    print("Prediction of training data with logistic regression: {0:.2f}".format(
-        predict_features_simple(X_scaled[coefList], y)))
+    print("Prediction of training data with simple model: {0:.2f}".format(
+        predict_features_simple(X_scaled[coefList], y, problem_type=problem_type)))
 
     ### Tree based feature selection
-    treecoefList = execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory)
+    treecoefList = execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory, problem_type=problem_type)
     selected_feature_list = selected_feature_list.append(pd.Series(name='Tree', data=treecoefList))
     relevantFeatureList.extend(treecoefList)
 
-    print("Prediction of training data with logistic regression: {0:.2f}".format(
-        predict_features_simple(X_scaled[treecoefList], y)))
+    print("Prediction of training data with simple model: {0:.2f}".format(
+        predict_features_simple(X_scaled[treecoefList], y, problem_type=problem_type)))
 
     ### Backward Elimination
     # Backward Elimination - Wrapper method
@@ -285,13 +316,14 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
     selected_feature_list = selected_feature_list.append(
         pd.Series(name='Backward_Elimination', data=selected_features_BE))
 
-    print("Prediction of training data with logistic regression: {0:.2f}".format(
-        predict_features_simple(X_scaled[selected_features_BE], y)))
+    print("Prediction of training data with simple model: {0:.2f}".format(
+        predict_features_simple(X_scaled[selected_features_BE], y, problem_type=problem_type)))
 
     ### Recursive Elimination with Logistic Regression
     # Recursive Elimination - Wrapper method, Feature ranking with recursive feature elimination
     relevant_features, rfe_coef = execute_recursive_elimination_feature_selection(X_scaled.iloc[X_train_index_subset],
-                                                                                  y[X_train_index_subset])
+                                                                                  y[X_train_index_subset],
+                                                                                  problem_type=problem_type)
     relevantFeatureList.extend(relevant_features)
 
     step_size = np.round(len(X_scaled.columns) / 4, 0).astype(int)

@@ -2,7 +2,28 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 7 Predict Temporal Data: Predict model for temporal data
+Step 7.2: Backtest the trading strategies.
+
+This script uses the `backtesting.py` library to backtest different trading
+strategies based on the model's predictions and the reference signal. It provides
+a quantitative evaluation of the strategies' performance, including metrics like
+return, sharpe ratio, and max drawdown.
+
+Inputs:
+    - `outcomes_backtest.csv`: A CSV file containing the trading signals from the
+      previous step.
+    - The source data.
+
+Outputs:
+    - Backtesting results for each strategy, saved as CSV and HTML files in the
+      `evaluation` subdirectory of the results directory.
+
+Main Functions:
+    - `backTestModel`: Performs the backtest for a given trading strategy using the
+      `backtesting.py` library.
+    - `backtest`: Loads the data and the trading signals, and then calls
+      `backTestModel` for each strategy.
+
 License_info: ISC
 ISC License
 

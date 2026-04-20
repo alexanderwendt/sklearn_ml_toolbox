@@ -2,7 +2,33 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 2X Data generation: Generate features for stock markets based on OHLC data
+Step 2X Data generation: Generate a reduced set of long-term features for stock markets based on OHLC data.
+
+This script calculates a selection of technical indicators and features from raw
+stock market OHLC data, with a focus on long-term signals. It is a lighter
+version of `step21_generate_features.py`, creating a smaller and more focused
+feature set.
+
+This script generates a reduced set of features, including:
+    - Price normalization over longer periods.
+    - Impulse counts (number of rising days in a period).
+    - A selection of Simple Moving Averages (SMAs) with longer window sizes.
+    - Relative Strength Index (RSI) with longer periods.
+    - Stochastic oscillators with multiple parameter sets.
+    - Moving Average Convergence Divergence (MACD) with different settings.
+    - MACD differences.
+
+Inputs:
+    - Configuration file (specified by --config_path argument): Contains paths
+      for raw data, prepared data, and results directories.
+    - Raw stock market OHLC data: Loaded from the path specified in the config file.
+
+Outputs:
+    - `temp_features_uncut.csv`: A CSV file containing all the generated features.
+    - Various PNG plots: Visualizations of the raw data and some of the generated
+      features (e.g., Stochastics, MACD). These are saved in a 'data_generation'
+      subdirectory within the configured results directory.
+
 License_info: ISC
 ISC License
 

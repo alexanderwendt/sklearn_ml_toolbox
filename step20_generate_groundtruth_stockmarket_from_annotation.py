@@ -2,7 +2,33 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 2X Data generation: Generate ground truth for stock markets based on OHLC data
+Step 2X Data generation: Generate ground truth for stock markets based on annotations.
+
+This script generates ground truth signals for stock market data by loading them
+from an external annotation file. Unlike `step20_generate_groundtruth_stockmarket.py`,
+which calculates trends and signals from raw OHLC data, this script uses
+pre-existing, manually or externally created annotations as the ground truth.
+
+Inputs:
+    - Configuration file (specified by --config_path argument): Contains paths
+      for raw data, prepared data, results directories, and the annotation file.
+    - Raw stock market OHLC data: Loaded from the path specified in the config file.
+    - Annotation file: A CSV file containing the ground truth signals, specified
+      by the `outcomes_source` path in the config file.
+
+Outputs:
+    - `outcomes_cut.csv`: A CSV file containing the ground truth signals loaded
+      from the annotation file.
+    - Various PNG plots: Visualizations of the raw data and the loaded ground
+      truth signals. These are saved in a 'data_generation' subdirectory within
+      the configured results directory.
+
+Main Functions:
+    - `generate_features_outcomes`: Loads the ground truth signals from the
+      annotation file and merges them with the source data.
+    - `main`: Parses arguments, loads configuration, loads raw data and annotations,
+      calls `generate_features_outcomes`, and saves the final outcomes and plots.
+
 License_info: ISC
 ISC License
 
@@ -28,13 +54,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # Libs
 import argparse
 import os
-import pandas as pd
-import matplotlib.pyplot as plt
-from statsmodels.nonparametric.smoothers_lowess import lowess
-import numpy as np
-from scipy.ndimage.interpolation import shift
+
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from pandas.plotting import register_matplotlib_converters
+
 register_matplotlib_converters()
 
 # Own modules
@@ -440,45 +466,44 @@ def generate_features_outcomes(outcomes_source, outcome_col, source, rename_outc
 
     '''
 
-
     # Outcome and Feature Construction
-    #Generate the class values, i.e.the y for the data.Construct features. The following dataframes are
-    #generated:
-    #- source
-    #- features
-    #- outcomes
+    # Generate the class values, i.e.the y for the data.Construct features. The following dataframes are
+    # generated:
+    # - source
+    # - features
+    # - outcomes
 
-    #Load only a subset of the whole raw data to create a debug dataset
-    #source = custom(conf['source_path']).iloc[0:1000, :]
+    # Load only a subset of the whole raw data to create a debug dataset
+    # source = custom(conf['source_path']).iloc[0:1000, :]
 
-    #Plot source
-    #plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
-    #plt.plot(source['Date'], source['Close'])
-    #plt.title(conf['source_path'])
-    #plt.show()
+    # Plot source
+    # plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
+    # plt.plot(source['Date'], source['Close'])
+    # plt.title(conf['source_path'])
+    # plt.show()
 
-    #bottoms, tops, latestTops, latestBottoms = find_tops_bottoms(source)
+    # bottoms, tops, latestTops, latestBottoms = find_tops_bottoms(source)
 
-    #pos_trend_long, fig_long = calculate_lowess(source, 300)
-    #plt.gca()
-    #plt.show(block = False)
+    # pos_trend_long, fig_long = calculate_lowess(source, 300)
+    # plt.gca()
+    # plt.show(block = False)
 
-    #pos_trend_short, fig_short = calculate_lowess(source, 10)
-    #plt.gca()
-    #plt.show(block = False)
+    # pos_trend_short, fig_short = calculate_lowess(source, 10)
+    # plt.gca()
+    # plt.show(block = False)
 
-    #y1day, y5day, y20day, ylong = calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_trend_long, pos_trend_short)
-    #y1day, y5day, y20day, ylong = clean_bad_signals_1(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
-    #y1day, y5day, y20day, ylong = clean_bad_signals_2(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
-    #y1day, y5day, y20day, ylong = clean_bad_signals_3(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
+    # y1day, y5day, y20day, ylong = calculate_y_signals(source, bottoms, tops, latestBottoms, latestTops, pos_trend_long, pos_trend_short)
+    # y1day, y5day, y20day, ylong = clean_bad_signals_1(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
+    # y1day, y5day, y20day, ylong = clean_bad_signals_2(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
+    # y1day, y5day, y20day, ylong = clean_bad_signals_3(y1day, y5day, y20day, ylong, source['Close'], latestBottoms, latestTops)
 
-    #Load outcome file
+    # Load outcome file
     outcome_raw = pd.read_csv(outcomes_source, sep=';')
     outcome_raw.index.name = "id"
     outcome_raw.columns = ['Date', outcome_col]
     outcome_raw['Date'] = pd.to_datetime(outcome_raw['Date'])
     outcome_raw['Date'].apply(mdates.date2num)
-    outcome_raw.rename(columns={outcome_col : rename_outcome_col}, inplace=True)
+    outcome_raw.rename(columns={outcome_col: rename_outcome_col}, inplace=True)
 
     # Merge all y values to the series start
     outcomes = pd.DataFrame(index=source.index).join(
@@ -494,36 +519,37 @@ def main(config_path):
 
     # Generating filenames for saving the files
     image_save_directory = os.path.join(conf['Paths'].get('results_directory'), "data_generation")
-    outcomes_filename_raw = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp", "temp_outcomes_uncut" + ".csv")
+    outcomes_filename_raw = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp",
+                                         "temp_outcomes_uncut" + ".csv")
     os.makedirs(os.path.dirname(outcomes_filename_raw), exist_ok=True)
 
-    #if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
+    # if os.path.isdir(conf['Paths'].get('prepared_data_directory'))==False:
     ##    os.makedirs(conf['Paths'].get('prepared_data_directory'))
     #    print("Created directory ", conf['Paths'].get('training_data_directory'))
 
-    #if os.path.isdir(conf['Paths'].get('results_directory'))==False:
+    # if os.path.isdir(conf['Paths'].get('results_directory'))==False:
     #    os.makedirs(conf['Paths'].get('result_directory'))
     #   print("Created directory ", conf['Paths'].get('result_directory'))
 
-    #Load only a subset of the whole raw data to create a debug dataset
-    source = custom.load_source(conf['Paths'].get('source_path')) #.iloc[0:1000, :]
+    # Load only a subset of the whole raw data to create a debug dataset
+    source = custom.load_source(conf['Paths'].get('source_path'))  # .iloc[0:1000, :]
     outcomes_source = conf['Paths'].get('outcomes_source')
     outcome_col = conf['Generation'].get('outcome_col')
     rename_outcome_col = conf['Common'].get('class_name')
 
-    #Plot source
+    # Plot source
     plt.figure(num=None, figsize=(12.5, 7), dpi=80, facecolor='w', edgecolor='k')
     plt.plot(source['Date'], source['Close'])
     plt.title(conf['Paths'].get('source_path'))
-    plt.show(block = False)
+    plt.show(block=False)
 
-    #y_labels = annotations #generate_custom_class_labels()
+    # y_labels = annotations #generate_custom_class_labels()
     outcomes = generate_features_outcomes(outcomes_source, outcome_col, source, rename_outcome_col)
 
     # Drop the 50 last values as they cannot be used for prediction as +50 days ahead is predicted
-    #No drop as the annotations were loaded
-    source_cut = source #source.drop(source.tail(50).index, inplace=False)
-    outcomes_cut = outcomes #outcomes.drop(outcomes.tail(50).index, inplace=False)
+    # No drop as the annotations were loaded
+    source_cut = source  # source.drop(source.tail(50).index, inplace=False)
+    outcomes_cut = outcomes  # outcomes.drop(outcomes.tail(50).index, inplace=False)
 
     # vis.plot_three_class_graph(outcomes_cut['1dTrend'].values,
     #                            source_cut['Close'], source_cut['Date'],
@@ -545,7 +571,7 @@ def main(config_path):
 
     vis.plot_three_class_graph(outcomes_cut[rename_outcome_col].values,
                                source_cut['Close'], source_cut['Date'],
-                               0,0,0, ('close', 'neutral', 'positive', 'negative'),
+                               0, 0, 0, ('close', 'neutral', 'positive', 'negative'),
                                title=conf['Common'].get('dataset_name') + '_Groud_Truth_LongTrend',
                                save_fig_prefix=image_save_directory)
 
@@ -588,10 +614,9 @@ def main(config_path):
 
 
 if __name__ == "__main__":
-    #if not args.pb and not args.xml:
+    # if not args.pb and not args.xml:
     #    sys.exit("Please pass either a frozen pb or IR xml/bin model")
 
     main(args.config_path)
-
 
     print("=== Program end ===")

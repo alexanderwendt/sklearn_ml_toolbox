@@ -2,7 +2,37 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Data analysis
+Step 3X Preprocessing: Data analysis.
+
+This script performs a comprehensive analysis of the prepared data. It includes
+visualizations like correlation matrices, pair plots, hierarchical linkage plots,
+and dimensionality reduction plots (PCA, t-SNE, UMAP). The goal is to gain
+insights into the data and the relationships between the features.
+
+Inputs:
+    - Features and outcomes from the previous steps (loaded via `sup.load_features`).
+
+Outputs:
+    - A variety of plots saved in the `data_preparation` subdirectory of the
+      results directory, including:
+        - `Correlation_Strength.png`
+        - `Spearman_Correlation_Plot.png`
+        - `Pairplot.png`
+        - `Hierarchical_Linkage.png`
+        - `T-SNE_Plot.png`
+        - `UMAP_Supervised.png` and `UMAP_Unsupervised.png`
+        - `PCA_Variance_Coverage.png` and `PCA_Plot.png`
+
+Main Functions:
+    - `analyse_features`: Orchestrates the entire analysis, calling the various
+      plotting functions.
+    - `plot_pca`, `plot_umap`, `plot_t_sne`, `plot_parallel_coordinates`,
+      `plot_hierarchical_linkage`, `plot_correlation_bar`,
+      `plot_spearman_correlation_matrix`, `plot_correlation_matrix2`,
+      `plot_correlation_matrix`: Functions for generating the different
+      visualizations.
+    - `main`: Loads the data and calls `analyse_features`.
+
 License_info: ISC
 ISC License
 

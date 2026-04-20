@@ -24,7 +24,7 @@ import xgboost as xgb
 from sklearn.model_selection import GridSearchCV
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
+from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold, KFold
 from sklearn import feature_selection
 
 from sklearn.impute import SimpleImputer
@@ -164,21 +164,25 @@ def load_training_input_input(conf):
     y_train_path = os.path.join(conf['Training'].get('outcomes_train_in'))
     X_val_path = os.path.join(conf['Training'].get('features_val_in'))
     y_val_path = os.path.join(conf['Training'].get('outcomes_val_in'))
-    labels_path = os.path.join(conf['Training'].get('labels_in'))
+    labels_path = conf['Paths'].get('labels_path')
 
     X_train, _, y_train = load_data(X_train_path, y_train_path)
     X_val, _, y_val = load_data(X_val_path, y_val_path)
 
-    labels = load_labels(labels_path)
-
-    y_classes = labels  # train['label_map']
+    problem_type = conf['Common'].get('problem_type', fallback='classification')
+    if problem_type == 'classification' and labels_path and os.path.isfile(labels_path):
+        labels = load_labels(labels_path)
+        y_classes = labels
+    else:
+        labels = None
+        y_classes = None
 
     print("Load feature columns")
     feature_columns_path = os.path.join(conf['Training'].get('selected_feature_columns_in'))
     selected_features, feature_dict, df_feature_columns = load_feature_columns(feature_columns_path, X_train)
 
     print("Load metrics")
-    metrics = Metrics(conf, list(labels.values()))
+    metrics = Metrics(conf, list(labels.values()) if labels else None)
     scorers = metrics.scorers
     refit_scorer_name = metrics.refit_scorer_name
 
@@ -358,7 +362,7 @@ def get_top_median_method(method_name, model_results, refit_scorer_name, top_sha
     return median_values, source
 
 
-def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, pipeline, subset_share=0.1, n_splits=5):
+def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, pipeline, subset_share=0.1, n_splits=5, problem_type='classification'):
     '''
     Run a SKLearn model
 
@@ -367,40 +371,33 @@ def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, pi
 
     # Create a subset to train on
     print("[Step 1]: Create a data subset")
-    subset_min = 300  # Minimal subset is 100 samples.
+    subset_min = 100  # Minimal subset is 100 samples.
 
     if subset_share * X_train.shape[0] < subset_min:
-        number_of_samples = subset_min
+        number_of_samples = min(subset_min, X_train.shape[0])
         print("minimal number of samples used: ", number_of_samples)
     else:
-        number_of_samples = subset_share * X_train.shape[0]
+        number_of_samples = int(subset_share * X_train.shape[0])
 
     X_train_subset, y_train_subset = modelutil.extract_data_subset(X_train, y_train, number_of_samples)
     print("Got subset sizes X train: {} and y train: {}".format(X_train_subset.shape, y_train_subset.shape))
 
     # Main pipeline for the grid search
     pipe_run1 = pipeline
-    #Pipeline([
-    #    ('imputer', SimpleImputer(missing_values=np.nan, strategy='median')),
-    #    ('scaler', StandardScaler()),
-    #    ('sampling', modelutil.Nosampler()),
-    #    ('feat', modelutil.ColumnExtractor(cols=None)),
-    #    ('model', model)
-    #])
 
     print("Pipeline: ", pipe_run1)
 
-    print("Stratified KFold={} used.".format(n_splits))
-    # INFO: KFold Splitter with shuffle=True to get random values
-    skf = StratifiedKFold(n_splits=n_splits, random_state=3, shuffle=True)
+    if problem_type == 'classification':
+        print("Stratified KFold={} used.".format(n_splits))
+        # INFO: KFold Splitter with shuffle=True to get random values
+        cv = StratifiedKFold(n_splits=n_splits, random_state=3, shuffle=True)
+    else:
+        print("KFold={} used for regression.".format(n_splits))
+        cv = KFold(n_splits=n_splits, random_state=3, shuffle=True)
 
-    #pipe_run1 = pipe_run1
     params_run1 = parameters  # params_debug #params_run1
-    grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=2, cv=skf, scoring=scorers, refit=refit_scorer_name,
+    grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=2, cv=cv, scoring=scorers, refit=refit_scorer_name,
                                     return_train_score=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
-
-    # grid_search_run1 = GridSearchCV(pipe_run1, params_run1, verbose=1, cv=skf, scoring=scorers, refit=refit_scorer_name,
-    #                                return_train_score=True, iid=True, n_jobs=-1).fit(X_train_subset, y_train_subset)
 
     results_run1 = modelutil.generate_result_table(grid_search_run1, params_run1, refit_scorer_name)
     print("Result size=", results_run1.shape)
@@ -615,7 +612,7 @@ def generate_parameter_limits_for_SVM(results, plot_best=20):
 
 def run_random_cv_for_SVM(X_train, y_train, parameter_svm, pipe_run, scorers, refit_scorer_name, number_of_samples=400,
                           kfolds=5,
-                          n_iter_search=2000, plot_best=20):
+                          n_iter_search=2000, plot_best=20, problem_type='classification'):
     '''
     Execute random search cv
 
@@ -648,18 +645,16 @@ def run_random_cv_for_SVM(X_train, y_train, parameter_svm, pipe_run, scorers, re
     }
 
     # K-Fold settings
-    skf = StratifiedKFold(n_splits=kfolds)
+    if problem_type == 'classification':
+        cv = StratifiedKFold(n_splits=kfolds)
+    else:
+        cv = KFold(n_splits=kfolds)
 
     # run randomized search
     random_search_run = RandomizedSearchCV(pipe_run, param_distributions=params_run, n_jobs=-1,
-                                           n_iter=n_iter_search, cv=skf, scoring=scorers,
+                                           n_iter=n_iter_search, cv=cv, scoring=scorers,
                                            refit=refit_scorer_name, return_train_score=True,
                                            verbose=5).fit(X_train_subset, y_train_subset)
-
-   # random_search_run = RandomizedSearchCV(pipe_run, param_distributions=params_run, n_jobs=-1,
-   #                                        n_iter=n_iter_search, cv=skf, scoring=scorers,
-   #                                        refit=refit_scorer_name, return_train_score=True,
-   #                                        iid=True, verbose=5).fit(X_train_subset, y_train_subset)
 
     print("Best parameters: ", random_search_run.best_params_)
     print("Best score: {:.3f}".format(random_search_run.best_score_))

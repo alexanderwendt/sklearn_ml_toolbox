@@ -2,7 +2,35 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 2X Data generation: Generate features for stock markets based on OHLC data
+Step 2X Data generation: Generate a comprehensive set of features for stock markets based on OHLC data.
+
+This script calculates a wide variety of technical indicators and features from raw
+stock market OHLC data. These features can then be used to train a machine
+learning model for stock market prediction.
+
+This script generates a broad range of features, including:
+    - Price normalization over various periods.
+    - Impulse counts (number of rising days in a period).
+    - A comprehensive set of Simple Moving Averages (SMAs) with different window sizes.
+    - Direction of the moving averages.
+    - Relative Strength Index (RSI) with various periods.
+    - RSI differences.
+    - Stochastic oscillators with multiple parameter sets.
+    - Moving Average Convergence Divergence (MACD) with different settings.
+    - MACD differences and trigger signals.
+    - Periodical indicators (day of week, month of year, etc.).
+
+Inputs:
+    - Configuration file (specified by --config_path argument): Contains paths
+      for raw data, prepared data, and results directories.
+    - Raw stock market OHLC data: Loaded from the path specified in the config file.
+
+Outputs:
+    - `temp_features_uncut.csv`: A CSV file containing all the generated features.
+    - Various PNG plots: Visualizations of the raw data and some of the generated
+      features (e.g., Stochastics, MACD). These are saved in a 'data_generation'
+      subdirectory within the configured results directory.
+
 License_info: ISC
 ISC License
 

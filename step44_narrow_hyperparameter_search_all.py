@@ -2,7 +2,31 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 4X Training: Train narrow search
+Step 4X Training: Perform a narrow, incremental hyperparameter search.
+
+This script executes a narrow, iterative search to fine-tune the hyperparameters
+of the machine learning model. It starts with the best parameters from the wide
+search and explores the surrounding parameter space in more detail.
+
+Inputs:
+    - Training data.
+    - The best pipeline from the wide search (`pipe_first_selection.pickle`).
+
+Outputs:
+    - `run2_result.pickle`: A pickle file containing the results of the narrow search.
+    - `pipeline_out.pickle`: A pickle file with the final, fine-tuned pipeline.
+    - Visualization of the narrow search results, saved as PNG files in the
+      `model_images` subdirectory of the results directory.
+
+Main Functions:
+    - `execute_search_iterations_random_search_SVM`: Performs the iterative random
+      search for SVM hyperparameters.
+    - `perform_run2_svm`: Orchestrates the narrow search for SVM models.
+    - `perform_run2_xgboost`: Orchestrates the narrow search for XGBoost models.
+    - `execute_narrow_search`: Loads the data and the best pipeline from the wide
+      search, and then calls the appropriate narrow search function based on the
+      model type.
+
 License_info: ISC
 ISC License
 
@@ -78,7 +102,7 @@ args = parser.parse_args()
 
 
 def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter_svm, pipe_run_random, scorers,
-                                                refit_scorer_name, iter_setup, save_fig_prefix=None):
+                                                refit_scorer_name, iter_setup, save_fig_prefix=None, problem_type='classification'):
     '''
     Iterated search for parameters. Set sample size, kfolds, number of iterations and top result selection. Execute
     random search cv for the number of entries and extract the best parameters from that search. As a result the
@@ -123,27 +147,23 @@ def execute_search_iterations_random_search_SVM(X_train, y_train, init_parameter
                                                                                    number_of_samples=sample_size,
                                                                                    kfolds=folds,
                                                                                    n_iter_search=iterations,
-                                                                                   plot_best=selection)
+                                                                                   plot_best=selection,
+                                                                                   problem_type=problem_type)
         print("Got best parameters: ")
         print(new_parameter_rand)
 
         # Display random search results
-        ax = svmvis.visualize_random_search_results(clf, refit_scorer_name,
-                                                    param_x='param_model__C', param_y='param_model__gamma')
-        ax_enhanced = svmvis.add_best_results_to_random_search_visualization(ax, results_random_search, selection)
+        if problem_type == 'classification':
+            ax = svmvis.visualize_random_search_results(clf, refit_scorer_name,
+                                                        param_x='param_model__C', param_y='param_model__gamma')
+            ax_enhanced = svmvis.add_best_results_to_random_search_visualization(ax, results_random_search, selection)
 
-        plt.gca()
-        plt.tight_layout()
+            plt.gca()
+            plt.tight_layout()
 
-        vis.save_figure(plt.gcf(), image_save_directory=save_fig_prefix,
-                        filename='run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
-                                 + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection))
-
-        # plt.savefig(save_fig_prefix + '_' + 'run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
-        #            + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection), dpi=300)
-        # plt.show(block = False)
-        # plt.pause(0.01)
-        # plt.close()
+            vis.save_figure(plt.gcf(), image_save_directory=save_fig_prefix,
+                            filename='run2_subrun_' + str(i) + '_samples' + str(sample_size) + '_fold'
+                                     + str(folds) + '_iter' + str(iterations) + '_sel' + str(selection))
 
         print("===============================================================")
 
@@ -178,6 +198,7 @@ def execute_narrow_search(config_path):
     X_train, y_train, X_val, y_val, y_classes, selected_features, \
     feature_dict, paths, scorers, refit_scorer_name = exe.load_training_input_input(config)
     #model_type = config.get('Common', 'model_type')
+    problem_type = config['Common'].get('problem_type', fallback='classification')
 
     pipeline_class_name = config.get('Training', 'pipeline_class', fallback=None)
     PipelineClass = locate('models.' + pipeline_class_name + '.ModelParam')
@@ -228,7 +249,7 @@ def execute_narrow_search(config_path):
         # SVM Code Start
         pipe_run_second_selection, results_run2 = perform_run2_svm(X_train, iter_setup, pipe_run_best_first_selection,
                                                                    refit_scorer_name,
-                                                                   save_fig_prefix, scorers, y_train)
+                                                                   save_fig_prefix, scorers, y_train, problem_type=problem_type)
         # SVM Code End
     else:
         # XGBoost Code start
@@ -283,7 +304,7 @@ def perform_run2_xgboost(X_train, iter_setup, pipe_run_best_first_selection, ref
 
 
 def perform_run2_svm(X_train, iter_setup, pipe_run_best_first_selection, refit_scorer_name, save_fig_prefix, scorers,
-                     y_train):
+                     y_train, problem_type='classification'):
     """
     Run a comprehensive parameter search for SVM, where a fine tuning phase starts.
 
@@ -300,7 +321,8 @@ def perform_run2_svm(X_train, iter_setup, pipe_run_best_first_selection, refit_s
                                                                             scorers,
                                                                             refit_scorer_name,
                                                                             iter_setup,
-                                                                            save_fig_prefix=save_fig_prefix + '/')
+                                                                            save_fig_prefix=save_fig_prefix + '/',
+                                                                            problem_type=problem_type)
     # Enhance kernel with found parameters
     pipe_run_second_selection['model'].C = param_final['C']
     pipe_run_second_selection['model'].gamma = param_final['gamma']

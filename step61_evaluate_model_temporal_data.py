@@ -2,7 +2,26 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 5 Evaluation Temporal Data: Evaluate model for temporal data
+Step 6.1: Evaluate the model on temporal data.
+
+This script visualizes the model's predictions on the temporal data, allowing for
+a qualitative assessment of its performance over time. It plots the ground truth
+and the model's predictions against the source data (e.g., the closing price of
+a stock).
+
+Inputs:
+    - Validation data.
+    - The trained model.
+    - The source data.
+
+Outputs:
+    - Plots showing the ground truth and the model's predictions on the temporal
+      data, saved in the `evaluation` subdirectory of the results directory.
+
+Main Functions:
+    - `visualize_temporal_data`: Loads the data and the model, generates the
+      predictions, and creates the temporal evaluation plots.
+
 License_info: ISC
 ISC License
 

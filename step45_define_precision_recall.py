@@ -2,7 +2,32 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 4X Training: Define Precision/Recall coefficent for binary classes
+Step 4X Training: Define the optimal precision/recall threshold for binary classification.
+
+This script calculates the optimal precision/recall threshold for a binary
+classification model. This is particularly useful when the cost of false
+positives and false negatives is not equal, and a balance between precision and
+recall is desired.
+
+Inputs:
+    - Training data.
+    - The final, fine-tuned pipeline from the narrow search.
+
+Outputs:
+    - `ext_param_out.json`: A JSON file containing the optimal precision/recall
+      threshold.
+    - Various plots in the `model_images` subdirectory of the results directory,
+      showing the precision-recall curve, the ROC curve, and the confusion matrix.
+
+Main Functions:
+    - `get_optimal_precision_recall_threshold`: Calculates the optimal
+      precision/recall threshold by finding the point on the precision-recall
+      curve that is closest to the top-left corner (i.e., perfect precision and
+      recall).
+    - `define_precision_recall_threshold`: Loads the data and the model, calls
+      `get_optimal_precision_recall_threshold`, and saves the optimal threshold
+      to a JSON file.
+
 License_info: ISC
 ISC License
 

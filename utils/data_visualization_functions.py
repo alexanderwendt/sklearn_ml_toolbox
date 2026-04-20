@@ -1,6 +1,9 @@
 import os
-
 import numpy as np
+import scipy
+# Monkey-patch scipy.interp for scikit-plot compatibility
+if not hasattr(scipy, 'interp'):
+    scipy.interp = np.interp
 import matplotlib.pyplot as plt
 import matplotlib as m
 import pandas as pd
@@ -59,12 +62,6 @@ def paintBarChartForMissingValues(xlabels, yvalues):
     barProportions = [calculateProportion(i, 0, 0.3) for i in yvalues]
     barColors = colorMap(barProportions)
 
-    # Create a color bar
-    cscalar = m.cm.ScalarMappable(cmap=colorMap, norm=plt.Normalize(0,0.3))
-    cscalar.set_array([])
-    colorbar = plt.colorbar(cscalar, orientation='vertical', ticks=[0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.3])
-    colorbar.set_label('Low and high values', rotation=270,labelpad=25)
-
     #Plot
     plt.xlabel("Missing features")
     plt.ylabel('Share of missing features')
@@ -72,9 +69,16 @@ def paintBarChartForMissingValues(xlabels, yvalues):
     plt.gca().yaxis.set_ticks(np.arange(0, 0.3, 0.01))
     plt.title('Missing Features Bar chart')
     plt.gca().set_ylim([0, 0.3])
+    bar = plt.bar(xlabels, yvalues, color=barColors, width=1.0, capsize=10, edgecolor='black')
+
+    # Create a color bar
+    cscalar = m.cm.ScalarMappable(cmap=colorMap, norm=plt.Normalize(0,0.3))
+    cscalar.set_array([])
+    colorbar = plt.colorbar(cscalar, orientation='vertical', ticks=[0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.3], ax=plt.gca())
+    colorbar.set_label('Low and high values', rotation=270,labelpad=25)
+
     plt.tight_layout()
     fig.subplots_adjust(bottom=0.3)
-    bar = plt.bar(xlabels, yvalues, color=barColors, width=1.0, capsize=10, edgecolor='black')
 
     return bar
 
@@ -291,7 +295,45 @@ def plot_confusion_matrix_multiclass(cm, classes, normalize=False, title='Confus
     plt.tight_layout()
     return plt.gcf()
 
-def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues):
+def plot_regression_results(y_true, y_pred, title='Regression Results', save_fig_prefix=None):
+    '''
+    Plot predicted vs actual values for regression
+
+    '''
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_true, y_pred, alpha=0.5)
+    plt.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'r--', lw=2)
+    plt.xlabel('Actual')
+    plt.ylabel('Predicted')
+    plt.title(title)
+    if save_fig_prefix:
+        save_figure(plt.gcf(), image_save_directory=os.path.dirname(save_fig_prefix),
+                    filename=os.path.basename(save_fig_prefix) + "_regression_scatter")
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
+
+def plot_residuals(y_true, y_pred, title='Residuals', save_fig_prefix=None):
+    '''
+    Plot residuals for regression
+
+    '''
+    residuals = y_true - y_pred
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_pred, residuals, alpha=0.5)
+    plt.axhline(y=0, color='r', linestyle='--', lw=2)
+    plt.xlabel('Predicted')
+    plt.ylabel('Residuals')
+    plt.title(title)
+    if save_fig_prefix:
+        save_figure(plt.gcf(), image_save_directory=os.path.dirname(save_fig_prefix),
+                    filename=os.path.basename(save_fig_prefix) + "_residuals")
+    plt.show(block=False)
+    plt.pause(0.1)
+    plt.close()
+
+def plot_confusion_matrix(y_true, y_pred, classes,
+ normalize=False, title=None, cmap=plt.cm.Blues):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.

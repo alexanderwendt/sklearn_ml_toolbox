@@ -2,7 +2,26 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Feature Selection
+Step 3X Preprocessing: Split data into training and validation sets.
+
+This script splits the prepared data into training and validation sets. This is
+a crucial step before training a machine learning model, as it allows for an
+unbiased evaluation of the model's performance.
+
+Inputs:
+    - Features and outcomes from the previous steps (loaded via `sup.load_features`).
+
+Outputs:
+    - `features_out_train.csv`: CSV file with the training features.
+    - `features_out_val.csv`: CSV file with the validation features.
+    - `outcomes_out_train.csv`: CSV file with the training outcomes.
+    - `outcomes_out_val.csv`: CSV file with the validation outcomes.
+
+Main Functions:
+    - `split_train_validation_data`: Splits the data into training and validation
+      sets using `train_test_split` from scikit-learn and saves the results to
+      CSV files.
+
 License_info: ISC
 ISC License
 

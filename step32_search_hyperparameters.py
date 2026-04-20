@@ -2,7 +2,26 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Hyperparameter search for T-SNE
+Step 3X Preprocessing: Hyperparameter search for T-SNE.
+
+This script performs a grid search to find the optimal hyperparameters for the
+T-SNE (t-Distributed Stochastic Neighbor Embedding) algorithm. T-SNE is a
+visualization technique that is particularly well suited for the visualization
+of high-dimensional datasets. This script helps in finding the best `perplexity`
+and `early_exaggeration` parameters for the T-SNE plot.
+
+Inputs:
+    - Features and outcomes from the previous steps (loaded via `sup.load_features`).
+
+Outputs:
+    - `_TSNE_Calibration_Plot.png`: A plot showing the T-SNE results for different
+      hyperparameter combinations, saved in the results directory.
+
+Main Functions:
+    - `find_tsne_parmeters`: Performs the grid search for the T-SNE hyperparameters
+      and generates the calibration plot.
+    - `main`: Loads the data, scales it, and calls `find_tsne_parmeters`.
+
 License_info: ISC
 ISC License
 

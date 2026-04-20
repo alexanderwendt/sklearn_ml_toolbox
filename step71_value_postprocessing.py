@@ -2,8 +2,28 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 71: Postprocess and generate values from the validation data to check how well the system works
+Step 7.1: Postprocess and generate values for backtesting.
 
+This script takes the model's predictions and post-processes them to generate
+trading signals for backtesting. It also generates a reference signal based on a
+simple moving average (SMA) strategy to serve as a baseline for comparison.
+
+Inputs:
+    - Validation data.
+    - The trained model.
+    - The source data.
+
+Outputs:
+    - `outcomes_backtest.csv`: A CSV file containing the ground truth, the model's
+      predictions, the post-processed predictions, and the reference signal.
+    - Plots showing the reference signal and the post-processed predictions on the
+      temporal data, saved in the `evaluation` subdirectory of the results
+      directory.
+
+Main Functions:
+    - `generate_values_for_backtesting`: Loads the data and the model, generates
+      the predictions and the reference signal, performs post-processing on the
+      predictions, and saves the results to a CSV file.
 
 License_info: ISC
 ISC License

@@ -2,7 +2,30 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Adapt features for Machine Learning
+Step 3X Preprocessing: Adapt features for Machine Learning.
+
+This script takes the cleaned data from the previous step and prepares it for
+use in a machine learning model. This includes converting all features to a
+numeric type, binarizing the outcome labels if specified, and visualizing the
+missing data. The prepared features and outcomes are then saved to new CSV files.
+
+Inputs:
+    - `step31out.pickle`: A pickle file containing the cleaned features, outcomes,
+      and other data from the previous step.
+
+Outputs:
+    - `features_out.csv`: A CSV file with the model-ready features.
+    - `outcomes_out.csv`: A CSV file with the model-ready outcomes.
+    - `labels_out.csv`: A CSV file with the class labels.
+    - Various plots in the results directory, showing the missing data matrix
+      and heatmap.
+
+Main Functions:
+    - `adapt_features_for_model`: Converts features to numeric types, binarizes
+      outcomes if specified, and visualizes missing data.
+    - `main`: Loads the data from the pickle file, calls `adapt_features_for_model`,
+      and saves the prepared data to new CSV files.
+
 License_info: ISC
 ISC License
 
@@ -106,16 +129,20 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
     # df_dig.drop(columns=['cylinders'], inplace=True)
 
     ## Prepare the Outcomes if they exist
+    problem_type = conf['Common'].get('problem_type', fallback='classification')
     if outcomes_cleaned1 is not None:
         # Replace classes with digital values
         outcomes = outcomes_cleaned1.copy()
-        outcomes = outcomes.astype(int)
+        if problem_type == 'classification':
+            outcomes = outcomes.astype(int)
+        else:
+            outcomes = outcomes.astype(float)
         print("Outcome types")
         print(outcomes.dtypes)
 
         ### Binarize Multiclass Dataset
         # If the binarize setting is used, then binarize the class of the outcome.
-        if conf['Preparation'].getboolean('binarize_labels') == True:
+        if problem_type == 'classification' and conf['Preparation'].getboolean('binarize_labels', fallback=False) == True:
             binarized_outcome = (outcomes[conf['Common'].get('class_name')] == conf['Preparation'].getint('class_number')).astype(int)
             y = binarized_outcome.values.flatten()
             print("y was binarized. Classes before: {}. Classes after: {}".format(np.unique(outcomes[conf['Common'].get('class_name')]),
@@ -131,11 +158,15 @@ def adapt_features_for_model(features_cleaned1, outcomes_cleaned1, result_dir, c
             print("y labels: {}".format(class_labels))
         else:
             y = outcomes[conf['Common'].get('class_name')].values.flatten()
-            print("No binarization was made. Classes: {}".format(np.unique(y)))
+            if problem_type == 'classification':
+                print("No binarization was made. Classes: {}".format(np.unique(y)))
+            else:
+                print("Regression: No binarization was made.")
 
 
         print("y shape: {}".format(y.shape))
-        print("y unique classes: {}".format(np.unique(y, axis=0)))
+        if problem_type == 'classification':
+            print("y unique classes: {}".format(np.unique(y, axis=0)))
     else:
         y = None
         class_labels = None

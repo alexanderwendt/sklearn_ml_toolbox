@@ -2,7 +2,28 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 3X Preprocessing: Feature Selection
+Step 4X Training: Analyze training time and performance.
+
+This script analyzes the training time and performance of a machine learning model
+as a function of the training set size. It helps in understanding how the model
+scales with more data and provides insights into the learning process.
+
+Inputs:
+    - Training and validation data from the previous steps.
+    - A machine learning pipeline (specified in the config).
+
+Outputs:
+    - `Duration_Samples.png`: A plot showing the training duration as a function
+      of the number of training samples.
+    - `F1_Samples.png`: A plot showing the F1 score on the validation set as a
+      function of the number of training samples.
+
+Main Functions:
+    - `run_training_estimation`: Executes the training and evaluation for different
+      subset sizes of the training data and generates the plots.
+    - `run_training_predictors`: Loads the data and the model pipeline, and calls
+      `run_training_estimation`.
+
 License_info: ISC
 ISC License
 

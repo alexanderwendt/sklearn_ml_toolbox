@@ -2,7 +2,25 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 7 Predict Temporal Data: Predict model for temporal data
+Step 7: Predict on temporal data.
+
+This script uses the trained model to make predictions on new, unseen temporal
+data. It visualizes the predictions against the source data to provide a
+qualitative assessment of the model's performance on the inference data.
+
+Inputs:
+    - Inference data.
+    - The trained model.
+    - The source data for the inference period.
+
+Outputs:
+    - Plots showing the model's predictions on the inference data, saved in the
+      `evaluation` subdirectory of the results directory.
+
+Main Functions:
+    - `visualize_temporal_data`: Loads the data and the model, generates the
+      predictions, and creates the temporal prediction plots.
+
 License_info: ISC
 ISC License
 

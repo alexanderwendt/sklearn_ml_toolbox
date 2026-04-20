@@ -8,12 +8,13 @@
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
     <option name="SDK_HOME" value="" />
+    <option name="SDK_NAME" value="sklearn312" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="IS_MODULE_SDK" value="true" />
+    <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-    <option name="SCRIPT_NAME" value="C:/Users/wendt.ICT/Documents/Alexander/03_PythonProjects/04_Machine_Learning_Toolbox/machine_learning_toolbox/step30_clean_raw_data.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../../../Users/wendt.ICT/Documents/Alexander/03_PythonProjects/04_Machine_Learning_Toolbox/machine_learning_toolbox/step30_clean_raw_data.py" />
     <option name="PARAMETERS" value="--config_path=&quot;config/debug_timedata_omxS30_inference.ini&quot; -n -i" />
     <option name="SHOW_COMMAND_LINE" value="true" />
     <option name="EMULATE_TERMINAL" value="false" />

@@ -2,7 +2,26 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 4X Training: Evaluate training model
+Step 6.0: Evaluate the trained model.
+
+This script evaluates the performance of the trained machine learning model on the
+validation data. It generates various evaluation plots, such as confusion
+matrices, precision-recall curves, and ROC curves, to assess the model's
+performance.
+
+Inputs:
+    - Validation data.
+    - The trained model.
+    - External parameters, such as the precision/recall threshold.
+
+Outputs:
+    - Various evaluation plots saved in the `model_images` subdirectory of the
+      results directory.
+
+Main Functions:
+    - `evaluate_model`: Loads the data and the model, performs the evaluation,
+      and generates the evaluation plots.
+
 License_info: ISC
 ISC License
 
@@ -92,49 +111,70 @@ def evaluate_model(config_path, config_section="EvaluationTraining"):
     figure_path_prefix = result_directory + '/model_images/' + title
     os.makedirs(result_directory + '/model_images', exist_ok=True)
 
-    # Load model external parameters
-    pr_threshold = external_params['pr_threshold']
-    print("Loaded precision/recall threshold: ", pr_threshold)
+    problem_type = config['Common'].get('problem_type', fallback='classification')
 
     # Load model
     print("Predict validation data")
     y_test_pred = model.predict(X_val.values)
-    #If there is an error here, set model_pipe['svm'].probability = True
-    y_test_pred_proba = model.predict_proba(X_val.values)
-    y_test_pred_scores = y_test_pred_proba[:,1] #model.decision_function(X_val.values)
 
-    #Reduce the number of classes only to classes that can be found in the data
-    #reduced_class_dict_train = model_util.reduce_classes(y_classes, y_train, y_train_pred)
-    reduced_class_dict_test = model_util.reduce_classes(y_classes, y_val, y_test_pred)
+    if problem_type == 'classification':
+        # Load model external parameters
+        pr_threshold = external_params['pr_threshold']
+        print("Loaded precision/recall threshold: ", pr_threshold)
 
-    if len(y_classes) == 2:
-        #y_train_pred_adjust = model_util.adjusted_classes(y_train_pred_scores, pr_threshold)  # (y_train_pred_scores>=pr_threshold).astype('int')
-        y_test_pred_adjust = model_util.adjusted_classes(y_test_pred_scores, pr_threshold)  # (y_test_pred_scores>=pr_threshold).astype('int')
-        print("This is a binarized problem. Apply optimal threshold to precision/recall. Threshold=", pr_threshold)
-    else:
-        #y_train_pred_adjust = y_train_pred
-        y_test_pred_adjust = y_test_pred
-        print("This is a multi class problem. No precision/recall adjustment of scores are made.")
+        #If there is an error here, set model_pipe['svm'].probability = True
+        y_test_pred_proba = model.predict_proba(X_val.values)
+        y_test_pred_scores = y_test_pred_proba[:,1] #model.decision_function(X_val.values)
 
-    #Plot graphs
-    #If binary class plot precision/recall
-    # Plot the precision and the recall together with the selected value for the test set
-    if len(y_classes) == 2:
-        print("Plot precision recall graphs")
-        precision, recall, thresholds = precision_recall_curve(y_val, y_test_pred_scores)
-        vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold,
-                                               save_fig_prefix=figure_path_prefix, title_prefix="pr_adjusted")
+        #Reduce the number of classes only to classes that can be found in the data
+        #reduced_class_dict_train = model_util.reduce_classes(y_classes, y_train, y_train_pred)
+        reduced_class_dict_test = model_util.reduce_classes(y_classes, y_val, y_test_pred)
 
-        vis.plot_precision_recall_evaluation(y_val, y_test_pred_adjust, y_test_pred_proba, reduced_class_dict_test,
-                                             save_fig_prefix_dir=figure_path_prefix, title_prefix="pr_adjusted")
+        if len(y_classes) == 2:
+            #y_train_pred_adjust = model_util.adjusted_classes(y_train_pred_scores, pr_threshold)  # (y_train_pred_scores>=pr_threshold).astype('int')
+            y_test_pred_adjust = model_util.adjusted_classes(y_test_pred_scores, pr_threshold)  # (y_test_pred_scores>=pr_threshold).astype('int')
+            print("This is a binarized problem. Apply optimal threshold to precision/recall. Threshold=", pr_threshold)
+        else:
+            #y_train_pred_adjust = y_train_pred
+            y_test_pred_adjust = y_test_pred
+            print("This is a multi class problem. No precision/recall adjustment of scores are made.")
 
-    #Plot evaluation for unadjusted values
-    vis.plot_precision_recall_evaluation(y_val, y_test_pred, y_test_pred_proba, reduced_class_dict_test,
-                                         save_fig_prefix_dir=figure_path_prefix, title_prefix="")
-    #Plot decision boundary plot
-    X_decision = X_val.values[0:1000, :]
-    y_decision = y_val[0:1000]
-    vis.plot_decision_boundary(X_decision, y_decision, model, title_prefix=title + "_", save_fig_prefix=figure_path_prefix)
+        #Plot graphs
+        #If binary class plot precision/recall
+        # Plot the precision and the recall together with the selected value for the test set
+        if len(y_classes) == 2:
+            print("Plot precision recall graphs")
+            precision, recall, thresholds = precision_recall_curve(y_val, y_test_pred_scores)
+            vis.plot_precision_recall_vs_threshold(precision, recall, thresholds, pr_threshold,
+                                                   save_fig_prefix=figure_path_prefix, title_prefix="pr_adjusted")
+
+            vis.plot_precision_recall_evaluation(y_val, y_test_pred_adjust, y_test_pred_proba, reduced_class_dict_test,
+                                                 save_fig_prefix_dir=figure_path_prefix, title_prefix="pr_adjusted")
+
+        #Plot evaluation for unadjusted values
+        vis.plot_precision_recall_evaluation(y_val, y_test_pred, y_test_pred_proba, reduced_class_dict_test,
+                                             save_fig_prefix_dir=figure_path_prefix, title_prefix="")
+        #Plot decision boundary plot
+        X_decision = X_val.values[0:1000, :]
+        y_decision = y_val[0:1000]
+        vis.plot_decision_boundary(X_decision, y_decision, model, title_prefix=title + "_", save_fig_prefix=figure_path_prefix)
+
+    elif problem_type == 'regression':
+        # Regression metrics
+        from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+        mse = mean_squared_error(y_val, y_test_pred)
+        mae = mean_absolute_error(y_val, y_test_pred)
+        r2 = r2_score(y_val, y_test_pred)
+
+        print(f"Regression Metrics: MSE={mse:.4f}, MAE={mae:.4f}, R2={r2:.4f}")
+        with open(os.path.join(result_directory, title + "_regression_metrics.txt"), 'w') as f:
+            f.write(f"MSE: {mse}\nMAE: {mae}\nR2: {r2}\n")
+
+        # Regression plots
+        vis.plot_regression_results(y_val, y_test_pred, title=title + ' Regression Results',
+                                     save_fig_prefix=figure_path_prefix)
+        vis.plot_residuals(y_val, y_test_pred, title=title + ' Residuals',
+                            save_fig_prefix=figure_path_prefix)
 
     print("Visualization complete")
 
