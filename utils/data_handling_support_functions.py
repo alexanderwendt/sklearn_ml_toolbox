@@ -144,7 +144,7 @@ def list_to_name(list_of_lists, list_names, result):
     :result: Input Series, where the values shall be replaced. The values in the format of a list are replaced by
     strings. This is done inplace
 
-    :return: None
+    :return: Updated series
 
     '''
 
@@ -155,6 +155,8 @@ def list_to_name(list_of_lists, list_names, result):
             result.iloc[k] = list_names[first_index]
         if k % 50 == 0:
             print("run ", k)
+    
+    return result
 
 def replace_lists_in_grid_search_params_with_strings(selected_features, feature_dict, params_run1_copy):
     '''

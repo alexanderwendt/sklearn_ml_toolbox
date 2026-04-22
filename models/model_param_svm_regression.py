@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransfor
 from imblearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 import utils.sklearn_utils as modelutil
-from models.model_param import ModelParam as ModelParamBase
+from models.model_param import ModelParamInterface as ModelParamBase
 
 class ModelParam(ModelParamBase):
     def __init__(self):

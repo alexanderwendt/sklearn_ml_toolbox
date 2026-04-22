@@ -44,7 +44,7 @@ class ColumnExtractor(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
-def extract_data_subset(X_train, y_train, number_of_samples, shuffled=True):
+def extract_data_subset(X_train, y_train, number_of_samples, shuffled=True, stratify_data=True):
     '''
     Extract subset of a dataset with X and y. The subset size is set and if the data shall be shuffled
 
@@ -54,9 +54,14 @@ def extract_data_subset(X_train, y_train, number_of_samples, shuffled=True):
     print("Original size y: ", y_train.shape)
     if number_of_samples < X_train.shape[0]:
         print("Quota of samples used in the optimization: {0:.2f}".format(number_of_samples / X_train.shape[0]))
-        _, X_train_subset, _, y_train_subset = train_test_split(X_train, y_train, random_state=0,
-                                                                test_size=number_of_samples / X_train.shape[0],
-                                                                shuffle=shuffled, stratify=y_train)
+        if stratify_data:
+            _, X_train_subset, _, y_train_subset = train_test_split(X_train, y_train, random_state=0,
+                                                                    test_size=number_of_samples / X_train.shape[0],
+                                                                    shuffle=shuffled, stratify=y_train)
+        else:
+            _, X_train_subset, _, y_train_subset = train_test_split(X_train, y_train, random_state=0,
+                                                                    test_size=number_of_samples / X_train.shape[0],
+                                                                    shuffle=shuffled, stratify=None)
     else:
         X_train_subset = X_train
         y_train_subset = y_train
@@ -64,11 +69,11 @@ def extract_data_subset(X_train, y_train, number_of_samples, shuffled=True):
     print("Subset size X: ", X_train_subset.shape)
     print("Subset size y: ", y_train_subset.shape)
 
-    a, b = np.unique(y_train_subset, return_counts=True)
-    print("Classes {}, counts {}".format(a, b))
-    if len(a)<2:
-        raise Exception("Only one class")
-
+    if stratify_data:
+        a, b = np.unique(y_train_subset, return_counts=True)
+        print("Classes {}, counts {}".format(a, b))
+        if len(a)<2:
+            raise Exception("Only one class")
 
     return X_train_subset, y_train_subset
 

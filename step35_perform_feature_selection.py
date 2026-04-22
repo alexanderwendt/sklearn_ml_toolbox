@@ -295,7 +295,7 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
     ### Lasso Feature Selection
     m.rc_file_defaults()  # Reset sns
     coefList = execute_lasso_feature_selection(X_scaled, y, conf, image_save_directory)
-    selected_feature_list = selected_feature_list.append(pd.Series(name='Lasso', data=coefList))
+    selected_feature_list = pd.concat([selected_feature_list, pd.Series(name='Lasso', data=coefList).to_frame().T], axis=0)
     relevantFeatureList.extend(coefList)
 
     print("Prediction of training data with simple model: {0:.2f}".format(
@@ -303,7 +303,7 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
 
     ### Tree based feature selection
     treecoefList = execute_treebased_feature_selection(X_scaled, y, conf, image_save_directory, problem_type=problem_type)
-    selected_feature_list = selected_feature_list.append(pd.Series(name='Tree', data=treecoefList))
+    selected_feature_list = pd.concat([selected_feature_list, pd.Series(name='Tree', data=treecoefList).to_frame().T], axis=0)
     relevantFeatureList.extend(treecoefList)
 
     print("Prediction of training data with simple model: {0:.2f}".format(
@@ -313,8 +313,8 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
     # Backward Elimination - Wrapper method
     selected_features_BE = execute_backwardelimination_feature_selection(X_scaled, y)
     relevantFeatureList.extend(selected_features_BE)
-    selected_feature_list = selected_feature_list.append(
-        pd.Series(name='Backward_Elimination', data=selected_features_BE))
+    selected_feature_list = pd.concat([selected_feature_list, 
+                                       pd.Series(name='Backward_Elimination', data=selected_features_BE).to_frame().T], axis=0)
 
     print("Prediction of training data with simple model: {0:.2f}".format(
         predict_features_simple(X_scaled[selected_features_BE], y, problem_type=problem_type)))
@@ -328,16 +328,18 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
 
     step_size = np.round(len(X_scaled.columns) / 4, 0).astype(int)
     for i in range(step_size, len(X_scaled.columns), step_size):
-        selected_feature_list = selected_feature_list.append(
-            pd.Series(name='RecursiveTop' + str(i), data=rfe_coef.iloc[0:i-1]).reset_index()['RecursiveTop' + str(i)])
+        # Create a series with the top i features
+        s = rfe_coef.iloc[0:i].reset_index(drop=True)
+        s.name = 'RecursiveTop' + str(i)
+        selected_feature_list = pd.concat([selected_feature_list, s.to_frame().T], axis=0)
         print('Created RecursiveTop{}'.format(str(i)))
 
     ### Add the top coloums from all methods
     top_feature_cols = create_feature_list_from_top_features(relevantFeatureList)
-    selected_feature_list = selected_feature_list.append(pd.Series(name='Manual', data=top_feature_cols))
+    selected_feature_list = pd.concat([selected_feature_list, pd.Series(name='Manual', data=top_feature_cols).to_frame().T], axis=0)
 
     ### Add all columns
-    selected_feature_list = selected_feature_list.append(pd.Series(name='All', data=X_scaled.columns))
+    selected_feature_list = pd.concat([selected_feature_list, pd.Series(name='All', data=X_scaled.columns).to_frame().T], axis=0)
 
     return selected_feature_list
 

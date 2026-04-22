@@ -247,14 +247,14 @@ def extract_categorical_visualize_graphs_frame(config, top_percentage=0.2):
         raise Exception("Model pipeline could not be found: {}".format('models.' + pipeline_class_name + '.ModelParam'))
 
     # Create a result subset
-    number_results = int(results_run1.shape[0] * top_percentage)
+    number_results = max(1, int(results_run1.shape[0] * top_percentage))
     print("The top {}% of the results are used, i.e {} samples".format(top_percentage * 100, number_results))
     results_subset = results_run1.iloc[0:number_results, :]
 
     # Prepare the inputs: Replace the lists with strings
     results_subset_copy = results_subset.copy()
     print("Convert feature lists to names")
-    sup.list_to_name(selected_features, list(feature_dict.keys()), results_subset_copy['param_feat__cols'])
+    results_subset_copy['param_feat__cols'] = sup.list_to_name(selected_features, list(feature_dict.keys()), results_subset_copy['param_feat__cols'])
 
     # Replace lists in the parameters with strings
     params_run1_copy = copy.deepcopy(params_run1)

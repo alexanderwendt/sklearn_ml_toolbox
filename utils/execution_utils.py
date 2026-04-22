@@ -113,6 +113,10 @@ def load_labels(labels_path):
 
     '''
     # === Load labels ===#
+    if not labels_path or not os.path.isfile(labels_path):
+        print("No labels file found at {}. Returning empty dictionary.".format(labels_path))
+        return {}
+    
     df_labels = pd.read_csv(labels_path, delimiter=';', header=None)
     labels_inverse = sup.inverse_dict(df_labels.set_index(df_labels.columns[0]).to_dict()[1])
     print("Loaded classes into dictionary: {}".format(labels_inverse))
@@ -379,7 +383,8 @@ def run_basic_model(X_train, y_train, scorers, refit_scorer_name, parameters, pi
     else:
         number_of_samples = int(subset_share * X_train.shape[0])
 
-    X_train_subset, y_train_subset = modelutil.extract_data_subset(X_train, y_train, number_of_samples)
+    X_train_subset, y_train_subset = modelutil.extract_data_subset(X_train, y_train, number_of_samples, 
+                                                                   stratify_data=(problem_type == 'classification'))
     print("Got subset sizes X train: {} and y train: {}".format(X_train_subset.shape, y_train_subset.shape))
 
     # Main pipeline for the grid search
@@ -634,7 +639,8 @@ def run_random_cv_for_SVM(X_train, y_train, parameter_svm, pipe_run, scorers, re
     '''
 
     # Extract data subset to train on
-    X_train_subset, y_train_subset = modelutil.extract_data_subset(X_train, y_train, number_of_samples)
+    X_train_subset, y_train_subset = modelutil.extract_data_subset(X_train, y_train, number_of_samples, 
+                                                                   stratify_data=(problem_type == 'classification'))
 
     # Main set of parameters for the grid search run 2: Select solver parameter
     # Reciprocal for the logarithmic range

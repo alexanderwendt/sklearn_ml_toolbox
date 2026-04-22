@@ -83,12 +83,12 @@ class Paths:
         paths = dict()
 
         # Custom settings - Model name #
-        dataset_name = conf['Common'].get('dataset_name')
-        class_name = conf['Common'].get('class_name')
-        model_type = conf['Common'].get('model_type')
+        dataset_name = conf['Common'].get('dataset_name', 'default')
+        class_name = conf['Common'].get('class_name', 'default')
+        model_type = conf['Common'].get('model_type', 'default')
 
         dataset_class_prefix = dataset_name # + "_" + class_name
-        paths['dataset_name'] = conf['Common'].get('dataset_name')
+        paths['dataset_name'] = dataset_name
         paths['source_path'] = conf["Paths"].get("source_path")
         paths['labels_path'] = conf["Paths"].get("labels_path")
 

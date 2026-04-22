@@ -1,4 +1,5 @@
 import json
+import os
 
 import joblib
 import utils.execution_utils as exe
@@ -27,7 +28,11 @@ def load_evaluation_data(conf, config_section="EvaluationTraining"):
     print("Model", model)
 
     # Load external parameters
-    with open(ext_param_in, 'r') as fp:
-        external_params = json.load(fp)
+    if ext_param_in and os.path.isfile(ext_param_in):
+        with open(ext_param_in, 'r') as fp:
+            external_params = json.load(fp)
+    else:
+        print("No external parameters file found at {}. Returning empty dictionary.".format(ext_param_in))
+        external_params = {}
 
     return X_val, y_val, labels, model, external_params
