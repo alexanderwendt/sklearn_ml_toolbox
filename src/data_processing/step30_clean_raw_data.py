@@ -68,15 +68,16 @@ import utils.data_handling_support_functions as sup
 # Own modules
 import utils.data_visualization_functions as vis
 
-__author__ = 'Alexander Wendt'
-__copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
-                'Embedded Machine Learning'
-__credits__ = ['']
-__license__ = 'ISC'
-__version__ = '0.2.0'
-__maintainer__ = 'Alexander Wendt'
-__email__ = 'alexander.wendt@tuwien.ac.at'
-__status__ = 'Experiental'
+__author__ = "Alexander Wendt"
+__copyright__ = (
+    "Copyright 2020, Christian Doppler Laboratory for " "Embedded Machine Learning"
+)
+__credits__ = [""]
+__license__ = "ISC"
+__version__ = "0.2.0"
+__maintainer__ = "Alexander Wendt"
+__email__ = "alexander.wendt@tuwien.ac.at"
+__status__ = "Experiental"
 
 # Global settings
 np.set_printoptions(precision=3)
@@ -85,18 +86,36 @@ np.set_printoptions(suppress=True)
 
 register_matplotlib_converters()
 
-parser = argparse.ArgumentParser(description='Step 3 - Clean raw data')
+parser = argparse.ArgumentParser(description="Step 3 - Clean raw data")
 # parser.add_argument("-r", '--retrain_all_data', action='store_true',
 #                    help='Set flag if retraining with all available data shall be performed after ev')
-parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
-                    help='Configuration file path', required=False)
-parser.add_argument("-n", "--no_images", action='store_true', default=False,
-                    help="Set true if the generation of feature images shall be disabled. "
-                         "It is usually done for inference data.")
-parser.add_argument("-i", "--on_inference_data", action='store_true',
-                    help="Set inference if only inference and no training")
-parser.add_argument("-nds", "--no_source_data", action='store_true',
-                    help="Load no source data if the data does not need to be visualized in time charts.")
+parser.add_argument(
+    "-conf",
+    "--config_path",
+    default="config/debug_timedata_omxS30.ini",
+    help="Configuration file path",
+    required=False,
+)
+parser.add_argument(
+    "-n",
+    "--no_images",
+    action="store_true",
+    default=False,
+    help="Set true if the generation of feature images shall be disabled. "
+    "It is usually done for inference data.",
+)
+parser.add_argument(
+    "-i",
+    "--on_inference_data",
+    action="store_true",
+    help="Set inference if only inference and no training",
+)
+parser.add_argument(
+    "-nds",
+    "--no_source_data",
+    action="store_true",
+    help="Load no source data if the data does not need to be visualized in time charts.",
+)
 
 args = parser.parse_args()
 
@@ -160,7 +179,7 @@ def clean_features_first_pass(features_raw, class_name):
 
     # === Replace all missing values with np.nan
     for col in features.columns[0:-1]:
-        features[col] = features[col].replace('?', np.nan)
+        features[col] = features[col].replace("?", np.nan)
         # df[col] = df[col].replace('unknown', np.nan)
 
     print("Missing data in the data frame")
@@ -178,55 +197,61 @@ def clean_features_first_pass(features_raw, class_name):
 
 
 def load_files(features_path, outcomes_path, source_path, labels_path, no_source_data=False):
-    # Constants for all notebooks in the Machine Learning Toolbox
-    # print("Data source: {}".format(data_directory))
+    """
+    Load all necessary input files.
 
+    Parameters
+    ----------
+    features_path : str
+        Path to the features file.
+    outcomes_path : str
+        Path to the outcomes file.
+    source_path : str
+        Path to the source data file.
+    labels_path : str
+        Path to the labels file.
+    no_source_data : bool, optional
+        If True, do not load the source data, by default False.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the loaded DataFrames for features, outcomes, source data, and class labels.
+    """
     # Generating filenames for loading the files
     input_features_filename = features_path
     input_outcomes_filename = outcomes_path
 
-    source_filename = source_path  # data_directory + "/" + dataset_name + "_source" + ".csv"
-    # labels_filename = data_directory + "/" + dataset_name + "_labels" + ".csv"
-    # Columns for feature selection
-    # selected_feature_columns_filename = data_directory + "/" + dataset_name + "_" + class_name + "_selected_feature_columns.csv"
+    source_filename = source_path
 
     print("=== Paths ===")
     print("Input Features: ", input_features_filename)
-    # print("Output Features: ", model_features_filename)
     print("Input Outcomes: ", input_outcomes_filename)
-    # print("Output Outcomes: ", model_outcomes_filename)
-    # print("Labels: ", labels_filename)
     print("Original source: ", source_filename)
-    # print("Labels for the model: ", model_labels_filename)
-    # print("Selected feature columns: ", selected_feature_columns_filename)
-
-    ### Load Features and Outcomes
 
     # === Load Features ===#
-    features_raw = pd.read_csv(input_features_filename, sep=';').set_index('id')  # Set ID to be the data id
+    features_raw = pd.read_csv(input_features_filename, sep=";").set_index("id")
     print(features_raw.head(1))
 
     # === Load Outcomes ===#
     if input_outcomes_filename and os.path.isfile(input_outcomes_filename):
-        # if not on_inference_data:
-        outcomes_raw = pd.read_csv(input_outcomes_filename, sep=';').set_index('id')  # Set ID to be the data id
+        outcomes_raw = pd.read_csv(input_outcomes_filename, sep=";").set_index("id")
         print(outcomes_raw.head(1))
     else:
         outcomes_raw = None
         print("No outcomes available for inference data")
 
     # === Load Source ===#
-    # Load original data for visualization
     if source_filename and os.path.isfile(source_filename) and not no_source_data:
         data_source_raw = sup.load_data_source(source_filename)
         print("Loading data source as time graph")
     else:
         data_source_raw = None
-        print("No raw data source found or no source data should be loaded as it would be for temporal processing.")
+        print(
+            "No raw data source found or no source data should be loaded as it would be for temporal processing."
+        )
 
     # === Load class labels or modify ===#
-    # Load annotations
-    # annotations = pd.read_csv(annotations_filename, sep=';', header=None).set_index(0).to_dict()[1]
     if labels_path and os.path.isfile(labels_path):
         class_labels = load_class_labels(labels_path)
         print("Class labels found")
@@ -238,34 +263,54 @@ def load_files(features_path, outcomes_path, source_path, labels_path, no_source
 
 
 def load_class_labels(labels_filename):
-    '''
+    """
+    Load class labels from a file.
 
+    Parameters
+    ----------
+    labels_filename : str
+        Path to the labels file.
 
-    '''
+    Returns
+    -------
+    dict
+        A dictionary mapping class labels to integer values.
+    """
 
-    # === Load Class Labels ===#
-    # Get classes into a dict from outcomes
-    # class_labels = dict(zip(outcomes_raw[class_name].unique(), list(range(1,len(outcomes_raw[class_name].unique())+1, 1))))
-    # print(class_labels)
-    # Load class labels file
-    df_y_classes = pd.read_csv(labels_filename, delimiter=';', header=None)
-    class_labels = sup.inverse_dict(df_y_classes.set_index(df_y_classes.columns[0]).to_dict()[1])
+    df_y_classes = pd.read_csv(labels_filename, delimiter=";", header=None)
+    class_labels = sup.inverse_dict(
+        df_y_classes.set_index(df_y_classes.columns[0]).to_dict()[1]
+    )
     print("Loaded  classes from file", class_labels)
-    # === Define classes manually ===#
-    # class_labels = {
-    #    0 : 'class1',
-    #    1 : 'class2'
-    # }
     print(class_labels)
 
     return class_labels
 
 
-def print_characteristics(features_raw, image_save_directory, dataset_name, save_graphs=False):
+def print_characteristics(
+    features_raw, image_save_directory, dataset_name, save_graphs=False
+):
+    """
+    Print and plot the characteristics of each feature.
+
+    Parameters
+    ----------
+    features_raw : pd.DataFrame
+        The DataFrame containing the features.
+    image_save_directory : str
+        The directory where the plots will be saved.
+    dataset_name : str
+        The name of the dataset.
+    save_graphs : bool, optional
+        If True, save the generated plots, by default False.
+    """
     for i, d in enumerate(features_raw.dtypes):
         if is_string_dtype(d):
             print("Column {} is a categorical string".format(features_raw.columns[i]))
-            s = features_raw[features_raw.columns[i]].value_counts() / features_raw.shape[0]
+            s = (
+                features_raw[features_raw.columns[i]].value_counts()
+                / features_raw.shape[0]
+            )
             fig = vis.paintBarChartForCategorical(s.index, s)
         else:
             print("Column {} is a numerical value".format(features_raw.columns[i]))
@@ -273,103 +318,159 @@ def print_characteristics(features_raw, image_save_directory, dataset_name, save
 
         plt.figure(fig.number)
 
-        vis.save_figure(plt.gcf(), image_save_directory=image_save_directory,
-                        filename='feature_{}-{}'.format(i, features_raw.columns[i]))
-
-        # if save_graphs == True:
-        #    plt.savefig(
-        #        image_save_directory + '/' + 'feature_{}-{}'.format(i, features_raw.columns[i]),
-        #        dpi=300)
-        # plt.show(block = False)
-        # plt.close()
+        vis.save_figure(
+            plt.gcf(),
+            image_save_directory=image_save_directory,
+            filename="feature_{}-{}".format(i, features_raw.columns[i]),
+        )
 
 
-def analyze_raw_data(features, outcomes, result_directory, dataset_name, class_name, no_images=False,
-                     on_inference_data=False):
-    # Define file names
+def analyze_raw_data(
+    features,
+    outcomes,
+    result_directory,
+    dataset_name,
+    class_name,
+    no_images=False,
+    on_inference_data=False,
+):
+    """
+    Perform a basic analysis of the raw data.
+
+    Parameters
+    ----------
+    features : pd.DataFrame
+        The features DataFrame.
+    outcomes : pd.DataFrame
+        The outcomes DataFrame.
+    result_directory : str
+        The directory where the results will be saved.
+    dataset_name : str
+        The name of the dataset.
+    class_name : str
+        The name of the class column.
+    no_images : bool, optional
+        If True, do not generate images, by default False.
+    on_inference_data : bool, optional
+        If True, perform analysis on inference data, by default False.
+    """
     print("Results target: {}".format(result_directory))
 
-    ## Analyse the Features Individually
-
-    # Print graphs for all features
-
-    # Get number of samples
     numSamples = features.shape[0]
     print("Number of samples={}".format(numSamples))
 
-    # Get number of features
     numFeatures = features.shape[1]
     print("Number of features={}".format(numFeatures))
 
-    save_graphs = True  # If set true, then all images are saved into the image save directory.
+    save_graphs = True
 
-    # Get the number of classes for the supervised learning
     if not outcomes is None:
         numClasses = outcomes[class_name].value_counts().shape[0]
         print("Number of classes={}".format(numClasses))
 
         if not unique_cols(outcomes):
-            raise Exception("Data processing error. At least one column has all the same values.")
+            raise Exception(
+                "Data processing error. At least one column has all the same values."
+            )
 
-        # Print graphs for all features
-        print_characteristics(outcomes, result_directory, dataset_name, save_graphs=save_graphs)
+        print_characteristics(
+            outcomes, result_directory, dataset_name, save_graphs=save_graphs
+        )
     else:
         numClasses = -1
 
-    # Print graphs for all features
     if not no_images:
-        print_characteristics(features, result_directory, dataset_name, save_graphs=save_graphs)
+        print_characteristics(
+            features, result_directory, dataset_name, save_graphs=save_graphs
+        )
 
-    # Check if raw data has useless values, i.e. all values of one column are the same
     if (not on_inference_data) and (not unique_cols(features)):
-        raise Exception("Data processing error. At least one column has all the same values.")
+        raise Exception(
+            "Data processing error. At least one column has all the same values."
+        )
 
 
 def unique_cols(df):
-    '''
-    Check if all values of a column of a dataframe are the same. If yes, then columns are unique. If False,
-    the columns have to be processed.
+    """
+    Check if all values of a column of a dataframe are the same.
 
-    '''
-    a = df.to_numpy()  # df.values (pandas<0.24)
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The DataFrame to be checked.
+
+    Returns
+    -------
+    bool
+        True if all columns are unique, False otherwise.
+    """
+    a = df.to_numpy()
     return sum((a[0] == a).all(0)) == 0
 
 
 def main(config_path, on_inference_data, no_images, no_source_data):
+    """
+    Main function to execute the script.
+
+    Parameters
+    ----------
+    config_path : str
+        Path to the configuration file.
+    on_inference_data : bool
+        If True, perform analysis on inference data.
+    no_images : bool
+        If True, do not generate images.
+    no_source_data : bool
+        If True, do not load the source data.
+    """
     conf = sup.load_config(config_path)
 
-    # if not on_inference_data:
-    data_directory = conf['Paths'].get('prepared_data_directory')
-    result_directory = os.path.join(conf['Paths'].get('results_directory'), "data_preparation")
+    data_directory = conf["Paths"].get("prepared_data_directory")
+    result_directory = os.path.join(
+        conf["Paths"].get("results_directory"), "data_preparation"
+    )
 
-    data_preparation_dump_file_path = os.path.join(conf['Paths'].get('prepared_data_directory'), "temp",
-                                                   "step31out.pickle")
+    data_preparation_dump_file_path = os.path.join(
+        conf["Paths"].get("prepared_data_directory"), "temp", "step31out.pickle"
+    )
     os.makedirs(os.path.dirname(data_preparation_dump_file_path), exist_ok=True)
 
-    features_path = os.path.join(conf['Preparation'].get('features_in'))
-    if 'outcomes_in' in conf['Preparation']:
-        outcomes_path = os.path.join(conf['Preparation'].get('outcomes_in'))
+    features_path = os.path.join(conf["Preparation"].get("features_in"))
+    if "outcomes_in" in conf["Preparation"]:
+        outcomes_path = os.path.join(conf["Preparation"].get("outcomes_in"))
     else:
         outcomes_path = None
         print("No outcomes in, do inference")
-    labels_path = conf['Paths'].get('labels_path')
-    source_path = os.path.join(conf['Preparation'].get('source_in'))
+    labels_path = conf["Paths"].get("labels_path")
+    source_path = os.path.join(conf["Preparation"].get("source_in"))
 
-    # Load files
-    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(features_path, outcomes_path,
-                                                                                source_path, labels_path,
-                                                                                no_source_data)
+    features_raw, outcomes_cleaned1, data_source_raw, class_labels = load_files(
+        features_path, outcomes_path, source_path, labels_path, no_source_data
+    )
 
-    ## Data Cleanup of Features and Outcomes before Features are Modified
     features_cleaned1 = clean_features_first_pass(features_raw, class_labels)
 
-    analyze_raw_data(features_cleaned1, outcomes_cleaned1, result_directory, conf['Common'].get('dataset_name'),
-                     conf['Common'].get('class_name'), no_images, on_inference_data)
+    analyze_raw_data(
+        features_cleaned1,
+        outcomes_cleaned1,
+        result_directory,
+        conf["Common"].get("dataset_name"),
+        conf["Common"].get("class_name"),
+        no_images,
+        on_inference_data,
+    )
 
-    # Save structures for further processing
-    # Dump path data
-    dump((features_cleaned1, outcomes_cleaned1, class_labels, data_source_raw, data_directory, result_directory),
-         open(data_preparation_dump_file_path, 'wb'))
+    dump(
+        (
+            features_cleaned1,
+            outcomes_cleaned1,
+            class_labels,
+            data_source_raw,
+            data_directory,
+            result_directory,
+        ),
+        open(data_preparation_dump_file_path, "wb"),
+    )
     print("Stored paths to: ", data_preparation_dump_file_path)
 
 

@@ -77,7 +77,7 @@ np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 
 parser = argparse.ArgumentParser(description='Step 4.7 - Train evaluation model for final testing')
-parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
                     help='Configuration file path', required=False)
 parser.add_argument("-sec", '--config_section', default="Model",
                     help='Configuration section in config file', required=False)

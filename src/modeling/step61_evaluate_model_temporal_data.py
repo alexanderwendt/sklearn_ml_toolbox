@@ -2,24 +2,25 @@
 # -*- coding: utf-8 -*-
 
 """
-Step 7: Predict on temporal data.
+Step 6.1: Evaluate the model on temporal data.
 
-This script uses the trained model to make predictions on new, unseen temporal
-data. It visualizes the predictions against the source data to provide a
-qualitative assessment of the model's performance on the inference data.
+This script visualizes the model's predictions on the temporal data, allowing for
+a qualitative assessment of its performance over time. It plots the ground truth
+and the model's predictions against the source data (e.g., the closing price of
+a stock).
 
 Inputs:
-    - Inference data.
+    - Validation data.
     - The trained model.
-    - The source data for the inference period.
+    - The source data.
 
 Outputs:
-    - Plots showing the model's predictions on the inference data, saved in the
-      `evaluation` subdirectory of the results directory.
+    - Plots showing the ground truth and the model's predictions on the temporal
+      data, saved in the `evaluation` subdirectory of the results directory.
 
 Main Functions:
     - `visualize_temporal_data`: Loads the data and the model, generates the
-      predictions, and creates the temporal prediction plots.
+      predictions, and creates the temporal evaluation plots.
 
 License_info: ISC
 ISC License
@@ -59,7 +60,6 @@ import numpy as np
 # Own modules
 import utils.data_visualization_functions as vis
 import utils.data_handling_support_functions as sup
-import utils.execution_utils as step40
 import utils.evaluation_utils as eval
 
 __author__ = 'Alexander Wendt'
@@ -81,42 +81,51 @@ np.set_printoptions(precision=3)
 #Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
-parser = argparse.ArgumentParser(description='Step 7 - Predict Temporal Data')
-parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxs30.ini",
+parser = argparse.ArgumentParser(description='Step 5.0 - Evaluate Model for Temporal Data')
+parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omxS30.ini",
                     help='Configuration file path', required=False)
-parser.add_argument("-sec", '--config_section', default="EvaluationValidation",
+parser.add_argument("-sec", '--config_section', default="Evaluation",
                     help='Configuration section in config file', required=False)
 
 args = parser.parse_args()
-print(args)
 
 
 def visualize_temporal_data(config_path, config_section):
     # Load intermediate model, which has only been trained on training data
     # Get data
     # Load file paths
+    #paths, model, train, test = step40.load_training_files(paths_path)
     config = sup.load_config(config_path)
     print("Load paths")
     paths = Paths(config).paths
-    title = config.get(config_section, 'title')
+    #paths, model, train, test = step40.load_training_files(paths_path)
 
     X_val, y_val, labels, model, external_params = eval.load_evaluation_data(config, config_section)
+    y_classes = labels #train['label_map']
 
-    y_classes = labels
+    title = config.get(config_section, 'title')
 
     model_name = config['Common'].get('dataset_name')
-    source_path = config[config_section].get('source_in')
+    source_path = config[config_section].get('source_in') #paths['source_path']
     result_directory = paths['results_directory']
 
     figure_path_prefix = result_directory + '/evaluation'
-    os.makedirs(result_directory + '/evaluation', exist_ok=True)
+    if not os.path.isdir(result_directory + '/evaluation'):
+        os.makedirs(result_directory + '/evaluation')
+        print("Created folder: ", result_directory + '/evaluation')
 
     # Load model external parameters
+    #with open(svm_external_parameters_filename, 'r') as fp:
+    #    external_params = json.load(fp)
     pr_threshold = external_params['pr_threshold']
     print("Loaded precision/recall threshold: {0:.2f}".format(pr_threshold))
 
+    # Open evaluation model
 
     # Make predictions
+    #y_train_pred_scores = evalclf.decision_function(X_train.values)
+    #y_train_pred_proba = evalclf.predict_proba(X_train.values)
+    #y_train_pred_adjust = model_util.adjusted_classes(y_train_pred_scores, pr_threshold)
     y_test_pred_scores = model.predict_proba(X_val.values)[:,1]
     y_test_pred = model.predict(X_val.values)
     #y_test_pred_proba = evalclf.predict_proba(X_test.values)
@@ -129,47 +138,38 @@ def visualize_temporal_data(config_path, config_section):
     print("Loaded feature names for time graph={}".format(df_time_graph.columns))
     print("X. Shape={}".format(df_time_graph.shape))
 
-    # Create a df from the y array for the visualization functions
-    y_order_test_pred = pd.DataFrame(index=X_val.index,
-                                     data=pd.Series(data=y_test_pred, index=X_val.index, name="y")).sort_index()
+    y_order_test = pd.DataFrame(index=X_val.index,
+                                data=pd.Series(data=y_val, index=X_val.index, name="y")).sort_index()
 
     y_order_test_pred_adjust = pd.DataFrame(index=X_val.index,
                                      data=pd.Series(data=y_test_pred_adjust, index=X_val.index, name="y")).sort_index()
 
+    y_order_test_pred = pd.DataFrame(index=X_val.index,
+                                     data=pd.Series(data=y_test_pred, index=X_val.index, name="y")).sort_index()
+
 
     #Visualize the results
-    print("Plot for inference data to ", figure_path_prefix)
-    vis.plot_three_class_graph(y_order_test_pred['y'].values,
-                               df_time_graph['Close'][y_order_test_pred.index],
-                               df_time_graph['Date'][y_order_test_pred.index], 0, 0, 0,
+    print("Plot for test data")
+    vis.plot_three_class_graph(y_order_test['y'].values,
+                               df_time_graph['Close'][y_order_test.index],
+                               df_time_graph['Date'][y_order_test.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
-                               title=title + "_Inference_" + model_name,
+                               title=title + "_GT_" + model_name,
+                               save_fig_prefix=figure_path_prefix)
+
+    vis.plot_three_class_graph(y_order_test_pred['y'].values,
+                               df_time_graph['Close'][y_order_test.index],
+                               df_time_graph['Date'][y_order_test.index], 0, 0, 0,
+                               ('close', 'neutral', 'positive', 'negative'),
+                               title=title + "_Pred_" + model_name,
                                save_fig_prefix=figure_path_prefix)
 
     vis.plot_three_class_graph(y_order_test_pred_adjust['y'].values,
-                               df_time_graph['Close'][y_order_test_pred.index],
-                               df_time_graph['Date'][y_order_test_pred.index], 0, 0, 0,
+                               df_time_graph['Close'][y_order_test.index],
+                               df_time_graph['Date'][y_order_test.index], 0, 0, 0,
                                ('close', 'neutral', 'positive', 'negative'),
-                               title=title + "_Inference_Adjusted" + model_name,
+                               title=title + "_Pred_Adjust" + model_name,
                                save_fig_prefix=figure_path_prefix)
-    #Visulaize 2 class results
-    if np.unique(y_order_test_pred['y'].values)==2:
-        vis.plot_two_class_graph(y_order_test_pred['y'].values,
-                                 df_time_graph['Close'][y_order_test_pred.index],
-                                 df_time_graph['Date'][y_order_test_pred.index],
-                                 0,
-                                 ('close', 'Positive Trend'),
-                                 title=title + "_Inference_2_Class" + model_name,
-                                 save_fig_prefix=figure_path_prefix)
-        vis.plot_two_class_graph(y_order_test_pred_adjust['y'].values,
-                                 df_time_graph['Close'][y_order_test_pred.index],
-                                 df_time_graph['Date'][y_order_test_pred.index],
-                                 0,
-                                 ('close', 'Positive Trend'),
-                                 title=title + "_Inference_Adjusted_2_Class" + model_name,
-                                 save_fig_prefix=figure_path_prefix)
-    else:
-        print("Data is not binarized.")
 
 
 if __name__ == "__main__":

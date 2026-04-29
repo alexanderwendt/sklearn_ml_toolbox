@@ -1,0 +1,277 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Step 3X Preprocessing: Adapt features for Machine Learning.
+
+This script takes the cleaned data from the previous step and prepares it for
+use in a machine learning model. This includes converting all features to a
+numeric type, binarizing the outcome labels if specified, and visualizing the
+missing data. The prepared features and outcomes are then saved to new CSV files.
+
+Inputs:
+    - `step31out.pickle`: A pickle file containing the cleaned features, outcomes,
+      and other data from the previous step.
+
+Outputs:
+    - `features_out.csv`: A CSV file with the model-ready features.
+    - `outcomes_out.csv`: A CSV file with the model-ready outcomes.
+    - `labels_out.csv`: A CSV file with the class labels.
+    - Various plots in the results directory, showing the missing data matrix
+      and heatmap.
+
+Main Functions:
+    - `adapt_features_for_model`: Converts features to numeric types, binarizes
+      outcomes if specified, and visualizes missing data.
+    - `main`: Loads the data from the pickle file, calls `adapt_features_for_model`,
+      and saves the prepared data to new CSV files.
+
+License_info: ISC
+ISC License
+
+Copyright (c) 2020, Alexander Wendt
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD to THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+"""
+
+# Futures
+# from __future__ import print_function
+
+# Built-in/Generic Imports
+
+# Libs
+import argparse
+import os
+import pickle
+import missingno as msno
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from pandas.plotting import register_matplotlib_converters
+
+# Own modules
+import utils.data_handling_support_functions as sup
+from utils import data_visualization_functions as vis
+
+__author__ = "Alexander Wendt"
+__copyright__ = (
+    "Copyright 2020, Christian Doppler Laboratory for " "Embedded Machine Learning"
+)
+__credits__ = [""]
+__license__ = "ISC"
+__version__ = "0.2.0"
+__maintainer__ = "Alexander Wendt"
+__email__ = "alexander.wendt@tuwien.ac.at"
+__status__ = "Experiental"
+
+# Global settings
+np.set_printoptions(precision=3)
+# Suppress print out in scientific notiation
+np.set_printoptions(suppress=True)
+register_matplotlib_converters()
+
+parser = argparse.ArgumentParser(description="Step 3 - Adapt features")
+parser.add_argument(
+    "-conf",
+    "--config_path",
+    default="config/debug_timedata_omxS30.ini",
+    help="Configuration file path",
+    required=False,
+)
+
+args = parser.parse_args()
+
+
+def adapt_features_for_model(
+    features_cleaned1, outcomes_cleaned1, result_dir, class_labels, conf
+):
+    """
+    Adapt features for the machine learning model.
+
+    Parameters
+    ----------
+    features_cleaned1 : pd.DataFrame
+        The cleaned features DataFrame.
+    outcomes_cleaned1 : pd.DataFrame
+        The cleaned outcomes DataFrame.
+    result_dir : str
+        The directory where the results will be saved.
+    class_labels : dict
+        A dictionary mapping class labels to integer values.
+    conf : configparser.ConfigParser
+        The configuration object.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the adapted features, outcomes, and class labels.
+    """
+
+    features = features_cleaned1.copy()
+
+    for col in features.columns:
+        features[col] = pd.to_numeric(features[col])
+
+    print(features.head(5))
+
+    problem_type = conf["Common"].get("problem_type", fallback="classification")
+    if outcomes_cleaned1 is not None:
+        outcomes = outcomes_cleaned1.copy()
+        if problem_type == "classification":
+            outcomes = outcomes.astype(int)
+        else:
+            outcomes = outcomes.astype(float)
+        print("Outcome types")
+        print(outcomes.dtypes)
+
+        if problem_type == "classification" and conf["Preparation"].getboolean(
+            "binarize_labels", fallback=False
+        ):
+            binarized_outcome = (
+                outcomes[conf["Common"].get("class_name")]
+                == conf["Preparation"].getint("class_number")
+            ).astype(int)
+            y = binarized_outcome.values.flatten()
+            print(
+                "y was binarized. Classes before: {}. Classes after: {}".format(
+                    np.unique(outcomes[conf["Common"].get("class_name")]), np.unique(y)
+                )
+            )
+
+            class_labels = {
+                0: conf["Preparation"].get("binary_0_label"),
+                1: conf["Preparation"].get("binary_1_label"),
+            }
+
+            print("Class labels redefined to: {}".format(class_labels))
+            print("y labels: {}".format(class_labels))
+        else:
+            y = outcomes[conf["Common"].get("class_name")].values.flatten()
+            if problem_type == "classification":
+                print("No binarization was made. Classes: {}".format(np.unique(y)))
+            else:
+                print("Regression: No binarization was made.")
+
+        print("y shape: {}".format(y.shape))
+        if problem_type == "classification":
+            print("y unique classes: {}".format(np.unique(y, axis=0)))
+    else:
+        y = None
+        class_labels = None
+
+    print("Missing data in the features: ", features.isnull().values.sum())
+    features[features.isna().any(axis=1)]
+
+    print("Number of missing values per feature")
+    missingValueShare = []
+    for col in features.columns:
+        missingValueShare.append(sum(features[col].isna()) / features.shape[0])
+
+    vis.paintBarChartForMissingValues(features.columns, missingValueShare)
+    barplot = plt.gcf()
+    vis.save_figure(
+        plt.gcf(),
+        image_save_directory=result_dir,
+        filename=str(barplot.axes[0].get_title()).replace(" ", "_"),
+    )
+
+    msno.matrix(features)
+    fig_matrix = plt.gcf()
+    vis.save_figure(fig_matrix, image_save_directory=result_dir, filename="missing_numbers_matrix")
+
+    if features.isnull().values.sum() > 0:
+        plt.gcf()
+        msno.heatmap(features)
+        vis.save_figure(
+            plt.gcf(), image_save_directory=result_dir, filename="missing_numbers_heatmap"
+        )
+
+    return features, y, class_labels
+
+
+def main(config_path):
+    """
+    Main function to execute the script.
+
+    Parameters
+    ----------
+    config_path : str
+        Path to the configuration file.
+    """
+    conf = sup.load_config(config_path)
+
+    data_directory = conf["Paths"].get("prepared_data_directory")
+
+    data_preparation_dump_file_path = os.path.join(
+        data_directory, "temp", "step31out.pickle"
+    )
+    (
+        features_cleaned1,
+        outcomes_cleaned1,
+        class_labels,
+        data_source_raw,
+        data_directory,
+        result_directory,
+    ) = pickle.load(open(data_preparation_dump_file_path, "rb"))
+
+    class_name = conf["Common"].get("class_name")
+
+    model_features_filename = os.path.join(conf["Preparation"].get("features_out"))
+    if "outcomes_out" in conf["Preparation"]:
+        model_outcomes_filename = os.path.join(conf["Preparation"].get("outcomes_out"))
+    else:
+        model_outcomes_filename = None
+        print("No outcomes out defined. Use inference settings with no outcomes")
+
+    if "labels_out" in conf["Preparation"]:
+        model_labels_filename = os.path.join(conf["Preparation"].get("labels_out"))
+    else:
+        model_labels_filename = None
+        print("No labels file available for inference.")
+
+    features, y, class_labels = adapt_features_for_model(
+        features_cleaned1,
+        outcomes_cleaned1,
+        result_directory,
+        class_labels,
+        conf,
+    )
+
+    print("Features shape {}".format(features.shape))
+    features.to_csv(model_features_filename, sep=";", index=True)
+    print("Saved features to " + model_features_filename)
+
+    if y is not None:
+        print("outcome shape {}".format(y.shape))
+        y_true = pd.DataFrame(y, columns=[class_name], index=outcomes_cleaned1.index)
+        y_true.to_csv(model_outcomes_filename, sep=";", index=True, header=True)
+        print("Saved features to " + model_outcomes_filename)
+    else:
+        print("y values not saved as no ourcome was provided.")
+
+    if class_labels is not None:
+        print("Class labels length {}".format(len(class_labels)))
+        with open(model_labels_filename, "w") as f:
+            for key in class_labels.keys():
+                f.write(
+                    "%s;%s\n" % (class_labels[key], key)
+                )
+        print("Saved class names and id to " + model_labels_filename)
+    else:
+        print("Class labels were not saved as no outcome was available.")
+
+
+if __name__ == "__main__":
+    main(args.config_path)
+
+    print("=== Program end ===")
