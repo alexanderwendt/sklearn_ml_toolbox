@@ -1,12 +1,13 @@
-# One invocation runs both tasks; all outputs go into a new isolated _reruns folder.
+# GPA regression; all outputs go into a new isolated _reruns folder.
 [workflow]
 version = 1
 engine = "tabular"
 output = "_reruns"
-inputs = ["data_raw/Student_performance_data.csv"]
+inputs = ["data_raw/grades.csv"]
+code = ["steps"]
 
 [defaults.data]
-path = "data_raw/Student_performance_data.csv"
+path = "data_raw/grades.csv"
 prepare = "builtin:grades"
 
 [defaults.split]
@@ -15,7 +16,7 @@ test_size = 0.2
 
 [defaults.training]
 seed = 42
-models = ["svm", "xgboost", "svm_linear", "knn", "gnb"]
+models = ["ols", "linear", "lasso", "elastic_net", "forest", "svm", "svm_linear", "knn", "xgboost"]
 folds = 5
 search_iterations = 10
 
@@ -23,16 +24,7 @@ search_iterations = 10
 methods = ["pca", "tsne", "umap", "lasso", "tree", "recursive", "backward", "correlation"]
 max_samples = 1000
 
-[profiles.classification.data]
-task = "classification"
-target = "GradeClass"
-drop = ["StudentID", "GPA"]
-
 [profiles.regression.data]
 task = "regression"
 target = "GPA"
 drop = ["StudentID", "GradeClass"]
-
-[profiles.regression.training]
-# Gaussian Naive Bayes is classification-only.
-models = ["linear", "forest", "svm", "svm_linear", "knn", "xgboost"]

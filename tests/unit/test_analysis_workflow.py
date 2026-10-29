@@ -15,24 +15,23 @@ def grades_config():
     return runner.read_workflow(ROOT / 'samples/grades/workflow.toml')
 
 
-def test_grades_plan_runs_both_tasks_and_preserves_omx_plan():
+def test_grades_plan_runs_regression_and_preserves_omx_plan():
     config = grades_config()
     plan = runner.build_plan(config)
     assert [step['id'] for step in plan] == [
-        'classification.prepare', 'classification.analyze', 'classification.train', 'classification.evaluate', 'classification.predict',
         'regression.prepare', 'regression.analyze', 'regression.train', 'regression.evaluate', 'regression.predict', 'report',
     ]
     omx = runner.read_workflow(ROOT / 'samples/debug_omxs30/workflow.toml')
-    assert plan[0]['models'] == list(omx['models'])
+    assert {'ols', 'lasso', 'elastic_net', 'forest'} <= set(plan[0]['models'])
     assert 'gnb' not in next(s for s in plan if s['profile'] == 'regression')['models']
     assert len(runner.build_plan(omx)) == 78
 
 
 def test_task_and_model_selection_validate_incompatible_combinations():
     config = grades_config()
-    plan = runner.build_plan(config, models=['gnb'], tasks=['classification'])
+    plan = runner.build_plan(config, models=['ols'], tasks=['regression'])
     assert len(plan) == 6
-    assert all(step['models'] == ['gnb'] for step in plan)
+    assert all(step['models'] == ['ols'] for step in plan)
     with pytest.raises(ValueError, match='only supports classification'):
         runner.build_plan(config, models=['gnb'])
     with pytest.raises(ValueError, match='Tasks must'):
@@ -42,14 +41,14 @@ def test_task_and_model_selection_validate_incompatible_combinations():
 def test_resolved_task_configs_point_to_snapshots_and_exclude_alternate_outcomes(tmp_path):
     config = grades_config()
     (tmp_path / 'data_raw').mkdir()
-    (tmp_path / 'data_raw/Student_performance_data.csv').write_text('StudentID,GPA,GradeClass\n1,3,1\n')
+    (tmp_path / 'data_raw/grades.csv').write_text('GPA,Age\n3,16\n')
     (tmp_path / 'config').mkdir()
-    for task, target, excluded in [('classification', 'GradeClass', 'GPA'), ('regression', 'GPA', 'GradeClass')]:
+    for task, target, excluded in [('regression', 'GPA', 'GradeClass')]:
         step = next(s for s in runner.build_plan(config) if s['id'] == f'{task}.prepare')
         path = tmp_path / step['config']
         analysis.write_task_config(config, step, path)
         resolved = load_config(path)
-        assert resolved.input == tmp_path / 'data_raw/Student_performance_data.csv'
+        assert resolved.input == tmp_path / 'data_raw/grades.csv'
         assert resolved.target == target
         assert resolved.drop == ('StudentID', excluded)
         assert resolved.prepare == 'builtin:grades'

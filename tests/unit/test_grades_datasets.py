@@ -3,7 +3,6 @@ import runpy
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from sklearn_ml_toolbox.config import Config
 from sklearn_ml_toolbox.modeling.training import train_model
@@ -13,9 +12,8 @@ from sklearn_ml_toolbox.data_processing.preprocessing import make_preprocessor
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@pytest.mark.parametrize('dataset,target,excluded', [
-    ('grades_class', 'GradeClass', 'GPA'), ('grade_reg', 'GPA', 'GradeClass')])
-def test_generated_dataset_preserves_target_and_removes_leakage(tmp_path, dataset, target, excluded):
+def test_generated_dataset_preserves_target_and_removes_leakage(tmp_path):
+    dataset, target, excluded = 'grades', 'GPA', 'GradeClass'
     generate = runpy.run_path(str(ROOT / 'samples' / dataset / 'steps/data_generation/generate_dataset.py'))['generate']
     source = ROOT / 'samples/grades/data_raw/Student_performance_data.csv'
     original = pd.read_csv(source)
