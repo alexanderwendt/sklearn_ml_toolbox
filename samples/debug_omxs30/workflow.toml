@@ -4,6 +4,28 @@
 version = 1
 output = "_reruns"
 inputs = ["data_raw", "annotations"]
+code = ["steps"]
+
+[steps."prepare.groundtruth"]
+script = "steps/data_generation/step20_generate_groundtruth_stockmarket.py"
+
+[steps."prepare.features"]
+script = "steps/data_generation/step21_generate_features.py"
+args = ["-debug"]
+
+[steps."infer_prepare.features"]
+script = "steps/data_generation/step21_generate_features.py"
+args = ["-debug"]
+
+# One binding applies to every model; exact step IDs may override it.
+[steps."*.postprocess"]
+script = "steps/prediction/step71_value_postprocessing.py"
+
+[steps."*.backtest"]
+script = "steps/prediction/step72_backtesting.py"
+
+[steps."*.inference.predict"]
+script = "steps/prediction/step70_predict_temporal_data.py"
 
 [defaults.Common]
 dataset_name = "debug_omxs30_LongTrend"

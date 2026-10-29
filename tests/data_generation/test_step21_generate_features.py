@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn_ml_toolbox.data_generation.step21_generate_features import price_normalizer
+from samples.debug_omxs30.steps.data_generation.step21_generate_features import price_normalizer
 
 
 def test_price_normalizer_rolling_window_preserves_index():
@@ -16,7 +16,7 @@ def test_flat_price_is_neutral():
 
 
 def test_legacy_rsi_features_have_distinct_period_names():
-    from sklearn_ml_toolbox.data_generation.step21_generate_features import get_rsi
+    from samples.debug_omxs30.steps.data_generation.step21_generate_features import get_rsi
 
     source = pd.DataFrame({'Close': np.arange(1., 61.)})
     result = get_rsi(source, debug_param=True)
@@ -25,7 +25,7 @@ def test_legacy_rsi_features_have_distinct_period_names():
 
 
 def test_legacy_calendar_features_remain_numeric_for_histograms():
-    from sklearn_ml_toolbox.data_generation.step21_generate_features import get_periodical_indicators
+    from samples.debug_omxs30.steps.data_generation.step21_generate_features import get_periodical_indicators
 
     source = pd.DataFrame({'Date': pd.bdate_range('2022-01-01', periods=90)})
     result = get_periodical_indicators(source)

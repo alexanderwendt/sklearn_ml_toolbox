@@ -2,6 +2,7 @@ from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
 import json
+import shutil
 
 import pytest
 
@@ -42,7 +43,8 @@ def test_plan_matches_legacy_commands_and_order():
     config = runner.read_workflow(SAMPLE / 'workflow.toml')
     plan = runner.build_plan(config)
     assert len(plan) == 78
-    canonical = json.dumps([(s['module'], s['args']) for s in plan])
+    # Moving a dataset implementation changes its launch path, not its identity/order.
+    canonical = json.dumps([(f"sklearn_ml_toolbox.{Path(s['script']).parent.name}.{Path(s['script']).stem}" if s.get('script') else s['module'], s['args']) for s in plan])
     assert sha256(canonical.encode()).hexdigest() == 'bb80f6870c71968ea20de8e6928ecada632f4e50a8005002ec39a99401341be4'
 
 
@@ -50,6 +52,7 @@ def test_plan_matches_legacy_commands_and_order():
 def workflow(tmp_path):
     path = tmp_path / 'workflow.toml'
     path.write_bytes((SAMPLE / 'workflow.toml').read_bytes())
+    shutil.copytree(SAMPLE / 'steps', tmp_path / 'steps', ignore=shutil.ignore_patterns('__pycache__'))
     for name in ('data_raw', 'annotations'):
         (tmp_path / name).mkdir()
         (tmp_path / name / 'input.txt').write_text('original input')
@@ -87,7 +90,8 @@ def test_failure_stops_and_retry_preserves_attempt_history(workflow, monkeypatch
     monkeypatch.setattr(runner.subprocess, 'run', fail)
     with pytest.raises(ValueError, match='failed'):
         runner.run_workflow(workflow, models=['gnb'])
-    run = next((workflow.parent / '_old_reruns').iterdir())
+    output = runner.read_workflow(workflow)['workflow'].get('output', '_reruns')
+    run = next((workflow.parent / output).iterdir())
     manifest = json.loads((run / 'manifest.json').read_text())
     assert manifest['status'] == 'failed'
     assert manifest['completed'] == []
@@ -100,10 +104,59 @@ def test_failure_stops_and_retry_preserves_attempt_history(workflow, monkeypatch
 
 def test_dry_run_has_no_outputs_and_model_overrides_are_explicit(workflow):
     assert runner.run_workflow(workflow, models=['knn'], dry_run=True) is None
-    assert not (workflow.parent / '_old_reruns').exists()
+    output = runner.read_workflow(workflow)['workflow'].get('output', '_reruns')
+    assert not (workflow.parent / output).exists()
     config = runner.read_workflow(workflow)
-    config['steps'] = {'knn.wide': {'args': ['--execute_wide=True']}}
+    config['steps']['knn.wide'] = {'args': ['--execute_wide=True']}
     assert next(s for s in runner.build_plan(config, ['knn']) if s['id'] == 'knn.wide')['args'] == ['--execute_wide=True']
     config['steps']['typo'] = {'args': []}
     with pytest.raises(ValueError, match='Unknown step'):
         runner.build_plan(config)
+
+
+def test_local_steps_use_hashed_snapshots_on_resume(workflow, monkeypatch):
+    commands = []
+    def execute(command, **kwargs):
+        commands.append(command)
+        return SimpleNamespace(returncode=0)
+    monkeypatch.setattr(runner.subprocess, 'run', execute)
+    run = runner.run_workflow(workflow, models=['svm'], until='prepare.groundtruth')
+    snapshot = run / 'runtime/dataset/steps/data_generation/step20_generate_groundtruth_stockmarket.py'
+    assert commands[-1][1] == str(snapshot)
+    manifest = json.loads((run / 'manifest.json').read_text())
+    assert manifest['snapshots'][snapshot.relative_to(run).as_posix()] == runner.digest(snapshot)
+    live = workflow.parent / 'steps/data_generation/step21_generate_features.py'
+    live.write_text('raise RuntimeError("live code changed")')
+    runner.run_workflow(workflow, resume=run, until='prepare.features')
+    assert commands[-1][1] == str(run / 'runtime/dataset/steps/data_generation/step21_generate_features.py')
+    assert (run / 'runtime/dataset/steps/data_generation/step21_generate_features.py').read_text() != live.read_text()
+    snapshot.write_text('modified snapshot')
+    with pytest.raises(ValueError, match='snapshot changed'):
+        runner.run_workflow(workflow, resume=run)
+
+
+def test_local_step_binding_validation():
+    config = runner.read_workflow(SAMPLE / 'workflow.toml')
+    config['steps']['prepare.features']['script'] = '../outside.py'
+    with pytest.raises(ValueError, match='dataset-relative'):
+        runner.build_plan(config)
+    config['steps']['prepare.features'] = {'script': 'steps/example.py', 'module': 'some.module'}
+    with pytest.raises(ValueError, match='either script or module'):
+        runner.build_plan(config)
+
+
+def test_prediction_bindings_apply_to_every_model_and_exact_override_wins():
+    config = runner.read_workflow(SAMPLE / 'workflow.toml')
+    plan = runner.build_plan(config)
+    for model in config['models']:
+        for suffix in ('postprocess', 'backtest', 'inference.predict'):
+            step = next(s for s in plan if s['id'] == f'{model}.{suffix}')
+            assert step['script'].startswith('steps/prediction/')
+            assert step['module'] is None
+    config['steps']['svm.backtest'] = {'module': 'custom.backtest', 'args': ['--custom']}
+    plan = runner.build_plan(config)
+    svm = next(s for s in plan if s['id'] == 'svm.backtest')
+    assert svm['module'] == 'custom.backtest'
+    assert 'script' not in svm
+    assert svm['args'] == ['--custom']
+    assert next(s for s in plan if s['id'] == 'knn.backtest')['script'].endswith('step72_backtesting.py')

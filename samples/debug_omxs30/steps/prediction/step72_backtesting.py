@@ -56,10 +56,10 @@ import numpy as np
 from backtesting import Backtest, Strategy
 
 # Own modules
-from ..utils import data_handling_support_functions as sup
-from ..utils import evaluation_utils as eval
-from ..utils import stock_market_utils as stock
-from ..filepaths import Paths
+from sklearn_ml_toolbox.utils import data_handling_support_functions as sup
+from sklearn_ml_toolbox.utils import evaluation_utils as eval
+from sklearn_ml_toolbox.utils import stock_market_utils as stock
+from sklearn_ml_toolbox.filepaths import Paths
 
 __author__ = "Alexander Wendt"
 __copyright__ = (

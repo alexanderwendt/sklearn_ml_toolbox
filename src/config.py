@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import tomllib
 
+ANALYSIS_METHODS = ('pca', 'tsne', 'umap', 'lasso', 'tree', 'recursive', 'backward', 'correlation')
+
 
 @dataclass(frozen=True)
 class Config:
@@ -24,6 +26,8 @@ class Config:
     select_percentile: int = 100
     balance: bool = False
     tune_threshold: bool = False
+    analysis_methods: tuple[str, ...] = ()
+    analysis_max_samples: int = 1000
 
 
 def load_config(path: Path) -> Config:
@@ -35,6 +39,7 @@ def load_config(path: Path) -> Config:
         "split": {"strategy", "test_size", "time_column"},
         "training": {"seed", "models", "folds", "search_iterations", "select_percentile", "balance", "tune_threshold"},
         "output": {"directory"},
+        "analysis": {"methods", "max_samples"},
     }
     for section, values in raw.items():
         if section not in allowed or not isinstance(values, dict):
@@ -84,6 +89,13 @@ def load_config(path: Path) -> Config:
             raise ValueError("data.prepare must be a script path or builtin:name")
         if not hook.startswith("builtin:"):
             hook = str((path.parent / hook).resolve())
+    analysis = raw.get('analysis', {})
+    methods = analysis.get('methods', [])
+    if not isinstance(methods, list) or any(method not in ANALYSIS_METHODS for method in methods) or len(set(methods)) != len(methods):
+        raise ValueError(f'analysis.methods must contain unique names from {ANALYSIS_METHODS}')
+    max_samples = analysis.get('max_samples', 1000)
+    if type(max_samples) is not int or max_samples < 10:
+        raise ValueError('analysis.max_samples must be an integer >= 10')
     return Config(
         path=path, input=(path.parent / data["path"]).resolve(), target=data["target"],
         task=data["task"], output=(path.parent / raw.get("output", {}).get("directory", "results")).resolve(),
@@ -91,4 +103,5 @@ def load_config(path: Path) -> Config:
         time_column=split.get("time_column"), seed=training.get("seed", 42), models=tuple(models),
         folds=training.get("folds", 3), search_iterations=training.get("search_iterations", 10),
         select_percentile=percentile, balance=training.get("balance", False), tune_threshold=training.get("tune_threshold", False),
+        analysis_methods=tuple(methods), analysis_max_samples=max_samples,
     )

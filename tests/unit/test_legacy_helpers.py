@@ -24,6 +24,6 @@ def test_legacy_precision_recall_graphs(tmp_path):
 
 def test_event_forward_fill_and_reference_signal():
     from sklearn_ml_toolbox.utils.stock_market_utils import calculateLatestEvent
-    from sklearn_ml_toolbox.prediction.step71_value_postprocessing import generate_reference_results
+    from samples.debug_omxs30.steps.prediction.step71_value_postprocessing import generate_reference_results
     np.testing.assert_array_equal(calculateLatestEvent(np.array([0, 2, 0, 1, 0])), [0, 2, 2, 1, 1])
     np.testing.assert_array_equal(generate_reference_results(pd.Series([-1, 0, 1])), [0, 0, 1])

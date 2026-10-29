@@ -33,10 +33,10 @@ def log(run, message):
         stream.write(f"{datetime.now(timezone.utc).isoformat()} {message}\n")
 
 
-def prepare_run(config: Config) -> Path:
+def prepare_run(config: Config, run: Path | None = None) -> Path:
     frame = prepare_dataset(config)
     train, holdout = split_dataset(frame, config)
-    run = config.output / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:8])
+    run = Path(run) if run is not None else config.output / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:8])
     run.mkdir(parents=True)
     for name, part in (("prepared", frame), ("train", train), ("holdout", holdout)):
         part.to_csv(run / f"{name}.csv", index_label="_row_id")
@@ -76,6 +76,15 @@ def train_run(config: Config, run: Path) -> Path:
     return run
 
 
+def analyze_run(config: Config, run: Path) -> Path:
+    validate_run(config, run)
+    from .data_processing.diagnostics import analyze_training
+    parts = joblib.load(run / 'split.joblib')
+    analyze_training(parts['train'], config, run / 'analysis')
+    log(run, 'Completed training-only dimensionality reduction and feature diagnostics')
+    return run
+
+
 def evaluate_run(config: Config, run: Path) -> Path:
     manifest = validate_run(config, run)
     if manifest.get("model_sha256") != digest(run / "model.joblib"):
@@ -84,6 +93,8 @@ def evaluate_run(config: Config, run: Path) -> Path:
         raise FileExistsError("Evaluation already exists; start a new run")
     parts = joblib.load(run / "split.joblib")
     model = joblib.load(run / "model.joblib")
+    if config.analysis_methods and not (run / 'analysis/manifest.json').exists():
+        analyze_run(config, run)
     result = evaluate_model(model, parts["holdout"], run)
     analyze(parts["train"][model["features"]], run, parts["train"][config.target], config.task)
     table = compare_models(model, parts, run)

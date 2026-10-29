@@ -3,4 +3,5 @@ from pathlib import Path
 from sklearn_ml_toolbox.cli import main
 
 if __name__ == '__main__':
-    raise SystemExit(main(['run', '--config', str(Path(__file__).parent/'samples/grades/config.toml')]))
+    raise SystemExit(main(['workflow', '--config', str(Path(__file__).parent/'samples/grades/workflow.toml'),
+                          '--tasks', 'regression']))

@@ -64,9 +64,9 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
 # Own modules
-from ..utils import data_handling_support_functions as sup
-from ..utils import custom_methods as custom
-from ..utils import data_visualization_functions as vis
+from sklearn_ml_toolbox.utils import data_handling_support_functions as sup
+from sklearn_ml_toolbox.utils import custom_methods as custom
+from sklearn_ml_toolbox.utils import data_visualization_functions as vis
 
 __author__ = "Alexander Wendt"
 __copyright__ = (

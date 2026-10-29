@@ -11,9 +11,10 @@ from .prediction.inference import predict_csv
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="CSV → classification/regression → metrics, predictions and graphs")
     commands = parser.add_subparsers(dest="command", required=True)
-    workflow = commands.add_parser('workflow', help='Run a legacy step workflow in a new isolated folder')
+    workflow = commands.add_parser('workflow', help='Run a configured analysis workflow in a new isolated folder')
     workflow.add_argument('--config', type=Path, required=True)
     workflow.add_argument('--models', help='Comma-separated model names; defaults to all configured models')
+    workflow.add_argument('--tasks', help='Comma-separated task profiles for a tabular workflow')
     workflow.add_argument('--resume', type=Path, help='Resume this run, skipping completed steps')
     workflow.add_argument('--until', help='Pause after this step ID (see --dry-run)')
     workflow.add_argument('--dry-run', action='store_true', help='Print the expanded steps without creating a run')
@@ -39,7 +40,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == 'workflow':
             from .workflow_runner import run_workflow
             output = run_workflow(args.config, models=args.models.split(',') if args.models else None,
-                                  resume=args.resume, until=args.until, dry_run=args.dry_run)
+                                  resume=args.resume, until=args.until, dry_run=args.dry_run,
+                                  tasks=args.tasks.split(',') if args.tasks else None)
             if output is None:
                 return 0
         elif args.command in ("postprocess", "backtest", "analyze-temporal"):

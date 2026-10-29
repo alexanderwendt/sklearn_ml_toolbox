@@ -19,9 +19,9 @@ and ordering as the verified batch workflow. Superseded batch/shell scripts, job
 templates, and hand-maintained INI configs have been removed. Use `run.py` for all
 new runs. Historical copies remain inside the preserved run folders.
 
-The dataset root now contains only `run.py`, `workflow.toml`, this README,
-`annotations/`, the two required CSV inputs and provenance in `data_raw/`, and
-`_old_reruns`. Generated outputs belong exclusively inside a run folder.
+The dataset root contains `run.py`, `workflow.toml`, this README, dataset-specific
+Python code in `steps/`, `annotations/`, and the required CSV inputs and provenance
+in `data_raw/`. Generated outputs belong exclusively inside a run folder.
 
 ## Every new execution has its own folder
 
@@ -32,6 +32,7 @@ _reruns/<UTC timestamp>_<unique id>/
     environment.txt        # installed package versions
     logs/                  # one log per attempted step
     runtime/models/        # snapshot of legacy search definitions
+    runtime/dataset/steps/ # snapshot of dataset-specific Python code
     workspace/
         annotations/       # copied inputs
         data_raw/
@@ -43,9 +44,93 @@ _reruns/<UTC timestamp>_<unique id>/
 
 No previous prepared data or model is reused in a fresh run. Only an explicit
 `--resume` continues an existing run. A failed step stops execution; its log path
-is printed. Resume checks the configuration and input snapshots and skips completed
-steps. Step implementation code comes from the active installation, allowing a
-compatibility fix before resuming; package versions are recorded at run creation.
+is printed. Resume checks configuration, input, and local-code snapshots and skips
+completed steps. Dataset-specific code executes from the run's snapshot: editing
+the live `steps/` directory affects new runs only. Shared package steps come from
+the active installation; package versions are recorded at run creation.
+
+## Dataset-local Python steps
+
+Dataset-specific implementations are grouped by responsibility outside the general
+toolbox package:
+
+```text
+steps/
+    data_generation/
+        step20_generate_groundtruth_stockmarket.py
+        step20_generate_groundtruth_stockmarket_from_annotation.py
+        step21_generate_features.py
+        step21_generate_features_reduced_lt.py
+    prediction/
+        step70_predict_temporal_data.py
+        step71_value_postprocessing.py
+        step72_backtesting.py
+```
+
+They import shared utilities from the installed `sklearn_ml_toolbox`.
+Generic saved-model CSV inference stays in `src/prediction/inference.py`. The
+dataset-independent close/signal research helper stays in `src/prediction/temporal.py`;
+the OMX signal smoothing, temporal plots, SMA reference strategy, and model-specific
+backtests belong to the sample's prediction steps.
+The shared runner has no hard-coded stock-market generation module names. Instead,
+`workflow.toml` supplies the implementation for its ground-truth and feature steps:
+
+```toml
+[workflow]
+code = ["steps"] # copied and hashed with each run
+
+[steps."prepare.groundtruth"]
+script = "steps/data_generation/step20_generate_groundtruth_stockmarket.py"
+
+[steps."prepare.features"]
+script = "steps/data_generation/step21_generate_features.py"
+args = ["-debug"]
+
+[steps."infer_prepare.features"]
+script = "steps/data_generation/step21_generate_features.py"
+args = ["-debug"]
+
+[steps."*.postprocess"]
+script = "steps/prediction/step71_value_postprocessing.py"
+
+[steps."*.backtest"]
+script = "steps/prediction/step72_backtesting.py"
+
+[steps."*.inference.predict"]
+script = "steps/prediction/step70_predict_temporal_data.py"
+```
+
+These tables already exist; edit their values rather than adding duplicate tables.
+Wildcard bindings avoid repeating the same prediction scripts for every model.
+Matching wildcard tables merge in declaration order; an exact step ID (such as
+`svm.backtest`) overrides them. Standard config-section arguments are retained
+unless explicitly overridden with `args`.
+The usual `python run.py` still executes the entire workflow. To run just the
+generation stages in a new isolated folder:
+
+```powershell
+python run.py --until prepare.dimensions
+```
+
+To use annotated outcomes, change `prepare.groundtruth.script` to
+`steps/data_generation/step20_generate_groundtruth_stockmarket_from_annotation.py` and configure
+`Paths.outcomes_source`, `Generation.outcome_col`, and `Common.class_number` in
+the preparation profile. Include the annotation CSV in the copied inputs.
+To use reduced features, change both feature bindings to
+`steps/data_generation/step21_generate_features_reduced_lt.py` so training and inference agree.
+These alternatives retain their existing behavior; they are not the default profile.
+
+Each file also remains directly executable with `--config_path` (and `-debug` for
+feature generation). For manual debugging, use a run's `workspace/` as the working
+directory and pass its generated INI, e.g. `--config_path=config/prepare.ini`.
+An absolute script path works from that directory. Direct execution writes to the
+paths specified by that INI; `run.py` is the entry point that creates isolated runs.
+
+Other datasets can supply their own `script` paths using the same mechanism.
+An installed or snapshotted package can instead be selected with
+`module = "package.module"`; `module` and `script` are mutually exclusive.
+Older runs keep their original manifests/configs: this relocation does not rewrite
+their history. Start a new run with this workflow configuration after the migration.
 
 ## Controls
 

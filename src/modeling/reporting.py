@@ -48,6 +48,19 @@ def compare_models(model, parts, output):
 def write_report(config, model, result, table, output):
     import json
 
+    diagnostics = ''
+    analysis_manifest = output / 'analysis/manifest.json'
+    if analysis_manifest.exists():
+        analysis = json.loads(analysis_manifest.read_text(encoding='utf-8'))
+        diagnostics = (f'<h2>Training-only feature diagnostics</h2><p>{analysis["rows"]} sampled training rows; '
+                       f'methods: {escape(", ".join(analysis["completed"]))}. '
+                       'Categorical features are one-hot encoded (first level omitted), imputed, and standardized on these training rows. '
+                       'Lasso and backward OLS use one-vs-rest targets for classification. '
+                       'These are exploratory rankings: they do not select the training pipeline features. '
+                       'Supervised UMAP uses training labels; its visual separation is not an accuracy estimate. '
+                       'Plots and coordinate/coefficient tables are included below.</p>')
+        if analysis['skipped']:
+            diagnostics += '<p>Skipped methods: ' + escape(json.dumps(analysis['skipped'])) + '</p>'
     sections = []
     for directory in sorted({path.parent for path in output.rglob("*.png")}):
         title = directory.relative_to(output).as_posix()
@@ -71,5 +84,5 @@ importance are diagnostic only: do not use them to tune models. Importance is pr
 correlated features can share importance. Error bars show standard deviation over five permutations.</p>
 <h2>Selected model: holdout metrics</h2><pre>{escape(json.dumps(result, indent=2))}</pre>
 <h2>All models: training versus holdout</h2>{table.to_html(index=False, float_format=lambda value: f'{value:.4f}')}
-<h2>Plots</h2>{''.join(sections)}<h2>Tables and artifacts</h2><ul>{''.join(links)}</ul></body></html>'''
+{diagnostics}<h2>Plots</h2>{''.join(sections)}<h2>Tables and artifacts</h2><ul>{''.join(links)}</ul></body></html>'''
     (output / "report.html").write_text(report, encoding="utf-8")

@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 
-from src.data_generation.step20_generate_groundtruth_stockmarket import define_tops_bottoms
+from samples.debug_omxs30.steps.data_generation.step20_generate_groundtruth_stockmarket import define_tops_bottoms
 
 class TestGenerateGroundtruth(unittest.TestCase):
 

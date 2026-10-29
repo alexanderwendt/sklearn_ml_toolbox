@@ -54,7 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # Built-in/Generic Imports
 
 # Libs
-from . import indicators as ta
+from sklearn_ml_toolbox.data_generation import indicators as ta
 
 from math import ceil
 import argparse
@@ -68,8 +68,8 @@ from pandas.plotting import register_matplotlib_converters
 
 # Own modules
 # import utils.data_visualization_functions as vis
-from ..utils import custom_methods as custom
-from ..utils import data_handling_support_functions as sup
+from sklearn_ml_toolbox.utils import custom_methods as custom
+from sklearn_ml_toolbox.utils import data_handling_support_functions as sup
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
