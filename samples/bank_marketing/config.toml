@@ -1,0 +1,18 @@
+[data]
+path = "data_raw/data.csv"
+target = "y"
+task = "classification"
+drop = ["duration"]
+
+[split]
+strategy = "random"
+test_size = 0.2
+
+[training]
+seed = 42
+models = ["linear", "forest"]
+folds = 3
+search_iterations = 3
+
+[output]
+directory = "results/classification"

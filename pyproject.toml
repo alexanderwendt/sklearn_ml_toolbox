@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=84"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sklearn-ml-toolbox"
+version = "1.0.0"
+description = "Reproducible CSV classification and regression workflows"
+readme = "README.md"
+requires-python = ">=3.15.1"
+license = "ISC"
+dependencies = ["numpy>=2.5", "pandas>=3.1", "scikit-learn>=1.9", "matplotlib>=3.11", "joblib>=1.6"]
+
+[project.optional-dependencies]
+test = ["pytest>=9", "pytest-cov>=7", "build", "ruff"]
+finance = ["backtesting", "xgboost"]
+analysis = ["seaborn", "missingno", "umap-learn", "statsmodels", "imbalanced-learn"]
+omxs30 = ["sklearn-ml-toolbox[finance,analysis]"]
+datasets = ["xlrd", "openpyxl"]
+
+[project.scripts]
+ml-toolbox = "sklearn_ml_toolbox.cli:main"
+
+[tool.setuptools]
+packages = ["sklearn_ml_toolbox", "sklearn_ml_toolbox.data_generation", "sklearn_ml_toolbox.data_processing", "sklearn_ml_toolbox.modeling", "sklearn_ml_toolbox.prediction", "sklearn_ml_toolbox.utils"]
+package-dir = {sklearn_ml_toolbox = "src"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py315"
+
+[tool.coverage.run]
+source = ["src"]
+patch = ["subprocess"]
+
+[tool.coverage.report]
+show_missing = true

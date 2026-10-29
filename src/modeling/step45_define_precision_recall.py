@@ -63,16 +63,16 @@ from sklearn.metrics import (
     auc,
 )
 from sklearn.model_selection import train_test_split
-import utils.sklearn_utils as model_util
+from ..utils import sklearn_utils as model_util
 import argparse
 from pandas.plotting import register_matplotlib_converters
 import pickle
 import numpy as np
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.execution_utils as exe
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import execution_utils as exe
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -101,7 +101,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def get_optimal_precision_recall_threshold(

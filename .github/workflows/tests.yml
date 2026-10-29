@@ -1,0 +1,17 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  offline-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.15'
+      - run: python -m pip install -e ".[test,finance,analysis]"
+      - run: python -m pytest --cov=src
+      - run: python -m pip check
+      - run: python -m build

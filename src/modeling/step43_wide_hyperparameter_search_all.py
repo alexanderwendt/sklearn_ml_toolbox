@@ -61,11 +61,11 @@ import copy
 from pydoc import locate
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.execution_utils as exe
-from utils.metrics import Metrics
-from filepaths import Paths
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import execution_utils as exe
+from ..utils.metrics import Metrics
+from ..filepaths import Paths
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -108,7 +108,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def load_input(conf):

@@ -57,8 +57,8 @@ import numpy as np
 import argparse
 
 # Own modules
-import utils.data_handling_support_functions as sup
-import utils.custom_methods as custom
+from ..utils import data_handling_support_functions as sup
+from ..utils import custom_methods as custom
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -91,7 +91,7 @@ parser.add_argument(
 # parser.add_argument("-i", "--on_inference_data", action='store_true',
 #                    help="Set inference if only inference and no training")
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def cut_unusable_parts_of_dataframe(df, head_index=-1, tail_index=-1):
@@ -113,14 +113,7 @@ def cut_unusable_parts_of_dataframe(df, head_index=-1, tail_index=-1):
         The cut DataFrame.
     """
 
-    if tail_index > 0:
-        dfr = df.drop(df.tail(tail_index).index, inplace=False)
-    if head_index > 0:
-        dfr = df.drop(df.head(head_index).index, inplace=False)
-    # Drop from the timerows too
-    # source_cut = source.drop(source.tail(50).index, inplace=False)
-
-    return dfr
+    return df.iloc[max(0, head_index):len(df) - max(0, tail_index)].copy()
 
 
 def cut_dataframe_subset(df, start_loc, stop_loc):
@@ -159,7 +152,7 @@ def clean_nan(df):
         The cleaned DataFrame.
     """
 
-    nan_index = pd.isnull(df).any(1).to_numpy().nonzero()[0]
+    nan_index = df.index[df.isna().any(axis=1)]
     print("Found {} rows with NaN".format(len(nan_index)))
     df_nonan = df.drop(nan_index)
 

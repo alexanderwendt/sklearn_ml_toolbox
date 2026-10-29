@@ -54,7 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # Built-in/Generic Imports
 
 # Libs
-import pandas_ta as ta
+from . import indicators as ta
 
 from math import ceil
 import argparse
@@ -63,13 +63,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.nonparametric.smoothers_lowess import lowess
 import numpy as np
-from scipy.ndimage.interpolation import shift
+from scipy.ndimage import shift
 from pandas.plotting import register_matplotlib_converters
 
 # Own modules
 # import utils.data_visualization_functions as vis
-import utils.custom_methods as custom
-import utils.data_handling_support_functions as sup
+from ..utils import custom_methods as custom
+from ..utils import data_handling_support_functions as sup
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -108,7 +108,7 @@ parser.add_argument(
 # parser.add_argument("-i", "--on_inference_data", action='store_true',
 #                    help="Set inference if only inference and no training")
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def generate_smoothed_trigger(values, alpha=0.5, tailclip=0.1):
@@ -190,21 +190,9 @@ def price_normalizer(source, debug_param=False):
     close = source["Close"]
 
     for d in normed_days:
-        temp_col = np.zeros(close.shape)
-        for i, c in enumerate(close[:]):
-            if i >= d:
-                min_value = np.min(close[i - d + 1 : i + 1])
-                max_value = np.max(close[i - d + 1 : i + 1])
-                current_value = close[i]
-
-                normed_value = (current_value - min_value) / (max_value - min_value)
-                temp_col[i] = normed_value
-            else:
-                temp_col[i] = np.nan
-
-        normed_days_features = normed_days_features.join(
-            pd.DataFrame(temp_col, columns=["NormKurs" + str(d)])
-        )
+        minimum = close.rolling(d).min()
+        spread = close.rolling(d).max() - minimum
+        normed_days_features["NormKurs" + str(d)] = ((close - minimum) / spread).mask(spread == 0, 0.5)
 
     print("Number of features: {}".format(normed_days_features.shape))
     print(normed_days_features.head(5))
@@ -308,7 +296,7 @@ def calculate_moving_average(source, debug_param=False):
 
     for i in meanList:
         meanCol = ta.sma(close, i, 0)
-        meanColreshaped = np.reshape(meanCol.values, (1, np.product(meanCol.values.shape)))[0]
+        meanColreshaped = np.reshape(meanCol.values, (1, np.prod(meanCol.values.shape)))[0]
         diffPriceCol = np.divide(close.values - meanColreshaped, meanColreshaped)
         temp_source = pd.DataFrame(diffPriceCol, columns=["SMA" + str(i) + ""])
         meanfeatures = meanfeatures.join(temp_source)
@@ -652,18 +640,18 @@ def get_periodical_indicators(source):
     print(periodic_values.head())
 
     periodic_values = periodic_values.join(
-        pd.get_dummies(periodic_values["day_of_week"], prefix="day_week_")
+        pd.get_dummies(periodic_values["day_of_week"], prefix="day_week_", dtype=np.uint8)
     ).drop(["day_of_week"], axis=1)
     periodic_values.drop(
         columns=["day_week__5", "day_week__6"], errors="ignore", inplace=True
     )
 
     periodic_values = periodic_values.join(
-        pd.get_dummies(periodic_values["month_of_year"], prefix="month_year_")
+        pd.get_dummies(periodic_values["month_of_year"], prefix="month_year_", dtype=np.uint8)
     ).drop(["month_of_year"], axis=1)
 
     periodic_values = periodic_values.join(
-        pd.get_dummies(periodic_values["week_of_month"], prefix="week_month_")
+        pd.get_dummies(periodic_values["week_of_month"], prefix="week_month_", dtype=np.uint8)
     ).drop(["week_of_month"], axis=1)
 
     print("Number of features: {}".format(periodic_values.shape))

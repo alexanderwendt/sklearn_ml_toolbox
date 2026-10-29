@@ -56,8 +56,8 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 
 # Own modules
-import utils.data_handling_support_functions as sup
-import utils.data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import data_visualization_functions as vis
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -86,7 +86,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def find_tsne_parmeters(
@@ -117,7 +117,7 @@ def find_tsne_parmeters(
                 n_components=2,
                 perplexity=p,
                 early_exaggeration=e,
-                n_iter=5000,
+                max_iter=5000,
                 n_iter_without_progress=1000,
                 learning_rate=10,
             ).fit_transform(X_scaled_subset)

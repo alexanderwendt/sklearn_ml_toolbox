@@ -1,0 +1,17 @@
+{
+  "repository_url": "https://archive.ics.uci.edu/dataset/10/automobile",
+  "download_url": "https://archive.ics.uci.edu/static/public/10/data.csv",
+  "doi": "10.24432/C5B01C",
+  "creators": [
+    "Jeffrey Schlimmer"
+  ],
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "retrieved": "2026-10-25",
+  "original_sha256": "fe36b5dcd1a8603ce46d80dae5682765d3671613622840602d748e4cadeda6b9",
+  "csv_sha256": "03768f90ac571a1fc779151ca57c4b1b0ead0184364aa11f1c0cf88ee7d3c145",
+  "rows": 201,
+  "target": "price",
+  "task": "regression",
+  "note": "Vehicle-price regression. Rows missing price excluded. Replaces California Housing for explicit UCI CC BY 4.0 provenance."
+}

@@ -63,10 +63,10 @@ from pickle import dump
 import numpy as np
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.execution_utils as exe
-import utils.data_visualization_functions_for_SVM as svmvis
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import execution_utils as exe
+from ..utils import data_visualization_functions_for_SVM as svmvis
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -95,7 +95,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def execute_search_iterations_random_search_SVM(

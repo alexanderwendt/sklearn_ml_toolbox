@@ -1,0 +1,32 @@
+{
+  "name": "The SKLearn Machine Learning Toolbox",
+  "slug": "sklearn_ml_toolbox",
+  "language": "en",
+  "signOff": "",
+  "stack": "Python, scikit-learn, pandas, NumPy",
+  "stacks": [],
+  "issues": {
+    "root": "issues",
+    "idPattern": "(?!)"
+  },
+  "instructions": {
+    "main": "AGENTS.md"
+  },
+  "lanes": {
+    "backend": {
+      "description": "Python machine-learning pipeline, scripts, samples, and tests",
+      "dir": ".",
+      "paths": ["src/**", "utils/**", "scripts/**", "samples/**", "tests/**", "*.py", "requirements.txt", "environment.yml", "env_ml.yml"],
+      "commands": {
+        "test": ".verify-venv/Scripts/python -m pytest",
+        "verify": ".verify-venv/Scripts/python -m pytest --cov=src",
+        "build": ".verify-venv/Scripts/python -m build",
+        "run": ".verify-venv/Scripts/python -m sklearn_ml_toolbox.cli --help"
+      }
+    }
+  },
+  "integrations": {
+    "jira": { "enabled": false },
+    "gitlab": { "enabled": false }
+  }
+}

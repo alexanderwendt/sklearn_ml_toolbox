@@ -82,8 +82,8 @@ import seaborn as sns
 from sklearn import preprocessing
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -112,7 +112,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def unique_cols(df):
@@ -201,7 +201,7 @@ def analyse_features(features, y, class_labels, conf, image_save_directory):
         df_fv = total_values.iloc[X_train_index_subset, :]
 
         m.rc_file_defaults()
-        colors = ["#2e8ad8", "#cd3785", "#c64c00", "#889a00"]
+        colors = sns.color_palette("husl", n_colors=df_fv[comparison_name].nunique())
         plot_parallel_coordinates(
             df_fv, cols, colors, comparison_name, conf, image_save_directory
         )
@@ -381,7 +381,7 @@ def plot_t_sne(X_scaled_subset, y_scaled_subset, class_labels, image_save_direct
         n_components=2,
         perplexity=10.0,
         early_exaggeration=100.0,
-        n_iter=5000,
+        max_iter=5000,
         n_iter_without_progress=1000,
         learning_rate=10,
     ).fit_transform(X_scaled_subset)
@@ -442,7 +442,7 @@ def plot_parallel_coordinates(
     for i, ax in enumerate(axes):
         for idx in df.index:
             mpg_category = df.loc[idx, comparison_name]
-            ax.plot(x, df.loc[idx, cols], colours[mpg_category])
+            ax.plot(x, df.loc[idx, cols], color=colours[mpg_category])
         ax.set_xlim([x[i], x[i + 1]])
 
     def set_ticks_for_axis(dim, ax, ticks):

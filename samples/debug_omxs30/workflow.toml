@@ -1,0 +1,171 @@
+# One model-independent workflow. Paths are relative to this file.
+# Legacy INI values remain strings to preserve the verified settings exactly.
+[workflow]
+version = 1
+output = "_reruns"
+inputs = ["data_raw", "annotations"]
+
+[defaults.Common]
+dataset_name = "debug_omxs30_LongTrend"
+class_name = "LongTrend"
+model_type = "svm"
+
+[defaults.Paths]
+labels_path = "annotations/omxs30_debug_labels.csv"
+models_directory = "models/${Common:dataset_name}/${Common:model_type}"
+config_directory = "config"
+outcomes_source = ""
+
+[defaults.Generation]
+features_out = "${Paths:prepared_data_directory}/features_raw.csv"
+source_out = "${Paths:prepared_data_directory}/source.csv"
+
+[defaults.Preparation]
+features_out = "${Paths:prepared_data_directory}/features.csv"
+
+[profiles.prepare.Paths]
+source_path = "data_raw/^OMX_20151230_20191016_debug_training_yahoo_finance.csv"
+prepared_data_directory = "prepared-data/${Common:dataset_name}"
+results_directory = "results/${Common:dataset_name}"
+
+[profiles.prepare.Generation]
+outcomes_out = "${Paths:prepared_data_directory}/outcomes_raw.csv"
+
+[profiles.prepare.Preparation]
+features_in = "${Generation:features_out}"
+outcomes_in = "${Generation:outcomes_out}"
+source_in = "${Generation:source_out}"
+test_size = "0.20"
+shuffle_data = "False"
+binarize_labels = "True"
+class_number = "1"
+binary_0_label = "Neg. Trend"
+binary_1_label = "Pos. Trend"
+features_out_train = "${Paths:prepared_data_directory}/features_train.csv"
+features_out_val = "${Paths:prepared_data_directory}/features_val.csv"
+outcomes_out = "${Paths:prepared_data_directory}/outcomes.csv"
+outcomes_out_train = "${Paths:prepared_data_directory}/outcomes_train.csv"
+outcomes_out_val = "${Paths:prepared_data_directory}/outcomes_val.csv"
+labels_out = "${Paths:prepared_data_directory}/labels.csv"
+selected_feature_columns_out = "${Paths:prepared_data_directory}/selected_feature_columns.csv"
+
+[profiles.train.Paths]
+source_path = "data_raw/^OMX_20151230_20191016_debug_training_yahoo_finance.csv"
+prepared_data_directory = "prepared-data/${Common:dataset_name}"
+results_directory = "results/${Common:dataset_name}/${Common:model_type}"
+
+[profiles.train.Generation]
+outcomes_out = "${Paths:prepared_data_directory}/outcomes_raw.csv"
+
+[profiles.train.Preparation]
+binarize_labels = "True"
+class_number = "1"
+binary_0_label = "Neg. Trend"
+binary_1_label = "Pos. Trend"
+features_out_train = "${Paths:prepared_data_directory}/features_train.csv"
+features_out_val = "${Paths:prepared_data_directory}/features_val.csv"
+outcomes_out = "${Paths:prepared_data_directory}/outcomes.csv"
+outcomes_out_train = "${Paths:prepared_data_directory}/outcomes_train.csv"
+outcomes_out_val = "${Paths:prepared_data_directory}/outcomes_val.csv"
+labels_out = "${Paths:prepared_data_directory}/labels.csv"
+selected_feature_columns_out = "${Paths:prepared_data_directory}/selected_feature_columns.csv"
+
+[profiles.train.Training]
+features_train_in = "${Preparation:features_out_train}"
+outcomes_train_in = "${Preparation:outcomes_out_train}"
+# Intentionally retains the existing search input; held-out evaluation is separate.
+features_val_in = "${Preparation:features_out_train}"
+outcomes_val_in = "${Preparation:outcomes_out_train}"
+selected_feature_columns_in = "${Preparation:selected_feature_columns_out}"
+labels_in = "${Preparation:labels_out}"
+pipeline_class = "model_param_svm_default"
+refit_scorer_name = "f1_score"
+subset_share = "0.20"
+max_features = "80"
+narrow_samples = "[0.1, 0.2, 1.0]"
+narrow_kfolds = "[3, 3, 3]"
+narrow_iterations = "[20, 10, 10]"
+narrow_selection = "[10, 10, 10]"
+pipeline_out = "${Paths:models_directory}/final_pipe.pkl"
+ext_param_out = "${Paths:models_directory}/ext_param.json"
+
+[profiles.train.ModelTrain]
+features_in = "${Preparation:features_out_train}"
+outcomes_in = "${Preparation:outcomes_out_train}"
+labels_in = "${Preparation:labels_out}"
+pipeline_in = "${Training:pipeline_out}"
+ext_param_in = "${Training:ext_param_out}"
+model_out = "${Paths:models_directory}/saved_model_train.sav"
+
+[profiles.train.ModelFinal]
+features_in = "${Preparation:features_out}"
+outcomes_in = "${Preparation:outcomes_out}"
+labels_in = "${Preparation:labels_out}"
+pipeline_in = "${Training:pipeline_out}"
+ext_param_in = "${Training:ext_param_out}"
+model_out = "${Paths:models_directory}/saved_model_final.sav"
+
+[profiles.train.EvaluationTraining]
+features_in = "${Preparation:features_out_train}"
+outcomes_in = "${Preparation:outcomes_out_train}"
+source_in = "${Generation:source_out}"
+labels_in = "${Preparation:labels_out}"
+model_in = "${ModelTrain:model_out}"
+ext_param_in = "${ModelTrain:ext_param_in}"
+title = "Training"
+
+[profiles.train.EvaluationValidation]
+features_in = "${Preparation:features_out_val}"
+outcomes_in = "${Preparation:outcomes_out_val}"
+source_in = "${Generation:source_out}"
+labels_in = "${Preparation:labels_out}"
+model_in = "${ModelTrain:model_out}"
+ext_param_in = "${ModelTrain:ext_param_in}"
+title = "Validation"
+
+[profiles.train.EvaluationInference]
+features_in = "${Preparation:features_out_val}"
+outcomes_in = ""
+source_in = "${Generation:source_out}"
+labels_in = "${Preparation:labels_out}"
+model_in = "${ModelFinal:model_out}"
+ext_param_in = "${ModelFinal:ext_param_in}"
+title = "Inference"
+
+[profiles.infer.Paths]
+source_path = "data_raw/^OMXS30_20200101-20201229_yahoo.csv"
+prepared_data_directory = "prepared-data/${Common:dataset_name}_inference"
+prepared_data_directory_train = "prepared-data/${Common:dataset_name}"
+results_directory = "results/${Common:dataset_name}/${Common:model_type}/inference"
+
+[profiles.infer.Preparation]
+features_in = "${Generation:features_out}"
+source_in = "${Generation:source_out}"
+
+[profiles.infer.EvaluationInference]
+features_in = "${Preparation:features_out}"
+outcomes_in = ""
+source_in = "${Generation:source_out}"
+labels_in = "${Paths:prepared_data_directory_train}/labels.csv"
+model_in = "${Paths:models_directory}/saved_model_final.sav"
+ext_param_in = "${Paths:models_directory}/ext_param.json"
+title = "Inference"
+
+# Order here controls execution order. Only differences belong in model tables.
+[models.svm.Training]
+average_method = "macro"
+
+[models.xgboost.Training]
+average_method = "macro"
+pipeline_class = "model_param_xgboost_default"
+pos_label = "0"
+labels = "[1, 2]"
+
+[models.svm_linear.Training]
+pipeline_class = "model_param_svm_linear"
+
+[models.knn.Training]
+pipeline_class = "model_param_knn"
+
+[models.gnb.Training]
+pipeline_class = "model_param_gnb"

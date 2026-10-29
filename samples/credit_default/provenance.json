@@ -1,0 +1,17 @@
+{
+  "repository_url": "https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients",
+  "download_url": "https://archive.ics.uci.edu/static/public/350/data.csv",
+  "doi": "10.24432/C55S3H",
+  "creators": [
+    "I-Cheng Yeh"
+  ],
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "retrieved": "2026-10-25",
+  "original_sha256": "45bcf4df62ff2e237a74eb155cabfb4bbbc171219a0637daef44fdad07503dd0",
+  "csv_sha256": "1d85c100a680bd57ae5848d236242a1d95b0c0216075be244b13980a6ad0ef19",
+  "rows": 30000,
+  "target": "Y",
+  "task": "classification",
+  "note": "Taiwan credit default benchmark. Demographic predictors require review before real lending use."
+}

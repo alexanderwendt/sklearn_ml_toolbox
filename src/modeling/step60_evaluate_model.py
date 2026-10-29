@@ -52,17 +52,17 @@ import time
 import json
 import joblib
 from sklearn.metrics import precision_recall_curve
-import utils.sklearn_utils as model_util
+from ..utils import sklearn_utils as model_util
 import argparse
 from pandas.plotting import register_matplotlib_converters
 import pickle
 import numpy as np
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.evaluation_utils as evalutil
-from filepaths import Paths
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import evaluation_utils as evalutil
+from ..filepaths import Paths
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -87,7 +87,7 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 parser.add_argument("-sec", '--config_section', default="EvaluationTraining",
                     help='Configuration section in config file', required=False)
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def evaluate_model(config_path, config_section="EvaluationTraining"):

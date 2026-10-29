@@ -1,0 +1,18 @@
+[data]
+path = "data_raw/data.csv"
+target = "price"
+task = "regression"
+drop = ["symboling", "normalized-losses"]
+
+[split]
+strategy = "random"
+test_size = 0.2
+
+[training]
+seed = 42
+models = ["linear", "forest"]
+folds = 3
+search_iterations = 3
+
+[output]
+directory = "results/regression"

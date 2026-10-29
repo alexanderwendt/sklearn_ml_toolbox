@@ -64,9 +64,9 @@ import pandas as pd
 from pandas.core.dtypes.common import is_string_dtype
 from pandas.plotting import register_matplotlib_converters
 
-import utils.data_handling_support_functions as sup
+from ..utils import data_handling_support_functions as sup
 # Own modules
-import utils.data_visualization_functions as vis
+from ..utils import data_visualization_functions as vis
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -117,7 +117,7 @@ parser.add_argument(
     help="Load no source data if the data does not need to be visualized in time charts.",
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def clean_features_first_pass(features_raw, class_name):

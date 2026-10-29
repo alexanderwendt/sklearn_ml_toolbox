@@ -13,7 +13,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import f1_score
 import time
 import random
-import utils.sklearn_utils as modelutil
+from . import sklearn_utils as modelutil
 
 from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer, Normalizer
 # from sklearn.pipeline import Pipeline
@@ -56,9 +56,9 @@ from scipy.stats import reciprocal
 from scipy.stats import randint as sp_randint
 from sklearn.model_selection import RandomizedSearchCV
 
-import utils.data_handling_support_functions as sup
-from utils.metrics import Metrics
-from filepaths import Paths
+from . import data_handling_support_functions as sup
+from .metrics import Metrics
+from ..filepaths import Paths
 
 
 def load_labels(config):
@@ -168,7 +168,7 @@ def load_training_input_input(conf):
     y_train_path = os.path.join(conf['Training'].get('outcomes_train_in'))
     X_val_path = os.path.join(conf['Training'].get('features_val_in'))
     y_val_path = os.path.join(conf['Training'].get('outcomes_val_in'))
-    labels_path = conf['Paths'].get('labels_path')
+    labels_path = conf['Training'].get('labels_in', fallback=conf['Paths'].get('labels_path'))
 
     X_train, _, y_train = load_data(X_train_path, y_train_path)
     X_val, _, y_val = load_data(X_val_path, y_val_path)
@@ -186,7 +186,7 @@ def load_training_input_input(conf):
     selected_features, feature_dict, df_feature_columns = load_feature_columns(feature_columns_path, X_train)
 
     print("Load metrics")
-    metrics = Metrics(conf, list(labels.values()) if labels else None)
+    metrics = Metrics(conf, list(labels.keys()) if labels else None)
     scorers = metrics.scorers
     refit_scorer_name = metrics.refit_scorer_name
 

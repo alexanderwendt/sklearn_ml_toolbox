@@ -32,7 +32,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.nonparametric.smoothers_lowess import lowess
 import numpy as np
-from scipy.ndimage.interpolation import shift
+from scipy.ndimage import shift
 from pandas.plotting import register_matplotlib_converters
 
 register_matplotlib_converters()
@@ -180,7 +180,7 @@ def calculate_lowess(source, days_to_consider):
     frac = days_to_consider / len(source['Close'])
     filtered = lowess(source['Close'], source['Date'], frac=frac)
     # Calculate the dlowess/dt to see if it is raising or declining
-    shiftCol = filtered[:, 1] - shift(filtered[:, 1], 1, cval=np.NaN)
+    shiftCol = filtered[:, 1] - shift(filtered[:, 1], 1, cval=np.nan)
     pos_trend = shiftCol > 0
     # print(pos_trend[0:5])
 

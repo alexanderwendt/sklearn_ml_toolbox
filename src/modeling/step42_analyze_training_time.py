@@ -58,9 +58,9 @@ from pandas.plotting import register_matplotlib_converters
 import matplotlib.pyplot as plt
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.execution_utils as exe
-import utils.data_handling_support_functions as sup
+from ..utils import data_visualization_functions as vis
+from ..utils import execution_utils as exe
+from ..utils import data_handling_support_functions as sup
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -80,16 +80,14 @@ np.set_printoptions(precision=3)
 # Suppress print out in scientific notiation
 np.set_printoptions(suppress=True)
 
-os.makedirs("./logs", exist_ok=True)
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s %(message)s",
-    datefmt="%Y%m%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler("logs/" + "toolbox" + ".log"),
-        logging.StreamHandler(),
-    ],
-)
+if __name__ == "__main__":
+    os.makedirs("./logs", exist_ok=True)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s %(message)s",
+        datefmt="%Y%m%d %H:%M:%S",
+        handlers=[logging.FileHandler("logs/toolbox.log"), logging.StreamHandler()],
+    )
 log = logging.getLogger(__name__)
 
 
@@ -104,7 +102,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def run_training_estimation(

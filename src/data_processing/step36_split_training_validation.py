@@ -53,8 +53,7 @@ from pandas.plotting import register_matplotlib_converters
 from sklearn.model_selection import train_test_split
 
 # Own modules
-import utils.data_handling_support_functions as sup
-from filepaths import Paths
+from ..utils import data_handling_support_functions as sup
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -85,7 +84,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def split_train_validation_data(config_path):

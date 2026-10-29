@@ -49,15 +49,15 @@ import os
 import argparse
 import pandas as pd
 import matplotlib.dates as mdates
-import utils.sklearn_utils as model_util
+from ..utils import sklearn_utils as model_util
 from pandas.plotting import register_matplotlib_converters
 import numpy as np
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.evaluation_utils as eval
-from filepaths import Paths
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import evaluation_utils as eval
+from ..filepaths import Paths
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -94,7 +94,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 print(args)
 
 
@@ -174,7 +174,7 @@ def visualize_temporal_data(config_path, config_section):
         title=title + "_Inference_Adjusted" + model_name,
         save_fig_prefix=figure_path_prefix,
     )
-    if np.unique(y_order_test_pred["y"].values) == 2:
+    if len(model.classes_) == 2:
         vis.plot_two_class_graph(
             y_order_test_pred["y"].values,
             df_time_graph["Close"][y_order_test_pred.index],

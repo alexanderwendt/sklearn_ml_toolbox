@@ -10,7 +10,6 @@ import pandas as pd
 from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
 from statsmodels import robust
-import scikitplot as skplt
 import itertools
 from scipy.stats import ks_2samp
 import seaborn as sns
@@ -19,7 +18,7 @@ from sklearn.manifold import TSNE
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.stats.diagnostic import acorr_ljungbox
 
-import utils.data_handling_support_functions as sup
+from . import data_handling_support_functions as sup
 
 def save_figure(fig, image_save_directory=None, filename="Image_file_name", show_image=False, dpi=300):
     """
@@ -99,7 +98,7 @@ def paintBarChartForCategorical(series, xlegend="Feature Label", ylegend="Share 
 
     #Crate a color scale
     #Create a color map
-    colorMap = plt.cm.get_cmap('GnBu') #m.colors.LinearSegmentedColormap.from_list("colorMap",["green", "yellow", "red"])
+    colorMap = plt.get_cmap('GnBu') #m.colors.LinearSegmentedColormap.from_list("colorMap",["green", "yellow", "red"])
 
     def calculateProportion(value, minValue, maxValue):
         colorValue = 0
@@ -832,7 +831,12 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
     #plt.pause(0.1)
     #plt.close()
 
-    fig_pr_curve = skplt.metrics.plot_precision_recall_curve(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
+    from sklearn.metrics import PrecisionRecallDisplay, RocCurveDisplay
+    _, axis = plt.subplots(figsize=(10, 10))
+    for column, (label, name) in enumerate(reduced_class_dict.items()):
+        binary = np.asarray(y_trainsub) == label
+        if np.unique(binary).size == 2:
+            PrecisionRecallDisplay.from_predictions(binary, np.asarray(y_trainsub_pred_proba)[:, column], name=name, ax=axis)
 
     save_figure(plt.gcf(), image_save_directory=save_fig_prefix_dir, filename=title_prefix + 'pr_curve')
 
@@ -843,7 +847,11 @@ def plot_precision_recall_evaluation(y_trainsub, y_trainsub_pred, y_trainsub_pre
     #plt.pause(0.1)
     #plt.close()
 
-    fig_roc_curve = skplt.metrics.plot_roc(np.array(y_trainsub), np.array(y_trainsub_pred_proba), figsize=(10, 10))
+    _, axis = plt.subplots(figsize=(10, 10))
+    for column, (label, name) in enumerate(reduced_class_dict.items()):
+        binary = np.asarray(y_trainsub) == label
+        if np.unique(binary).size == 2:
+            RocCurveDisplay.from_predictions(binary, np.asarray(y_trainsub_pred_proba)[:, column], name=name, ax=axis)
 
     save_figure(plt.gcf(), image_save_directory=save_fig_prefix_dir, filename=title_prefix + 'roc_curve')
 
@@ -1025,7 +1033,7 @@ def plot_autocorrelation(feature, title, mode=None, lags=None, xlim=None, ylim=N
         "The light blue cone is the confidence interval. If the correlation is > cone, "
         "the value is significant.")
 
-    print("Ljung-Box statistics: p-value=", acorr_ljungbox(feature, lags=None, boxpierce="Ljung-Box")[1])
+    print("Ljung-Box statistics: p-value=", acorr_ljungbox(feature, lags=None, boxpierce=True, return_df=True)["lb_pvalue"].to_numpy())
     print("If p values > 0.05 then there are significant autocorrelations.")
 
     save_figure(plt.gcf(), image_save_directory=image_save_directory, filename=filename)

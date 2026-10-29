@@ -56,8 +56,8 @@ import numpy as np
 
 # Own modules
 #import data_vsualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.execution_utils as exe
+from ..utils import data_handling_support_functions as sup
+from ..utils import execution_utils as exe
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -82,7 +82,7 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 parser.add_argument("-sec", '--config_section', default="Model",
                     help='Configuration section in config file', required=False)
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 def load_data(conf, config_section="ModelTrain"):
     '''

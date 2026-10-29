@@ -1,0 +1,19 @@
+{
+  "repository_url": "https://archive.ics.uci.edu/dataset/222/bank+marketing",
+  "download_url": "https://archive.ics.uci.edu/static/public/222/data.csv",
+  "doi": "10.24432/C5K306",
+  "creators": [
+    "S. Moro",
+    "P. Rita",
+    "P. Cortez"
+  ],
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "retrieved": "2026-10-25",
+  "original_sha256": "94a5cb4b7d461dab12f7f6123723054911fbdd28d84a2c4ec92378af019be686",
+  "csv_sha256": "3a4a452cc6622c99e39d28a9915d5508c2f330408b5e21a6c37a0fcdf10778d0",
+  "rows": 45211,
+  "target": "y",
+  "task": "classification",
+  "note": "Pre-contact subscription prediction: duration excluded. Random split is an IID benchmark, not a future-campaign backtest."
+}

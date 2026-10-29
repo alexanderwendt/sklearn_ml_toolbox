@@ -1,0 +1,17 @@
+{
+  "repository_url": "https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data",
+  "download_url": "https://archive.ics.uci.edu/static/public/144/data.csv",
+  "doi": "10.24432/C5NC77",
+  "creators": [
+    "Hans Hofmann"
+  ],
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "retrieved": "2026-10-25",
+  "original_sha256": "f985b42636c9e28ce4fb3913738d1ebfd0f7947fda8d4406fe2ded5d84295acb",
+  "csv_sha256": "0c300727679e0f2bb968f3e91dc050d13d842a8527a73cb4e734728ede381829",
+  "rows": 1000,
+  "target": "class",
+  "task": "classification",
+  "note": "Historical credit-risk benchmark; macro F1 does not implement the original asymmetric cost matrix."
+}

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="step31_adapt_features_training" type="PythonConfigurationType" factoryName="Python">
-    <module name="machine_learning_toolbox" />
+    <module name="sklearn-ml-toolbox" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -8,12 +8,13 @@
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="SDK_NAME" value="sklearn312" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/samples/debug_omxs30" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
+    <option name="DEBUG_JUST_MY_CODE" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="RUN_TOOL" value="" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/step31_adapt_features.py" />
     <option name="PARAMETERS" value="--config_path=&quot;config/debug_timedata_omxs30.ini&quot;" />
     <option name="SHOW_COMMAND_LINE" value="true" />

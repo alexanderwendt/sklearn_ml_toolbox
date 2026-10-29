@@ -53,14 +53,14 @@ import json
 import joblib
 import pandas as pd
 import matplotlib.dates as mdates
-import utils.sklearn_utils as model_util
+from ..utils import sklearn_utils as model_util
 from pandas.plotting import register_matplotlib_converters
 import numpy as np
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
-import utils.evaluation_utils as eval
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import evaluation_utils as eval
 
 __author__ = 'Alexander Wendt'
 __copyright__ = 'Copyright 2020, Christian Doppler Laboratory for ' \
@@ -72,7 +72,7 @@ __maintainer__ = 'Alexander Wendt'
 __email__ = 'alexander.wendt@tuwien.ac.at'
 __status__ = 'Experiental'
 
-from filepaths import Paths
+from ..filepaths import Paths
 
 register_matplotlib_converters()
 
@@ -87,7 +87,7 @@ parser.add_argument("-conf", '--config_path', default="config/debug_timedata_omx
 parser.add_argument("-sec", '--config_section', default="Evaluation",
                     help='Configuration section in config file', required=False)
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def visualize_temporal_data(config_path, config_section):

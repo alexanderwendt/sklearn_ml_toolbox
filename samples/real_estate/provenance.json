@@ -1,0 +1,17 @@
+{
+  "repository_url": "https://archive.ics.uci.edu/dataset/477/real+estate+valuation+data+set",
+  "download_url": "https://archive.ics.uci.edu/static/public/477/data.csv",
+  "doi": "10.24432/C5J30W",
+  "creators": [
+    "I-Cheng Yeh"
+  ],
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "retrieved": "2026-10-25",
+  "original_sha256": "0730a5687ec285a3c2f9921a808855bd1bde21fc53e6377561cbdce2dda9cbb1",
+  "csv_sha256": "bd75f2ea01180e5b2aea1fd096610681cbd0e3fa91d1e6df01e6737a9f5fdff5",
+  "rows": 414,
+  "target": "Y house price of unit area",
+  "task": "regression",
+  "note": "Price per unit area, Taiwan. IID benchmark; nearby properties and dates may correlate."
+}

@@ -67,8 +67,8 @@ from sklearn.linear_model import LogisticRegressionCV, RidgeCV
 from sklearn.feature_selection import RFE
 
 # Own modules
-import utils.data_visualization_functions as vis
-import utils.data_handling_support_functions as sup
+from ..utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -97,7 +97,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def predict_features_simple(X, y, problem_type="classification"):
@@ -120,7 +120,7 @@ def predict_features_simple(X, y, problem_type="classification"):
     """
     if problem_type == "classification":
         clf = LogisticRegression(
-            random_state=0, solver="lbfgs", multi_class="multinomial"
+            random_state=0, solver="lbfgs", max_iter=2000
         ).fit(X, y)
     else:
         clf = LinearRegression().fit(X, y)
@@ -206,9 +206,9 @@ def execute_treebased_feature_selection(
 
     print("Tree based feature selection")
     if problem_type == "classification":
-        clf = ExtraTreesClassifier(n_estimators=50)
+        clf = ExtraTreesClassifier(n_estimators=50, random_state=42)
     else:
-        clf = ExtraTreesRegressor(n_estimators=50)
+        clf = ExtraTreesRegressor(n_estimators=50, random_state=42)
     clf = clf.fit(X_scaled, y)
     print(clf.feature_importances_)
     print("Best score: %f" % clf.score(X_scaled, y))
@@ -321,7 +321,7 @@ def execute_recursive_elimination_feature_selection(
 
     print("Recursive elimination")
     if problem_type == "classification":
-        model = LogisticRegressionCV(solver="liblinear", cv=3)
+        model = LogisticRegressionCV(solver="lbfgs", cv=3, max_iter=2000)
     else:
         model = RidgeCV(cv=3)
     print(
@@ -464,7 +464,7 @@ def perform_feature_selection_algorithms(features, y, conf, image_save_directory
     )
     relevantFeatureList.extend(relevant_features)
 
-    step_size = np.round(len(X_scaled.columns) / 4, 0).astype(int)
+    step_size = max(1, int(np.round(len(X_scaled.columns) / 4)))
     for i in range(step_size, len(X_scaled.columns), step_size):
         s = rfe_coef.iloc[0:i].reset_index(drop=True)
         s.name = "RecursiveTop" + str(i)

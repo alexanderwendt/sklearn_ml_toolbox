@@ -60,8 +60,8 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
 # Own modules
-import utils.data_handling_support_functions as sup
-from utils import data_visualization_functions as vis
+from ..utils import data_handling_support_functions as sup
+from ..utils import data_visualization_functions as vis
 
 __author__ = "Alexander Wendt"
 __copyright__ = (
@@ -89,7 +89,7 @@ parser.add_argument(
     required=False,
 )
 
-args = parser.parse_args()
+args = parser.parse_args() if __name__ == "__main__" else None
 
 
 def adapt_features_for_model(
