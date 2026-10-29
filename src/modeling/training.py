@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_selection import SelectPercentile, f_classif, f_regression
-from sklearn.linear_model import LogisticRegression, Ridge
+from sklearn.linear_model import LogisticRegression, Ridge, LinearRegression, Lasso, ElasticNet
 from sklearn.model_selection import KFold, StratifiedKFold, TimeSeriesSplit, RandomizedSearchCV, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC, SVR
@@ -50,6 +50,12 @@ def train_model(train: pd.DataFrame, config: Config) -> dict:
         "knn": ((KNeighborsClassifier if classification else KNeighborsRegressor)(), {"model__n_neighbors": [3, 5, 11], "model__weights": ["uniform", "distance"]}),
         "gnb": (GaussianNB(), {"model__var_smoothing": [1e-9, 1e-7, 1e-5]}),
     }
+    if not classification:
+        candidates.update({
+            'ols': (LinearRegression(), {}),
+            'lasso': (Lasso(max_iter=10000), {'model__alpha': [0.001, 0.01, 0.1, 1.0]}),
+            'elastic_net': (ElasticNet(max_iter=10000), {'model__alpha': [0.001, 0.01, 0.1], 'model__l1_ratio': [0.1, 0.5, 0.9]}),
+        })
     if "xgboost" in config.models:
         from xgboost import XGBClassifier, XGBRegressor
         if classification and list(np.unique(y)) != list(range(y.nunique())):

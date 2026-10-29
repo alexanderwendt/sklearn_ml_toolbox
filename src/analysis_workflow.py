@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 from uuid import uuid4
 
-from .config import load_config
+from .config import load_config, MODEL_NAMES, REGRESSION_MODELS
 from .workflow import prepare_run, train_run, evaluate_run, analyze_run
 from .prediction.inference import predict_csv
 
@@ -38,8 +38,10 @@ def build_tabular_plan(config, models=None, tasks=None):
         candidates = settings.get('training', {}).get('models', ['linear', 'forest'])
         if task not in ('classification', 'regression'):
             raise ValueError(f'{name}: data.task must be classification or regression')
-        if not isinstance(candidates, list) or not candidates or any(m not in ('linear', 'forest', 'svm', 'svm_linear', 'knn', 'gnb', 'xgboost') for m in candidates):
+        if not isinstance(candidates, list) or not candidates or any(m not in MODEL_NAMES for m in candidates):
             raise ValueError(f'{name}: invalid training.models')
+        if task == 'classification' and set(candidates).intersection(REGRESSION_MODELS):
+            raise ValueError('ols, lasso and elastic_net only support regression')
         if task == 'regression' and 'gnb' in candidates:
             raise ValueError('gnb only supports classification; select --tasks classification or different models')
         stages = ['prepare']

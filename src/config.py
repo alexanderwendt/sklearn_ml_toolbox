@@ -4,6 +4,8 @@ from pathlib import Path
 import tomllib
 
 ANALYSIS_METHODS = ('pca', 'tsne', 'umap', 'lasso', 'tree', 'recursive', 'backward', 'correlation')
+REGRESSION_MODELS = ('ols', 'lasso', 'elastic_net')
+MODEL_NAMES = ('linear', 'forest', 'svm', 'svm_linear', 'knn', 'gnb', 'xgboost', *REGRESSION_MODELS)
 
 
 @dataclass(frozen=True)
@@ -66,8 +68,10 @@ def load_config(path: Path) -> Config:
         if type(value) is not int or value < minimum:
             raise ValueError(f"training.{key} must be an integer >= {minimum}")
     models = training.get("models", ["linear", "forest"])
-    if not isinstance(models, list) or not models or any(m not in ("linear", "forest", "svm", "svm_linear", "knn", "gnb", "xgboost") for m in models):
-        raise ValueError("training.models must contain linear, forest, svm, svm_linear, knn, gnb or xgboost")
+    if not isinstance(models, list) or not models or any(m not in MODEL_NAMES for m in models):
+        raise ValueError(f"training.models must contain names from {MODEL_NAMES}")
+    if data['task'] == 'classification' and set(models).intersection(REGRESSION_MODELS):
+        raise ValueError('ols, lasso and elastic_net only support regression')
     if data["task"] != "classification" and "gnb" in models:
         raise ValueError("gnb only supports classification")
     drop = data.get("drop", [])

@@ -156,3 +156,9 @@ Classification and regression metrics are different quantities, not a common ran
 Original CSV supplied with this repository; its redistribution license has not
 been independently established. Raw data is preserved. External copies under
 `../sklearn_ml_toolbox_samples/grades` are not modified or synchronized automatically.
+# Separate task datasets
+
+The current task-specific entry points are `../grades_class/run.py` (GradeClass,
+without GPA) and `../grade_reg/run.py` (GPA, without GradeClass). Each generates
+its own CSV and keeps independent runs and reports. This directory retains the
+original source CSV and earlier combined workflow/results.

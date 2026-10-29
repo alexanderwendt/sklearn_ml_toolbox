@@ -1,0 +1,29 @@
+[workflow]
+version = 1
+engine = "tabular"
+output = "_reruns"
+inputs = ["data_raw/grades_class.csv"]
+code = ["steps"]
+
+[defaults.data]
+path = "data_raw/grades_class.csv"
+prepare = "builtin:grades"
+
+[defaults.split]
+strategy = "random"
+test_size = 0.2
+
+[defaults.training]
+seed = 42
+models = ["svm", "xgboost", "svm_linear", "knn", "gnb"]
+folds = 5
+search_iterations = 10
+
+[defaults.analysis]
+methods = ["pca", "tsne", "umap", "lasso", "tree", "recursive", "backward", "correlation"]
+max_samples = 1000
+
+[profiles.classification.data]
+task = "classification"
+target = "GradeClass"
+drop = ["StudentID", "GPA"]
