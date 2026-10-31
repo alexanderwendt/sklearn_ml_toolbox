@@ -1,7 +1,7 @@
 # Student GPA regression
 
 Predict GPA from student characteristics. GradeClass and StudentID are removed
-by `steps/data_generation/generate_dataset.py`, producing `data_raw/grades.csv`.
+by `steps/data_generation/generate_dataset.py`, producing `_old/grades.csv`.
 ParentalSupport and ParentalEducation are numeric ordered scores; Ethnicity is
 categorical. A regression target can still have categorical predictors.
 
@@ -10,14 +10,26 @@ categorical. A regression target can still have categorical predictors.
 From the repository root:
 
 ```powershell
-python scripts/download_grades.py
 python samples/grades/run.py
 ```
 
+Or run `python run.py` from this directory. The toolbox and the workflow's
+optional dependencies must be installed in your Python environment.
+
+`run.py` downloads the source if missing, automatically prepares `_old/grades.csv`,
+and launches the workflow. Existing source files are reused. Resuming a run uses
+its saved workspace without downloading or preparing data again.
+
 Source: [Rabie El Kharoua's Students Performance Dataset on Kaggle](https://www.kaggle.com/datasets/rabieelkharoua/students-performance-dataset).
-The downloader saves the original CSV as `data_raw/Student_performance_data.csv`
+The downloader saves the original CSV as `_old/Student_performance_data.csv`
 and records its download URL, timestamp and SHA-256 in `source_metadata.json`.
 Existing source files are preserved unless `--overwrite` is supplied.
+
+To download or refresh the source separately:
+
+```powershell
+python samples/grades/download_grades.py --overwrite
+```
 
 Models: OLS, Ridge (`linear`), Lasso, Elastic Net, random forest, RBF/linear SVR,
 KNN and XGBoost, plus a dummy baseline. Selection uses training cross-validation

@@ -1,0 +1,27 @@
+[workflow]
+version = 1
+engine = "tabular"
+output = "_reruns"
+inputs = ["data_raw/data.csv", "data_raw/preparation_metadata.json"]
+code = ["download_data.py", "run.py"]
+
+[defaults.data]
+path = "data_raw/data.csv"
+
+[defaults.split]
+strategy = "random"
+test_size = 0.2
+
+[defaults.training]
+seed = 42
+models = ["linear", "forest"]
+folds = 3
+search_iterations = 3
+
+[defaults.analysis]
+methods = ["pca", "tree", "correlation"]
+max_samples = 1000
+
+[profiles.regression.data]
+task = "regression"
+target = "price"
