@@ -15,8 +15,17 @@ ROOT = Path(__file__).resolve().parents[2]
 def test_generated_dataset_preserves_target_and_removes_leakage(tmp_path):
     dataset, target, excluded = 'grades', 'GPA', 'GradeClass'
     generate = runpy.run_path(str(ROOT / 'samples' / dataset / 'steps/data_generation/generate_dataset.py'))['generate']
-    source = ROOT / 'samples/grades/data_raw/Student_performance_data.csv'
-    original = pd.read_csv(source)
+    source = tmp_path / 'Student_performance_data.csv'
+    original = pd.DataFrame({
+        'StudentID': [1001, 1002, 1003, 1004],
+        'GPA': [3.5, 2.75, 1.25, 4.0],
+        'GradeClass': [0, 2, 4, 0],
+        'ParentalSupport': [0, 1, 3, 4],
+        'ParentalEducation': [1, 2, 3, 4],
+        'Ethnicity': [0, 1, 2, 3],
+        'Absences': [0, 5, 12, 1],
+    })
+    original.to_csv(source, index=False)
     result = pd.read_csv(generate(source, tmp_path / 'data.csv'))
     pd.testing.assert_series_equal(result[target], original[target])
     assert excluded not in result and 'StudentID' not in result
