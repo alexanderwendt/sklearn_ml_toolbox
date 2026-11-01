@@ -33,3 +33,23 @@ Results: `_reruns/<run>/workspace/results/report.html`. Options: `--models linea
 compared using training cross-validation macro F1. The 20% holdout and CV folds
 are stratified. PCA, tree importance and correlations use training rows only;
 imputation, encoding and scaling are fitted inside training folds.
+
+## Interpretation of the saved analysis
+
+Evidence: `_reruns/20261031T115228Z_a8239ca0/workspace/results/classification/`
+(`metrics.json`, `manifest.json`, and `analysis/`). The recorded model is **logistic
+regression only**, compared with a dummy baseline. On 200 holdout applicants,
+accuracy is **78.0%** versus baseline **70.0%**, macro F1 **0.721** versus **0.412**,
+and ROC AUC **0.804**.
+
+Bad-risk recall is **0.533** and precision **0.667**: 32 of 60 bad risks are detected,
+while 28 are missed. This is materially better than predicting everyone as good,
+but the default decision rule does not optimize the original 5:1 error cost.
+The small holdout also makes individual errors consequential.
+
+The largest diagnostic-tree importance is checking-account category `A14`
+(`Attribute1`, no checking account: **7.3%**), followed by loan duration and amount
+(**6.1%**, **5.7%**). This suggests account status and loan exposure carry signal;
+importance alone does not say which direction a category changes risk. The first
+two PCA components explain just **13.4%**, so a simple 2D separation should not be
+expected. These historical associations are not causal or a validated lending rule.

@@ -150,3 +150,18 @@ dmypy.json
 /.python/
 /.run/
 /*/*/_reruns/
+
+# Reproducible sample downloads and preparation outputs (keep OMX source inputs).
+/samples/*/data_raw/original.csv
+/samples/*/data_raw/data.csv
+/samples/*/data_raw/download_metadata.json
+/samples/*/data_raw/preparation_metadata.json
+/samples/grades/data_raw/Student_performance_data.csv
+/samples/grades/data_raw/grades.csv
+/samples/grades/data_raw/source_metadata.json
+/samples/*/data_prepared/
+/samples/*/prepared-data/
+/samples/*/results/
+/samples/*/models/
+/samples/*/logs/
+/samples/*/_reruns/

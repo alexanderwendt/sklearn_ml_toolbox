@@ -35,3 +35,25 @@ Results: `_reruns/<run>/workspace/results/report.html`. Options: `--models linea
 compared using training cross-validation macro F1. The 20% holdout and CV folds
 are stratified. PCA, tree importance and correlations use training rows only;
 imputation, encoding and scaling are fitted inside training folds.
+
+## Interpretation of the saved analysis
+
+Evidence: `_reruns/20261031T115141Z_c1822de8/workspace/results/classification/`
+(`metrics.json`, `manifest.json`, and `analysis/`). This run evaluated **logistic
+regression only**, plus a dummy baseline. Defaults comprise **22.1%** of the source.
+Holdout accuracy is **81.7%** versus majority-baseline **77.9%**, macro F1 **0.675**
+versus **0.438**, and balanced accuracy **0.650**.
+
+Default precision **0.661** and recall **0.352** show that roughly two thirds of
+actual defaults are missed at the default decision rule. ROC AUC **0.758** and
+default average precision **0.528** show ranking value, but do not imply that
+accuracy alone is sufficient for choosing a lending threshold.
+
+The strongest individual diagnostic-tree feature is `X6=2` (September repayment
+status: two-month delay, **6.5%** importance), followed by age `X5` and credit limit
+`X1` (about **5.4%** and **5.3%**). Bills and payments distribute signal across many
+related variables and months; a one-hot feature's importance is not the total
+importance of its original variable. PCA's first two components explain **20.9%**
+of transformed variance. Repayment history is informative, but substantial overlap
+between classes remains. This historical Taiwanese cohort does not establish
+performance on a new population or future economic period.

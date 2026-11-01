@@ -33,3 +33,25 @@ Results: `_reruns/<run>/workspace/results/report.html`. Options: `--models linea
 compared using training cross-validation macro F1. The 20% holdout and CV folds
 are stratified. PCA, tree importance and correlations use training rows only;
 imputation, encoding and scaling are fitted inside training folds.
+
+## Interpretation of the saved analysis
+
+Evidence: `_reruns/20261031T115047Z_cc590ac6/workspace/results/classification/`
+(`metrics.json`, `manifest.json`, and `analysis/`). This was a **logistic-regression
+only** run plus the dummy baseline, not a comparison of all default models.
+Subscribers are only **11.7%** of the source. Holdout accuracy **89.3%** is only
+slightly above the majority baseline **88.3%**; macro F1 (**0.612** versus **0.469**)
+and balanced accuracy (**0.584**) are more informative.
+
+Subscriber precision is **0.662**, but recall is only **0.180**: most subscribers
+are missed at the model's default decision rule. ROC AUC **0.772** and subscriber
+average precision **0.411** indicate useful ranking signal despite weak recall.
+Any contact-budget threshold should be chosen on training/validation data.
+
+The diagnostic tree ranks the source field `day_of_week`, age, balance and campaign
+count highest (roughly **10.7%, 10.5%, 10.4%, 7.9%**); previous campaign success is
+also prominent. Numeric tree importance can favor variables with many split points,
+so these are diagnostic associations, not proof of marketing effects. The first
+two PCA components explain only **13.1%**, making a 2D projection incomplete.
+Duration is deliberately excluded: using post-call information would answer a
+different question. The random split does not demonstrate future-campaign accuracy.

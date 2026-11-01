@@ -433,6 +433,7 @@ def plot_parallel_coordinates(
     }
 
     fig, axes = plt.subplots(1, len(x) - 1, sharey=False, figsize=(15, 5))
+    axes = np.atleast_1d(axes)
 
     min_max_range = {}
     for col in cols:

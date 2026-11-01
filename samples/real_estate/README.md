@@ -32,3 +32,22 @@ Results: `_reruns/<run>/workspace/results/report.html`. Options: `--models linea
 training cross-validation RMSE and a held-out 20% test set. PCA, tree importance
 and correlations use training rows only; imputation, encoding and scaling are
 fitted inside training folds.
+
+## Interpretation of the saved analysis
+
+Evidence: `_reruns/20261031T115316Z_2f502eeb/workspace/results/regression/`
+(`metrics.json`, `manifest.json`, `train.csv`, and `analysis/`). The recorded run
+used **Ridge only**, plus a dummy baseline. Holdout RMSE is **7.286**, MAE **5.295**
+(10,000 NTD per ping), and R² **0.684**, versus dummy RMSE **13.114**.
+
+Distance to the nearest MRT station has a strong negative training correlation
+with price (**−0.657**); convenience-store count and latitude correlate positively
+(**0.554**, **0.531**). MRT distance leads diagnostic-tree importance (**33.3%**),
+followed by latitude (**17.4%**) and store count (**16.5%**). Accessibility and
+location are central to this local market, but correlated location variables do
+not establish a causal price premium for adding a store or station.
+
+The first two PCA components explain **61.2%** of transformed variance, reflecting
+substantial shared geographic structure. The 83-row random holdout still leaves
+meaningful price error. Nearby transactions and dates can resemble training rows;
+these results do not measure extrapolation to new districts or later market cycles.

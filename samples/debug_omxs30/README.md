@@ -172,3 +172,36 @@ between training runs; the comparison records those differences.
 The November 2022 baseline is preserved at `_old_reruns`.
 The older `_old_data` archive was moved to `_old_reruns`.
 Duplicate root-level outputs and superseded partial verification attempts were removed.
+
+## Interpretation of the available data
+
+No completed `_reruns/` analysis is present in this checkout. The following figures
+are descriptive calculations from the two supplied `data_raw/*.csv` files, not
+model scores or a reproduced trading backtest. Both contain complete daily OHLC
+records with no missing cells.
+
+The training file has **956 sessions**, 2015-12-30 through 2019-10-16. Close rises
+from **1,446.82** to **1,677.19** (**15.9%**), with maximum close-to-close drawdown
+**17.5%** and daily percentage-return sample standard deviation **1.00%**.
+The 2020 inference file has **251 sessions**, January 2 through December 29.
+Despite a **4.7%** first-to-last close increase, its maximum drawdown is **32.0%**
+and daily volatility **1.79%**. Drawdown here means `min(Close / cummax(Close) - 1)`;
+returns exclude dividends, fees and any preceding session outside the files.
+
+Thus a modest positive endpoint return hides a substantially more volatile 2020
+path. Performance learned in the earlier regime may not transfer. Trend labels
+describe a constructed market state rather than realized strategy profit; evaluate
+them chronologically, and distinguish classification metrics from trading returns.
+The overlapping price-derived indicators also share information, so a large feature
+count is not evidence of many independent signals. No predictive or profitability
+claim can be made from these descriptive statistics alone.
+
+To regenerate raw features, outcomes and aligned dimensions in an isolated run:
+
+```powershell
+python scripts/prepare_samples.py debug_omxs30  # from repository root
+```
+
+This stops at `prepare.dimensions`; use `python run.py --until prepare.split` from
+this directory for the full legacy preparation, including analysis and selection.
+The supplied OHLC inputs remain versioned because this sample has no downloader.

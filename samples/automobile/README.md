@@ -32,3 +32,23 @@ for a smaller run, `--dry-run` to inspect steps, or `--resume <run-folder>` to r
 Defaults compare Ridge and random forest with training-only cross-validation and
 a held-out 20% test set. PCA, tree importance and correlations use training rows;
 encoding, scaling and imputation are fitted inside training folds.
+
+## Interpretation of the saved analysis
+
+Evidence: `_reruns/20261031T114929Z_9ed32282/workspace/results/regression/`
+(`metrics.json`, `manifest.json`, `train.csv`, and `analysis/`). This run used
+**Ridge only**, plus the dummy baseline; it is not a comparison with the current
+random-forest default. Holdout RMSE was **4,295**, MAE **2,903** in source price
+units, and R² **0.849**, versus dummy RMSE **11,489**.
+
+Engine size, curb weight and horsepower have strong positive training correlations
+with price (**0.870**, **0.835**, **0.803**). They also lead diagnostic tree importance
+(**20.7%**, **15.5%**, **11.1%**): larger, heavier and more powerful cars tend to cost
+more in this sample. These correlated specifications share information, so their
+individual importances should not be read as independent causal effects.
+
+The first two PCA components capture **26.8%** of transformed predictor variance;
+two-dimensional plots omit much of the mixed numeric/categorical structure.
+Only 201 labeled vehicles and a 41-row holdout underpin the reported accuracy.
+The gap between MAE and RMSE indicates some much larger errors, so this is a useful
+historical pricing benchmark rather than a precise estimate for every vehicle.

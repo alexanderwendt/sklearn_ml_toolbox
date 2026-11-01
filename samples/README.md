@@ -47,3 +47,33 @@ after preparation; `run.py` uses `workflow.toml` for isolated, resumable executi
 
 See the separate instructions in `grades/README.md` and `debug_omxs30/README.md`
 for those workflows.
+
+## Regenerate prepared data without training
+
+From the repository root, choose one or more datasets:
+
+```powershell
+python scripts/prepare_samples.py grades
+python scripts/prepare_samples.py automobile bank_marketing credit_default german_credit real_estate
+python scripts/prepare_samples.py grades --dry-run
+```
+
+The script uses each sample's existing runner and stops after its preparation
+stage. For the six tabular samples, `_reruns/<run>/workspace/results/<task>/`
+contains `prepared.csv`, `train.csv`, `holdout.csv`, `split.joblib` and provenance.
+Continue from the dataset directory with `python run.py --resume _reruns/<run>`.
+Preprocessing that learns parameters is fitted later inside training folds.
+`debug_omxs30` is also accepted; its legacy generation stops at
+`prepare.dimensions` and writes under the run's `workspace/prepared-data/`.
+
+Downloaded CSVs, generated download/preparation metadata, legacy prepared outputs,
+models, results and `_reruns/` are ignored by Git. Scripts, configs, source
+definitions (`source_metadata.json` at each UCI sample root), historical provenance,
+and the non-downloadable OMX source CSVs remain versioned. Local generated files
+can be recreated; ignoring them does not delete existing copies.
+
+Each dataset README interprets the available analysis and names the evidence run.
+The five UCI scores come from linear-only runs, whereas grades compared nine
+models. Saved run artifacts are local and ignored; rerun a sample to create a new
+report. Feature importance is diagnostic association, not a causal effect, and
+results from these different tasks should not be ranked against each other.
