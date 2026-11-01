@@ -22,7 +22,7 @@ def visualize_random_search_results(random_search, refit_scorer_name, xlim=None,
                     c=cols,
                     alpha=0.5,
                     edgecolors='none',
-                    cmap=plt.cm.bone)
+                    cmap='bone')
     #ax.pcolormesh(x, y, cols, cmap=plt.cm.BuGn_r)
 
     ax.set_yscale('log')

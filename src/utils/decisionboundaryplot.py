@@ -247,7 +247,7 @@ class DBPlot(BaseEstimator):
         retries = 0
         while i < self.n_interpolated_keypoints:
             if self.verbose:
-                print("Step 3/{}:{}/".format(self.steps, i, self.n_interpolated_keypoints))
+                print(f"Step 3/{self.steps}:{i}/{self.n_interpolated_keypoints}")
             if self.random_gap_selection:
                 # randomly sample from sorted DB keypoint gaps?
                 gap_idx = np.random.choice(len(gap_probability_scores),
@@ -703,7 +703,7 @@ class DBPlot(BaseEstimator):
                 return error
             except Exception as ex:
                 print("Error in objective function:", ex)
-                return np.infty
+                return np.inf
 
         optimizer = self._get_optimizer(
             D = self.X.shape[1] - 1, upper_bound = 2 * np.pi, iteration_budget = self.hypersphere_iteration_budget)
@@ -719,7 +719,13 @@ class DBPlot(BaseEstimator):
         if iteration_budget == None:
             iteration_budget = self.linear_iteration_budget
 
-        import nlopt
+        try:
+            import nlopt
+        except ImportError as exc:
+            raise ImportError(
+                "Decision-boundary optimization requires an NLopt installation "
+                "compatible with your Python version and platform."
+            ) from exc
         opt = nlopt.opt(nlopt.GN_DIRECT_L_RAND, D)
         # opt.set_stopval(self.acceptance_threshold/10.0)
         opt.set_ftol_rel(1e-5)

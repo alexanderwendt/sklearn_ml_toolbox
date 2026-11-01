@@ -232,7 +232,7 @@ def paintHistogram(df, colName):
 
 def plotBinaryValues(df_dig, cols):
     #Plot binary values including NaN
-    figlen = np.int(len(cols)/2)+1
+    figlen = int(len(cols)/2)+1
     
     fig = plt.figure(figsize=(8, figlen))
 
@@ -261,7 +261,7 @@ def plotBinaryValues(df_dig, cols):
     
     return fig
 	
-def plot_confusion_matrix_multiclass(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
+def plot_confusion_matrix_multiclass(cm, classes, normalize=False, title='Confusion matrix', cmap='Blues'):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -332,7 +332,7 @@ def plot_residuals(y_true, y_pred, title='Residuals', save_fig_prefix=None):
     plt.close()
 
 def plot_confusion_matrix(y_true, y_pred, classes,
- normalize=False, title=None, cmap=plt.cm.Blues):
+ normalize=False, title=None, cmap='Blues'):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -556,7 +556,7 @@ def plot_heatmap_xy(scores, parameters, xlabel, ylabel, title, normalizeScale=Fa
     # ax=axs[0]
 
     # ax=plt.gca()
-    colorMap = plt.cm.bone  # plt.cm.gist_gray #plt.cm.hot
+    colorMap = plt.get_cmap('bone')
 
     if normalizeScale == True:
         im1 = plt.imshow(scores, interpolation='catrom', cmap=colorMap, vmin=0, vmax=1)
@@ -568,7 +568,7 @@ def plot_heatmap_xy(scores, parameters, xlabel, ylabel, title, normalizeScale=Fa
 
     # contours = plt.contour(scores, 10, colors='black')
     # contours = plt.contour(scores, 10, colors='black')
-    contours = ax.contourf(scores, levels=levels, cmap=plt.cm.bone)
+    contours = ax.contourf(scores, levels=levels, cmap='bone')
 
     ax.contour(scores, levels=levels, colors='k', linestyles='solid', alpha=1, linewidths=.5, antialiased=True)
 

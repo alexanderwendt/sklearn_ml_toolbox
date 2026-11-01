@@ -159,7 +159,7 @@ def load_input(conf):
 
     print("Load metrics")
     metrics = Metrics(conf)
-    paths = Paths(conf).path
+    paths = Paths(conf).paths
     scorers = metrics.scorers
     refit_scorer_name = metrics.refit_scorer_name
 

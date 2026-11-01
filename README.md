@@ -142,7 +142,27 @@ Postprocessing thresholds numeric `predicted` into `signal`. Backtest needs `Clo
 
 ```bash
 python -m pytest --cov=src
+python -m pylint src scripts samples --recursive=y --errors-only
+python -m pip check
 python -m build
 ```
+
+Pylint is included in the `test` extra. Configure the IDE interpreter and Pylint
+executable to use `.venv` (Python 3.15.1+), rather than an older system or Conda
+environment. Generated `_reruns` snapshots are excluded from linting. Omit
+`--errors-only` to also see the existing style and refactoring diagnostics.
+
+To refresh all declared libraries to compatible releases and record the result:
+
+```bash
+uv pip compile pyproject.toml --all-extras --python .venv/Scripts/python.exe --upgrade --output-file requirements-lock.txt
+uv pip install --python .venv/Scripts/python.exe -r requirements-lock.txt
+uv pip install --python .venv/Scripts/python.exe -e . --no-deps
+```
+
+Use `.venv/bin/python` on Linux/macOS. The lock records the Windows environment;
+rerun the tests and `pip check` after refreshing it. The historical decision-boundary
+optimizer additionally requires a working NLopt build for the selected Python and
+platform; it is not a dependency of the normal workflows.
 
 [Migration guide](docs/migration.md) · [Capability inventory](docs/capabilities.md) · [Verification evidence](docs/verification.md)

@@ -61,12 +61,6 @@ from .metrics import Metrics
 from ..filepaths import Paths
 
 
-def load_labels(config):
-    '''
-
-    '''
-
-
 def create_feature_dict(df_feature_columns, df_X):
     '''
     Create a dictionary of feature selection names and the column numbers.
@@ -353,14 +347,12 @@ def get_top_median_method(method_name, model_results, refit_scorer_name, top_sha
     print(model_results.loc[indexList].round(3))
 
     # number of results to consider
-    number_results = np.int(model_results.shape[0] * top_share)
+    number_results = int(model_results.shape[0] * top_share)
     print("The top 10% of the results are used, i.e {} samples".format(number_results))
     hist_label = model_results['param_' + method_name][0:number_results]  # .apply(str).apply(lambda x: x[:20])
     source = hist_label.value_counts() / number_results  #
 
-    import data_visualization_functions as vis
-
-    median_values = vis.get_median_values_from_distributions(method_name, merged_params_of_model_results[method_name],
+    median_values = sup.get_median_values_from_distributions(method_name, merged_params_of_model_results[method_name],
                                                              model_results, refit_scorer_name)
 
     return median_values, source
