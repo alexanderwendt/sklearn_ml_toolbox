@@ -177,7 +177,7 @@ threadpoolctl==3.7.0
     #   scikit-learn
 tomlkit==0.15.2
     # via pylint
-tornado==6.6
+tornado==6.6.1
     # via bokeh
 tqdm==4.70.1
     # via umap-learn
